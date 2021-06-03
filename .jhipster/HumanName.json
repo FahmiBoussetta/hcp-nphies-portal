@@ -1,0 +1,40 @@
+{
+  "name": "HumanName",
+  "fields": [
+    {
+      "fieldName": "family",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "givens",
+      "otherEntityRelationshipName": "human",
+      "relationshipName": "given"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "patient",
+      "otherEntityRelationshipName": "names",
+      "relationshipName": "patient"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "practitioner",
+      "otherEntityRelationshipName": "names",
+      "relationshipName": "practitioner"
+    }
+  ],
+  "entityTableName": "human_name",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073852"
+}

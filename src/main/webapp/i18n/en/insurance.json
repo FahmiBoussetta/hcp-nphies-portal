@@ -1,0 +1,29 @@
+{
+  "hcpNphiesPortalApp": {
+    "insurance": {
+      "home": {
+        "title": "Insurances",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Insurance",
+        "createOrEditLabel": "Create or edit a Insurance",
+        "notFound": "No Insurances found"
+      },
+      "created": "A new Insurance is created with identifier {{ param }}",
+      "updated": "A Insurance is updated with identifier {{ param }}",
+      "deleted": "A Insurance is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Insurance {{ id }}?"
+      },
+      "detail": {
+        "title": "Insurance"
+      },
+      "id": "ID",
+      "sequence": "Sequence",
+      "focal": "Focal",
+      "preAuthRef": "Pre Auth Ref",
+      "coverage": "Coverage",
+      "claimResponse": "Claim Response",
+      "claim": "Claim"
+    }
+  }
+}

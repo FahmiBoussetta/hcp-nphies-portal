@@ -1,0 +1,10 @@
+{
+  "hcpNphiesPortalApp": {
+    "Use": {
+      "null": "",
+      "Claim": "claim",
+      "PreAuthorization": "preauthorization",
+      "Predetermination": "predetermination"
+    }
+  }
+}

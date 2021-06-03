@@ -1,0 +1,28 @@
+{
+  "hcpNphiesPortalApp": {
+    "costToBeneficiaryComponent": {
+      "home": {
+        "title": "Cost To Beneficiary Components",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Cost To Beneficiary Component",
+        "createOrEditLabel": "Create or edit a Cost To Beneficiary Component",
+        "notFound": "No Cost To Beneficiary Components found"
+      },
+      "created": "A new Cost To Beneficiary Component is created with identifier {{ param }}",
+      "updated": "A Cost To Beneficiary Component is updated with identifier {{ param }}",
+      "deleted": "A Cost To Beneficiary Component is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Cost To Beneficiary Component {{ id }}?"
+      },
+      "detail": {
+        "title": "Cost To Beneficiary Component"
+      },
+      "id": "ID",
+      "type": "Type",
+      "isMoney": "Is Money",
+      "value": "Value",
+      "exceptions": "Exceptions",
+      "coverage": "Coverage"
+    }
+  }
+}

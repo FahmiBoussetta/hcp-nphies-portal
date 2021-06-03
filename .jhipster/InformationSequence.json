@@ -1,0 +1,27 @@
+{
+  "name": "InformationSequence",
+  "fields": [
+    {
+      "fieldName": "infSeq",
+      "fieldType": "Integer"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "item",
+      "otherEntityRelationshipName": "informationSequence",
+      "relationshipName": "item"
+    }
+  ],
+  "entityTableName": "information_sequence",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073807"
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity CovEliErrorMessages.
+    -->
+    <changeSet id="20210603073802-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="coverage_eligibility_request_id"
+                                 baseTableName="cov_eli_error_messages"
+                                 constraintName="fk_cov_eli_error_messages__coverage_eligibility_request_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="coverage_eligibility_request"/>
+    </changeSet>
+</databaseChangeLog>

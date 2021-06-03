@@ -1,0 +1,35 @@
+{
+  "name": "OperationOutcome",
+  "fields": [
+    {
+      "fieldName": "value",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "system",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "parsed",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "opeOutErrorMessages",
+      "otherEntityRelationshipName": "operationOutcome",
+      "relationshipName": "errors"
+    }
+  ],
+  "entityTableName": "operation_outcome",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073854"
+}

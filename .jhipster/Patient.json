@@ -1,0 +1,84 @@
+{
+  "name": "Patient",
+  "fields": [
+    {
+      "fieldName": "guid",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "forceId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "residentNumber",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "passportNumber",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "nationalHealthId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "iqama",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "religion",
+      "fieldType": "ReligionEnum",
+      "fieldValues": "N0 (Other),N1 (Muslim),N2 (Christian),N3 (Judaism),N4 (Buddhism),N5 (Zoroastrian),N7 (Hinduism),N8 (Sikh),N9 (Without),N98 (Not available),N99 (Not Mentioned)"
+    },
+    {
+      "fieldName": "gender",
+      "fieldType": "AdministrativeGenderEnum",
+      "fieldValues": "Male (Male),Female (Female),Unknown (Unknown),U (Undetermined),N (Undifferentiated),A (Sex changed to Male),B (Sex changed to female ),C (Not Completed)"
+    },
+    {
+      "fieldName": "birthDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "deceasedDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "maritalStatus",
+      "fieldType": "MaritalStatusEnum",
+      "fieldValues": "L (Legally separated),D (Divorced),M (Married),U (Unmarried),W (Widowed),UNK (Unknown)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "contact",
+      "otherEntityRelationshipName": "patient",
+      "relationshipName": "contacts",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "address",
+      "otherEntityRelationshipName": "patient",
+      "relationshipName": "address",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "humanName",
+      "otherEntityRelationshipName": "patient",
+      "relationshipName": "names"
+    }
+  ],
+  "entityTableName": "patient",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073856"
+}

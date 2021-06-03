@@ -1,0 +1,146 @@
+{
+  "name": "Item",
+  "fields": [
+    {
+      "fieldName": "sequence",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "isPackage",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "tax",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "payerShare",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "patientShare",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "careTeamSequence",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "transportationSRCA",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "imaging",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "laboratory",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "medicalDevice",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "oralHealthIP",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "oralHealthOP",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "procedure",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "services",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "medicationCode",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "servicedDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "servicedDateStart",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "servicedDateEnd",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "quantity",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "unitPrice",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "factor",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "bodySite",
+      "fieldType": "BodySiteEnum",
+      "fieldValues": "E1 (Upper left eyelid),E2 (Lower left eyelid),E3 (Upper right eyelid),E4 (Lower right eyelid),F1 (Left hand second digit),F2 (Left hand third digit),F3 (Left hand fourth digit),F4 (Left hand fifth digit),F5 (Right hand thumb),F6 (Right hand second digit),F7 (Right hand third digit),F8 (Right hand fourth digit),F9 (Right hand fifth digit),FA (Left hand thumb),LC (Left circumflex coronary artery),LD (Left anterior descending coronary artery),LM (Left main coronary artery),LT (Left side (used to identify procedures performed on the left side of the body)),RC (Right coronary artery),RI (Ramus intermedius coronary artery),RT (Right side (used to identify procedures performed on the right side of the body)),T1 (Left foot second digit),T2 (Left foot third digit),T3 (Left foot fourth digit),T4 (Left foot fifth digit),T5 (Right foot great toe),T6 (Right foot second digit),T7 (Right foot third digit),T8 (Right foot fourth digit),T9 (Right foot fifth digit),TA (Left foot great toe)"
+    },
+    {
+      "fieldName": "subSite",
+      "fieldType": "SubSiteEnum",
+      "fieldValues": "R (Right),L (Left),U (Upper),D (Down),A (Anterior),P (Posterior),I (interior),E (Exterior)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "diagnosisSequence",
+      "otherEntityRelationshipName": "item",
+      "relationshipName": "diagnosisSequence"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "informationSequence",
+      "otherEntityRelationshipName": "item",
+      "relationshipName": "informationSequence"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "referenceIdentifier",
+      "otherEntityRelationshipName": "item",
+      "relationshipName": "udi"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "detailItem",
+      "otherEntityRelationshipName": "item",
+      "relationshipName": "details"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "claim",
+      "otherEntityRelationshipName": "items",
+      "relationshipName": "claim"
+    }
+  ],
+  "entityTableName": "item",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073826"
+}

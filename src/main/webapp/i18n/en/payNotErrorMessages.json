@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "payNotErrorMessages": {
+      "home": {
+        "title": "Pay Not Error Messages",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Pay Not Error Messages",
+        "createOrEditLabel": "Create or edit a Pay Not Error Messages",
+        "notFound": "No Pay Not Error Messages found"
+      },
+      "created": "A new Pay Not Error Messages is created with identifier {{ param }}",
+      "updated": "A Pay Not Error Messages is updated with identifier {{ param }}",
+      "deleted": "A Pay Not Error Messages is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Pay Not Error Messages {{ id }}?"
+      },
+      "detail": {
+        "title": "Pay Not Error Messages"
+      },
+      "id": "ID",
+      "message": "Message",
+      "paymentNotice": "Payment Notice"
+    }
+  }
+}

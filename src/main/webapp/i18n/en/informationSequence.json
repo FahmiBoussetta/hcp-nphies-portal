@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "informationSequence": {
+      "home": {
+        "title": "Information Sequences",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Information Sequence",
+        "createOrEditLabel": "Create or edit a Information Sequence",
+        "notFound": "No Information Sequences found"
+      },
+      "created": "A new Information Sequence is created with identifier {{ param }}",
+      "updated": "A Information Sequence is updated with identifier {{ param }}",
+      "deleted": "A Information Sequence is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Information Sequence {{ id }}?"
+      },
+      "detail": {
+        "title": "Information Sequence"
+      },
+      "id": "ID",
+      "infSeq": "Inf Seq",
+      "item": "Item"
+    }
+  }
+}

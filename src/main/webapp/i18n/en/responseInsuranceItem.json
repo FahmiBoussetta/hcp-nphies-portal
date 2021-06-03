@@ -1,0 +1,32 @@
+{
+  "hcpNphiesPortalApp": {
+    "responseInsuranceItem": {
+      "home": {
+        "title": "Response Insurance Items",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Response Insurance Item",
+        "createOrEditLabel": "Create or edit a Response Insurance Item",
+        "notFound": "No Response Insurance Items found"
+      },
+      "created": "A new Response Insurance Item is created with identifier {{ param }}",
+      "updated": "A Response Insurance Item is updated with identifier {{ param }}",
+      "deleted": "A Response Insurance Item is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Response Insurance Item {{ id }}?"
+      },
+      "detail": {
+        "title": "Response Insurance Item"
+      },
+      "id": "ID",
+      "category": "Category",
+      "excluded": "Excluded",
+      "name": "Name",
+      "description": "Description",
+      "network": "Network",
+      "unit": "Unit",
+      "term": "Term",
+      "benefit": "Benefit",
+      "responseInsurance": "Response Insurance"
+    }
+  }
+}

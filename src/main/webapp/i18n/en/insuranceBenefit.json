@@ -1,0 +1,26 @@
+{
+  "hcpNphiesPortalApp": {
+    "insuranceBenefit": {
+      "home": {
+        "title": "Insurance Benefits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Insurance Benefit",
+        "createOrEditLabel": "Create or edit a Insurance Benefit",
+        "notFound": "No Insurance Benefits found"
+      },
+      "created": "A new Insurance Benefit is created with identifier {{ param }}",
+      "updated": "A Insurance Benefit is updated with identifier {{ param }}",
+      "deleted": "A Insurance Benefit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Insurance Benefit {{ id }}?"
+      },
+      "detail": {
+        "title": "Insurance Benefit"
+      },
+      "id": "ID",
+      "allowed": "Allowed",
+      "used": "Used",
+      "responseInsuranceItem": "Response Insurance Item"
+    }
+  }
+}

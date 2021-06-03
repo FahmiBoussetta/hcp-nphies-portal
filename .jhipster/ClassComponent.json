@@ -1,0 +1,38 @@
+{
+  "name": "ClassComponent",
+  "fields": [
+    {
+      "fieldName": "type",
+      "fieldType": "ClassTypeEnum",
+      "fieldValues": "Group (Group),Subgroup (SubGroup),Plan (Plan),Subplan (SubPlan),Class (Class),Subclass (SubClass),Sequence (Sequence),Rxbin (RX BIN),Rxpcn (RX PCN),Rxid (RX Id),Rxgroup (RX Group)",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "value",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "coverage",
+      "otherEntityRelationshipName": "classComponents",
+      "relationshipName": "coverage"
+    }
+  ],
+  "entityTableName": "class_component",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073842"
+}

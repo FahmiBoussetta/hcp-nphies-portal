@@ -1,0 +1,37 @@
+{
+  "name": "Payee",
+  "fields": [
+    {
+      "fieldName": "type",
+      "fieldType": "PayeeTypeEnum",
+      "fieldValues": "Subscriber (Subscriber),Provider (Provider),Other (Other)",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "patient",
+      "otherEntityRelationshipName": "payee",
+      "relationshipName": "partyPatient",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "payee",
+      "relationshipName": "partyOrganization",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "payee",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073821"
+}

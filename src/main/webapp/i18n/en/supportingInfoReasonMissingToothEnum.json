@@ -1,0 +1,11 @@
+{
+  "hcpNphiesPortalApp": {
+    "SupportingInfoReasonMissingToothEnum": {
+      "null": "",
+      "E": "Extraction",
+      "C": "Congenital",
+      "U": "Unknown",
+      "O": "Other"
+    }
+  }
+}

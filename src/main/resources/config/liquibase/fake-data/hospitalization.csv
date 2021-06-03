@@ -1,0 +1,11 @@
+id;admit_source;re_admission;discharge_disposition
+1;EMBA;R;Aadvice
+2;EMBA;R;Exp
+3;EPH;R;Aadvice
+4;EIC;R;Home
+5;IA;R;DASHalt_home
+6;EER;R;Psy
+7;EPH;R;Home
+8;EIC;R;DASHlong
+9;Others;R;Oth
+10;EGPHC;R;Rehab

@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "cRErrorMessages": {
+      "home": {
+        "title": "CR Error Messages",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new CR Error Messages",
+        "createOrEditLabel": "Create or edit a CR Error Messages",
+        "notFound": "No CR Error Messages found"
+      },
+      "created": "A new CR Error Messages is created with identifier {{ param }}",
+      "updated": "A CR Error Messages is updated with identifier {{ param }}",
+      "deleted": "A CR Error Messages is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete CR Error Messages {{ id }}?"
+      },
+      "detail": {
+        "title": "CR Error Messages"
+      },
+      "id": "ID",
+      "message": "Message",
+      "claimResponse": "Claim Response"
+    }
+  }
+}

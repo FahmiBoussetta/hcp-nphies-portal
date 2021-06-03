@@ -1,0 +1,59 @@
+{
+  "name": "PractitionerRole",
+  "fields": [
+    {
+      "fieldName": "guid",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "forceId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "start",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "end",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "practitioner",
+      "otherEntityRelationshipName": "practitionerRole",
+      "relationshipName": "practitioner",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "practitionerRole",
+      "relationshipName": "organization",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "listRoleCodeEnum",
+      "otherEntityRelationshipName": "practitionerRole",
+      "relationshipName": "codes"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "listSpecialtyEnum",
+      "otherEntityRelationshipName": "practitionerRole",
+      "relationshipName": "specialties"
+    }
+  ],
+  "entityTableName": "practitioner_role",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073901"
+}

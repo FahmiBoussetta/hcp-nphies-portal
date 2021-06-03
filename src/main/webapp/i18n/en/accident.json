@@ -1,0 +1,26 @@
+{
+  "hcpNphiesPortalApp": {
+    "accident": {
+      "home": {
+        "title": "Accidents",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Accident",
+        "createOrEditLabel": "Create or edit a Accident",
+        "notFound": "No Accidents found"
+      },
+      "created": "A new Accident is created with identifier {{ param }}",
+      "updated": "A Accident is updated with identifier {{ param }}",
+      "deleted": "A Accident is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Accident {{ id }}?"
+      },
+      "detail": {
+        "title": "Accident"
+      },
+      "id": "ID",
+      "date": "Date",
+      "type": "Type",
+      "location": "Location"
+    }
+  }
+}

@@ -60,7 +60,7 @@
     "ci:frontend:test": "npm run webapp:build:$npm_package_config_default_environment && npm run test-ci"
   },
   "config": {
-    "backend_port": 8080,
+    "backend_port": "8080",
     "default_environment": "prod",
     "packaging": "jar"
   },
@@ -133,6 +133,7 @@
     "jest-sonar-reporter": "2.0.0",
     "json-loader": "0.5.7",
     "lint-staged": "10.5.4",
+    "merge-jsons-webpack-plugin": "1.0.21",
     "mini-css-extract-plugin": "1.4.0",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "postcss-loader": "5.2.0",

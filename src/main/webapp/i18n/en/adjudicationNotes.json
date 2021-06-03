@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "adjudicationNotes": {
+      "home": {
+        "title": "Adjudication Notes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Adjudication Notes",
+        "createOrEditLabel": "Create or edit a Adjudication Notes",
+        "notFound": "No Adjudication Notes found"
+      },
+      "created": "A new Adjudication Notes is created with identifier {{ param }}",
+      "updated": "A Adjudication Notes is updated with identifier {{ param }}",
+      "deleted": "A Adjudication Notes is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Adjudication Notes {{ id }}?"
+      },
+      "detail": {
+        "title": "Adjudication Notes"
+      },
+      "id": "ID",
+      "note": "Note",
+      "adjudicationItem": "Adjudication Item"
+    }
+  }
+}

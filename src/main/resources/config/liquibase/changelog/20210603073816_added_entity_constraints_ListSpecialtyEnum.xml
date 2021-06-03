@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity ListSpecialtyEnum.
+    -->
+    <changeSet id="20210603073816-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="practitioner_role_id"
+                                 baseTableName="list_specialty_enum"
+                                 constraintName="fk_list_specialty_enum__practitioner_role_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="practitioner_role"/>
+    </changeSet>
+</databaseChangeLog>

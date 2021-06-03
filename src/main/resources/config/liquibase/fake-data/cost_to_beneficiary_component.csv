@@ -1,0 +1,11 @@
+id;type;is_money;value
+1;Copay;true;3746
+2;Gpvisit;false;52772
+3;Maxoutofpocket;true;89041
+4;Gpvisit;false;44222
+5;Gpvisit;true;94894
+6;Copay;false;42595
+7;Copay;true;96099
+8;Maxoutofpocket;true;65808
+9;Copay;true;76629
+10;Copaypct;false;56079

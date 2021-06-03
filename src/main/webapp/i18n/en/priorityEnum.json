@@ -1,0 +1,10 @@
+{
+  "hcpNphiesPortalApp": {
+    "PriorityEnum": {
+      "null": "",
+      "Stat": "Immediate",
+      "Normal": "Normal",
+      "Deferred": "Deferred"
+    }
+  }
+}

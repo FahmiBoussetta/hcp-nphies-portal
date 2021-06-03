@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity Coverage.
+    -->
+    <changeSet id="20210603073841-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="subscriber_patient_id"
+                                 baseTableName="coverage"
+                                 constraintName="fk_coverage__subscriber_patient_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="patient"/>
+
+        <addForeignKeyConstraint baseColumnNames="beneficiary_id"
+                                 baseTableName="coverage"
+                                 constraintName="fk_coverage__beneficiary_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="patient"/>
+
+        <addForeignKeyConstraint baseColumnNames="payor_id"
+                                 baseTableName="coverage"
+                                 constraintName="fk_coverage__payor_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="organization"/>
+
+        <addForeignKeyConstraint baseColumnNames="coverage_eligibility_request_id"
+                                 baseTableName="coverage"
+                                 constraintName="fk_coverage__coverage_eligibility_request_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="coverage_eligibility_request"/>
+    </changeSet>
+</databaseChangeLog>

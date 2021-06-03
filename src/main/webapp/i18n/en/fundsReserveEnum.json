@@ -1,0 +1,10 @@
+{
+  "hcpNphiesPortalApp": {
+    "FundsReserveEnum": {
+      "null": "",
+      "Patient": "Patient",
+      "Provider": "Provider",
+      "None": "None"
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "name": "CoverageEligibilityRequest",
+  "fields": [
+    {
+      "fieldName": "guid",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "parsed",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "priority",
+      "fieldType": "PriorityEnum",
+      "fieldValues": "Stat (Immediate),Normal (Normal),Deferred (Deferred)",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "identifier",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "servicedDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "servicedDateEnd",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "patient",
+      "otherEntityRelationshipName": "coverageEligibilityRequest",
+      "relationshipName": "patient",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "coverageEligibilityRequest",
+      "relationshipName": "provider",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "coverageEligibilityRequest",
+      "relationshipName": "insurer",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "location",
+      "otherEntityRelationshipName": "coverageEligibilityRequest",
+      "relationshipName": "facility",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "covEliErrorMessages",
+      "otherEntityRelationshipName": "coverageEligibilityRequest",
+      "relationshipName": "errors"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "listEligibilityPurposeEnum",
+      "otherEntityRelationshipName": "coverageEligibilityRequest",
+      "relationshipName": "purposes"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "coverage",
+      "otherEntityRelationshipName": "coverageEligibilityRequest",
+      "relationshipName": "coverages"
+    }
+  ],
+  "entityTableName": "coverage_eligibility_request",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073845"
+}

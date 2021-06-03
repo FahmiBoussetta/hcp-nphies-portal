@@ -1,0 +1,33 @@
+{
+  "hcpNphiesPortalApp": {
+    "communicationRequest": {
+      "home": {
+        "title": "Communication Requests",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Communication Request",
+        "createOrEditLabel": "Create or edit a Communication Request",
+        "notFound": "No Communication Requests found"
+      },
+      "created": "A new Communication Request is created with identifier {{ param }}",
+      "updated": "A Communication Request is updated with identifier {{ param }}",
+      "deleted": "A Communication Request is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Communication Request {{ id }}?"
+      },
+      "detail": {
+        "title": "Communication Request"
+      },
+      "id": "ID",
+      "value": "Value",
+      "system": "System",
+      "parsed": "Parsed",
+      "limitDate": "Limit Date",
+      "subject": "Subject",
+      "about": "About",
+      "sender": "Sender",
+      "payload": "Payload",
+      "note": "Note",
+      "communication": "Communication"
+    }
+  }
+}

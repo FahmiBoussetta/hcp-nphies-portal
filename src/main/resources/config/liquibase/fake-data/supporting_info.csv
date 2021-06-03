@@ -1,0 +1,11 @@
+id;sequence;code_loinc;category;code_visit;code_fdi_oral;timing;timing_end;value_boolean;value_string;reason;reason_missing_tooth
+1;25116;Implemented;Missingtooth;Follow_up;N13;2021-06-03T07:24:24;2021-06-03T06:22:38;true;Fantastic generating;Missing_attach;O
+2;46634;IB;Onset;Walk_in;N24;2021-06-02T09:08:57;2021-06-03T04:36:22;true;Mississippi granular Account;Missing_info;U
+3;23967;GB;Discharge;Walk_in;N72;2021-06-02T15:58:41;2021-06-03T01:24:23;true;withdrawal reboot;Info_Correct;O
+4;846;Berkshire;Prosthesis;Referral;N55;2021-06-02T10:23:43;2021-06-02T12:04:40;true;clicks-and-mortar District;Missing_attach;U
+5;73494;Creative transmitting Trail;Reason_for_Visit;New_visit;N22;2021-06-03T03:38:52;2021-06-03T01:34:30;false;Handcrafted Incredible relationships;Info_Correct;E
+6;16197;Tools Account;Missingtooth;Refill;N73;2021-06-02T17:25:43;2021-06-02T22:01:13;true;innovative Berkshire;Info_Correct;E
+7;38155;Pennsylvania COM;Onset;Referral;N75;2021-06-02T20:09:08;2021-06-03T02:00:21;true;Supervisor;Missing_attach;O
+8;73396;local;Onset;Referral;N44;2021-06-02T13:28:57;2021-06-03T00:28:04;false;and;Missing_attach;E
+9;15886;Shoes;Other;New_visit;N84;2021-06-02T12:42:52;2021-06-02T13:56:53;true;directional;Info_Correct;E
+10;13293;calculating Refined;Vital_Sign_Systolic;New_visit;N33;2021-06-02T20:30:45;2021-06-03T07:07:04;true;Texas;Info_Correct;C

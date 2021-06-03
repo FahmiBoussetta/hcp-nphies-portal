@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity ReconciliationDetailItem.
+    -->
+    <changeSet id="20210603073859-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="request_id"
+                                 baseTableName="reconciliation_detail_item"
+                                 constraintName="fk_reconciliation_detail_item__request_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="claim"/>
+
+        <addForeignKeyConstraint baseColumnNames="submitter_id"
+                                 baseTableName="reconciliation_detail_item"
+                                 constraintName="fk_reconciliation_detail_item__submitter_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="organization"/>
+
+        <addForeignKeyConstraint baseColumnNames="response_id"
+                                 baseTableName="reconciliation_detail_item"
+                                 constraintName="fk_reconciliation_detail_item__response_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="claim_response"/>
+
+        <addForeignKeyConstraint baseColumnNames="payee_id"
+                                 baseTableName="reconciliation_detail_item"
+                                 constraintName="fk_reconciliation_detail_item__payee_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="organization"/>
+
+        <addForeignKeyConstraint baseColumnNames="payment_reconciliation_id"
+                                 baseTableName="reconciliation_detail_item"
+                                 constraintName="fk_reconciliation_detail_item__payment_reconciliation_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="payment_reconciliation"/>
+    </changeSet>
+</databaseChangeLog>

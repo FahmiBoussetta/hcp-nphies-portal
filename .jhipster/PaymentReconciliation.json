@@ -1,0 +1,73 @@
+{
+  "name": "PaymentReconciliation",
+  "fields": [
+    {
+      "fieldName": "value",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "system",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "parsed",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "periodStart",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "periodEnd",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "outcome",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "disposition",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "paymentAmount",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "paymentIdentifier",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "paymentReconciliation",
+      "relationshipName": "paymentIssuer",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "reconciliationDetailItem",
+      "otherEntityRelationshipName": "paymentReconciliation",
+      "relationshipName": "detail"
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "paymentNotice",
+      "otherEntityRelationshipName": "payment",
+      "relationshipName": "paymentNotice",
+      "ownerSide": false
+    }
+  ],
+  "entityTableName": "payment_reconciliation",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073858"
+}

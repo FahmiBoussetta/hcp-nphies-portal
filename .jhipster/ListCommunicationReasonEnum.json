@@ -1,0 +1,28 @@
+{
+  "name": "ListCommunicationReasonEnum",
+  "fields": [
+    {
+      "fieldName": "cr",
+      "fieldType": "CommunicationReasonEnum",
+      "fieldValues": "Missing_info (Missing information),Missing_attach (Missing attachment),Info_correct (Information correction)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "communication",
+      "otherEntityRelationshipName": "reasonCode",
+      "relationshipName": "communication"
+    }
+  ],
+  "entityTableName": "list_communication_reason_enum",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073813"
+}

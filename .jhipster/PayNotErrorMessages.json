@@ -1,0 +1,27 @@
+{
+  "name": "PayNotErrorMessages",
+  "fields": [
+    {
+      "fieldName": "message",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "paymentNotice",
+      "otherEntityRelationshipName": "errors",
+      "relationshipName": "paymentNotice"
+    }
+  ],
+  "entityTableName": "pay_not_error_messages",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073805"
+}

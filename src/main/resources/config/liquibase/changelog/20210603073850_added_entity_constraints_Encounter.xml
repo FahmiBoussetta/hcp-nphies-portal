@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity Encounter.
+    -->
+    <changeSet id="20210603073850-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="subject_id"
+                                 baseTableName="encounter"
+                                 constraintName="fk_encounter__subject_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="patient"/>
+
+        <addForeignKeyConstraint baseColumnNames="hospitalization_id"
+                                 baseTableName="encounter"
+                                 constraintName="fk_encounter__hospitalization_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="hospitalization"/>
+
+        <addForeignKeyConstraint baseColumnNames="service_provider_id"
+                                 baseTableName="encounter"
+                                 constraintName="fk_encounter__service_provider_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="organization"/>
+    </changeSet>
+</databaseChangeLog>

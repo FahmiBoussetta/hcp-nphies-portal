@@ -1,0 +1,37 @@
+{
+  "hcpNphiesPortalApp": {
+    "patient": {
+      "home": {
+        "title": "Patients",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Patient",
+        "createOrEditLabel": "Create or edit a Patient",
+        "notFound": "No Patients found"
+      },
+      "created": "A new Patient is created with identifier {{ param }}",
+      "updated": "A Patient is updated with identifier {{ param }}",
+      "deleted": "A Patient is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Patient {{ id }}?"
+      },
+      "detail": {
+        "title": "Patient"
+      },
+      "id": "ID",
+      "guid": "Guid",
+      "forceId": "Force Id",
+      "residentNumber": "Resident Number",
+      "passportNumber": "Passport Number",
+      "nationalHealthId": "National Health Id",
+      "iqama": "Iqama",
+      "religion": "Religion",
+      "gender": "Gender",
+      "birthDate": "Birth Date",
+      "deceasedDate": "Deceased Date",
+      "maritalStatus": "Marital Status",
+      "contacts": "Contacts",
+      "address": "Address",
+      "names": "Names"
+    }
+  }
+}

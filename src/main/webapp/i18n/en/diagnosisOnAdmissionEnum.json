@@ -1,0 +1,10 @@
+{
+  "hcpNphiesPortalApp": {
+    "DiagnosisOnAdmissionEnum": {
+      "null": "",
+      "Y": "Yes",
+      "N": "No",
+      "U": "Unknown"
+    }
+  }
+}

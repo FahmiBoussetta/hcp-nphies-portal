@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "claimErrorMessages": {
+      "home": {
+        "title": "Claim Error Messages",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Claim Error Messages",
+        "createOrEditLabel": "Create or edit a Claim Error Messages",
+        "notFound": "No Claim Error Messages found"
+      },
+      "created": "A new Claim Error Messages is created with identifier {{ param }}",
+      "updated": "A Claim Error Messages is updated with identifier {{ param }}",
+      "deleted": "A Claim Error Messages is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Claim Error Messages {{ id }}?"
+      },
+      "detail": {
+        "title": "Claim Error Messages"
+      },
+      "id": "ID",
+      "message": "Message",
+      "claim": "Claim"
+    }
+  }
+}

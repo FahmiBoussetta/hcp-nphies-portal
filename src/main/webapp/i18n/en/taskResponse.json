@@ -1,0 +1,28 @@
+{
+  "hcpNphiesPortalApp": {
+    "taskResponse": {
+      "home": {
+        "title": "Task Responses",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Task Response",
+        "createOrEditLabel": "Create or edit a Task Response",
+        "notFound": "No Task Responses found"
+      },
+      "created": "A new Task Response is created with identifier {{ param }}",
+      "updated": "A Task Response is updated with identifier {{ param }}",
+      "deleted": "A Task Response is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Task Response {{ id }}?"
+      },
+      "detail": {
+        "title": "Task Response"
+      },
+      "id": "ID",
+      "value": "Value",
+      "system": "System",
+      "parsed": "Parsed",
+      "status": "Status",
+      "outputs": "Outputs"
+    }
+  }
+}

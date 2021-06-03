@@ -1,0 +1,35 @@
+{
+  "name": "Accident",
+  "fields": [
+    {
+      "fieldName": "date",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "AccidentTypeEnum",
+      "fieldValues": "MVA (Motor vehicle accident),SCHOOL (School Accident),SPT (Sporting Accident),WPA (Workplace accident)",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "address",
+      "otherEntityRelationshipName": "accident",
+      "relationshipName": "location",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "accident",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073825"
+}

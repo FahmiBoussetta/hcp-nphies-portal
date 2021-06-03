@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity CareTeam.
+    -->
+    <changeSet id="20210603073822-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="provider_id"
+                                 baseTableName="care_team"
+                                 constraintName="fk_care_team__provider_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="practitioner"/>
+
+        <addForeignKeyConstraint baseColumnNames="provider_role_id"
+                                 baseTableName="care_team"
+                                 constraintName="fk_care_team__provider_role_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="practitioner_role"/>
+
+        <addForeignKeyConstraint baseColumnNames="claim_id"
+                                 baseTableName="care_team"
+                                 constraintName="fk_care_team__claim_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="claim"/>
+    </changeSet>
+</databaseChangeLog>

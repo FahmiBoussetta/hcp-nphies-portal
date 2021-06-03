@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "opeOutErrorMessages": {
+      "home": {
+        "title": "Ope Out Error Messages",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Ope Out Error Messages",
+        "createOrEditLabel": "Create or edit a Ope Out Error Messages",
+        "notFound": "No Ope Out Error Messages found"
+      },
+      "created": "A new Ope Out Error Messages is created with identifier {{ param }}",
+      "updated": "A Ope Out Error Messages is updated with identifier {{ param }}",
+      "deleted": "A Ope Out Error Messages is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Ope Out Error Messages {{ id }}?"
+      },
+      "detail": {
+        "title": "Ope Out Error Messages"
+      },
+      "id": "ID",
+      "message": "Message",
+      "operationOutcome": "Operation Outcome"
+    }
+  }
+}

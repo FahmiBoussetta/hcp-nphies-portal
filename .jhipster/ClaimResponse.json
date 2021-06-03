@@ -1,0 +1,51 @@
+{
+  "name": "ClaimResponse",
+  "fields": [
+    {
+      "fieldName": "value",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "system",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "parsed",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "outcome",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "cRErrorMessages",
+      "otherEntityRelationshipName": "claimResponse",
+      "relationshipName": "errors"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "adjudicationItem",
+      "otherEntityRelationshipName": "claimResponse",
+      "relationshipName": "items"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "total",
+      "otherEntityRelationshipName": "claimResponse",
+      "relationshipName": "total"
+    }
+  ],
+  "entityTableName": "claim_response",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073829"
+}

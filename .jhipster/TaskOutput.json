@@ -1,0 +1,38 @@
+{
+  "name": "TaskOutput",
+  "fields": [
+    {
+      "fieldName": "status",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "errorOutput",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "referenceIdentifier",
+      "otherEntityRelationshipName": "taskOutput",
+      "relationshipName": "response",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "taskResponse",
+      "otherEntityRelationshipName": "outputs",
+      "relationshipName": "taskResponse"
+    }
+  ],
+  "entityTableName": "task_output",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073908"
+}

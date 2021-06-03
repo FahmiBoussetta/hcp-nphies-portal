@@ -1,0 +1,72 @@
+{
+  "name": "CommunicationRequest",
+  "fields": [
+    {
+      "fieldName": "value",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "system",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "parsed",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "limitDate",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "patient",
+      "otherEntityRelationshipName": "communicationRequest",
+      "relationshipName": "subject",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "claim",
+      "otherEntityRelationshipName": "communicationRequest",
+      "relationshipName": "about",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "communicationRequest",
+      "relationshipName": "sender",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "payload",
+      "otherEntityRelationshipName": "communicationRequest",
+      "relationshipName": "payload"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "note",
+      "otherEntityRelationshipName": "communicationRequest",
+      "relationshipName": "note"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "communication",
+      "otherEntityRelationshipName": "basedOn",
+      "relationshipName": "communication"
+    }
+  ],
+  "entityTableName": "communication_request",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073839"
+}

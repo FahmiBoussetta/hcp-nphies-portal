@@ -1,0 +1,51 @@
+{
+  "name": "Attachment",
+  "fields": [
+    {
+      "fieldName": "contentType",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "title",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "language",
+      "fieldType": "LanguageEnum",
+      "fieldValues": "AR (Arabic),EN (English)"
+    },
+    {
+      "fieldName": "isData",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "dataFile",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any"
+    },
+    {
+      "fieldName": "url",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "attachmentSize",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "hash",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any"
+    }
+  ],
+  "relationships": [],
+  "entityTableName": "attachment",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073836"
+}

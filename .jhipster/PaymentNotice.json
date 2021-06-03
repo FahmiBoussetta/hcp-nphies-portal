@@ -1,0 +1,55 @@
+{
+  "name": "PaymentNotice",
+  "fields": [
+    {
+      "fieldName": "guid",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "parsed",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "identifier",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "paymentDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "paymentStatus",
+      "fieldType": "PaymentStatusEnum",
+      "fieldValues": "Paid (Paid),Cleared (Cleared)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "paymentReconciliation",
+      "otherEntityRelationshipName": "paymentNotice",
+      "relationshipName": "payment",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "payNotErrorMessages",
+      "otherEntityRelationshipName": "paymentNotice",
+      "relationshipName": "errors"
+    }
+  ],
+  "entityTableName": "payment_notice",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073857"
+}

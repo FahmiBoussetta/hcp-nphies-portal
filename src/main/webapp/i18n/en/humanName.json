@@ -1,0 +1,27 @@
+{
+  "hcpNphiesPortalApp": {
+    "humanName": {
+      "home": {
+        "title": "Human Names",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Human Name",
+        "createOrEditLabel": "Create or edit a Human Name",
+        "notFound": "No Human Names found"
+      },
+      "created": "A new Human Name is created with identifier {{ param }}",
+      "updated": "A Human Name is updated with identifier {{ param }}",
+      "deleted": "A Human Name is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Human Name {{ id }}?"
+      },
+      "detail": {
+        "title": "Human Name"
+      },
+      "id": "ID",
+      "family": "Family",
+      "given": "Given",
+      "patient": "Patient",
+      "practitioner": "Practitioner"
+    }
+  }
+}

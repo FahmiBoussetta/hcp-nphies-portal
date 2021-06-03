@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity PaymentNotice.
+    -->
+    <changeSet id="20210603073857-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="payment_id"
+                                 baseTableName="payment_notice"
+                                 constraintName="fk_payment_notice__payment_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="payment_reconciliation"/>
+    </changeSet>
+</databaseChangeLog>

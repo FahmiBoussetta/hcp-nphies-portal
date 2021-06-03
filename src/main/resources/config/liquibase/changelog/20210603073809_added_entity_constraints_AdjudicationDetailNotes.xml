@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity AdjudicationDetailNotes.
+    -->
+    <changeSet id="20210603073809-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="adjudication_detail_item_id"
+                                 baseTableName="adjudication_detail_notes"
+                                 constraintName="fk_adjudication_detail_notes__adjudication_detail_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="adjudication_detail_item"/>
+    </changeSet>
+</databaseChangeLog>

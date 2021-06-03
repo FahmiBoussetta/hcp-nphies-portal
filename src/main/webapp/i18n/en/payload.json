@@ -1,0 +1,28 @@
+{
+  "hcpNphiesPortalApp": {
+    "payload": {
+      "home": {
+        "title": "Payloads",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Payload",
+        "createOrEditLabel": "Create or edit a Payload",
+        "notFound": "No Payloads found"
+      },
+      "created": "A new Payload is created with identifier {{ param }}",
+      "updated": "A Payload is updated with identifier {{ param }}",
+      "deleted": "A Payload is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Payload {{ id }}?"
+      },
+      "detail": {
+        "title": "Payload"
+      },
+      "id": "ID",
+      "contentString": "Content String",
+      "contentAttachment": "Content Attachment",
+      "contentReference": "Content Reference",
+      "communication": "Communication",
+      "communicationRequest": "Communication Request"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "hcpNphiesPortalApp": {
+    "PayeeTypeEnum": {
+      "null": "",
+      "Subscriber": "Subscriber",
+      "Provider": "Provider",
+      "Other": "Other"
+    }
+  }
+}

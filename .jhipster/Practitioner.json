@@ -1,0 +1,41 @@
+{
+  "name": "Practitioner",
+  "fields": [
+    {
+      "fieldName": "guid",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "forceId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "practitionerLicense",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "gender",
+      "fieldType": "AdministrativeGenderEnum",
+      "fieldValues": "Male (Male),Female (Female),Unknown (Unknown),U (Undetermined),N (Undifferentiated),A (Sex changed to Male),B (Sex changed to female ),C (Not Completed)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "humanName",
+      "otherEntityRelationshipName": "practitioner",
+      "relationshipName": "names"
+    }
+  ],
+  "entityTableName": "practitioner",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073900"
+}
