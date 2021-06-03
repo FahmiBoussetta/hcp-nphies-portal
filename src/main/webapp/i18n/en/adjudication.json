@@ -1,0 +1,30 @@
+{
+  "hcpNphiesPortalApp": {
+    "adjudication": {
+      "home": {
+        "title": "Adjudications",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Adjudication",
+        "createOrEditLabel": "Create or edit a Adjudication",
+        "notFound": "No Adjudications found"
+      },
+      "created": "A new Adjudication is created with identifier {{ param }}",
+      "updated": "A Adjudication is updated with identifier {{ param }}",
+      "deleted": "A Adjudication is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Adjudication {{ id }}?"
+      },
+      "detail": {
+        "title": "Adjudication"
+      },
+      "id": "ID",
+      "category": "Category",
+      "reason": "Reason",
+      "amount": "Amount",
+      "value": "Value",
+      "adjudicationItem": "Adjudication Item",
+      "adjudicationDetailItem": "Adjudication Detail Item",
+      "adjudicationSubDetailItem": "Adjudication Sub Detail Item"
+    }
+  }
+}

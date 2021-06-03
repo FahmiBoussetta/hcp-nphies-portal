@@ -1,0 +1,27 @@
+{
+  "name": "AdjudicationNotes",
+  "fields": [
+    {
+      "fieldName": "note",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "adjudicationItem",
+      "otherEntityRelationshipName": "notes",
+      "relationshipName": "adjudicationItem"
+    }
+  ],
+  "entityTableName": "adjudication_notes",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073808"
+}

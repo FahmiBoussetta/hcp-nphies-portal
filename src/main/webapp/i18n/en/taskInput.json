@@ -1,0 +1,33 @@
+{
+  "hcpNphiesPortalApp": {
+    "taskInput": {
+      "home": {
+        "title": "Task Inputs",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Task Input",
+        "createOrEditLabel": "Create or edit a Task Input",
+        "notFound": "No Task Inputs found"
+      },
+      "created": "A new Task Input is created with identifier {{ param }}",
+      "updated": "A Task Input is updated with identifier {{ param }}",
+      "deleted": "A Task Input is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Task Input {{ id }}?"
+      },
+      "detail": {
+        "title": "Task Input"
+      },
+      "id": "ID",
+      "inputInclude": "Input Include",
+      "inputExclude": "Input Exclude",
+      "inputIncludeMessage": "Input Include Message",
+      "inputExcludeMessage": "Input Exclude Message",
+      "inputCount": "Input Count",
+      "inputStart": "Input Start",
+      "inputEnd": "Input End",
+      "inputLineItem": "Input Line Item",
+      "inputOrigResponse": "Input Orig Response",
+      "task": "Task"
+    }
+  }
+}

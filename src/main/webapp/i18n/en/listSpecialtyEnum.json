@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "listSpecialtyEnum": {
+      "home": {
+        "title": "List Specialty Enums",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new List Specialty Enum",
+        "createOrEditLabel": "Create or edit a List Specialty Enum",
+        "notFound": "No List Specialty Enums found"
+      },
+      "created": "A new List Specialty Enum is created with identifier {{ param }}",
+      "updated": "A List Specialty Enum is updated with identifier {{ param }}",
+      "deleted": "A List Specialty Enum is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete List Specialty Enum {{ id }}?"
+      },
+      "detail": {
+        "title": "List Specialty Enum"
+      },
+      "id": "ID",
+      "s": "S",
+      "practitionerRole": "Practitioner Role"
+    }
+  }
+}

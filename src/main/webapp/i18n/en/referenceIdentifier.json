@@ -1,0 +1,30 @@
+{
+  "hcpNphiesPortalApp": {
+    "referenceIdentifier": {
+      "home": {
+        "title": "Reference Identifiers",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Reference Identifier",
+        "createOrEditLabel": "Create or edit a Reference Identifier",
+        "notFound": "No Reference Identifiers found"
+      },
+      "created": "A new Reference Identifier is created with identifier {{ param }}",
+      "updated": "A Reference Identifier is updated with identifier {{ param }}",
+      "deleted": "A Reference Identifier is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Reference Identifier {{ id }}?"
+      },
+      "detail": {
+        "title": "Reference Identifier"
+      },
+      "id": "ID",
+      "ref": "Ref",
+      "idValue": "Id Value",
+      "identifier": "Identifier",
+      "display": "Display",
+      "item": "Item",
+      "detailItem": "Detail Item",
+      "subDetailItem": "Sub Detail Item"
+    }
+  }
+}

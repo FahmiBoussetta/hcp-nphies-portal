@@ -1,0 +1,37 @@
+{
+  "hcpNphiesPortalApp": {
+    "coverage": {
+      "home": {
+        "title": "Coverages",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Coverage",
+        "createOrEditLabel": "Create or edit a Coverage",
+        "notFound": "No Coverages found"
+      },
+      "created": "A new Coverage is created with identifier {{ param }}",
+      "updated": "A Coverage is updated with identifier {{ param }}",
+      "deleted": "A Coverage is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Coverage {{ id }}?"
+      },
+      "detail": {
+        "title": "Coverage"
+      },
+      "id": "ID",
+      "guid": "Guid",
+      "forceId": "Force Id",
+      "coverageType": "Coverage Type",
+      "subscriberId": "Subscriber Id",
+      "dependent": "Dependent",
+      "relationShip": "Relation Ship",
+      "network": "Network",
+      "subrogation": "Subrogation",
+      "subscriberPatient": "Subscriber Patient",
+      "beneficiary": "Beneficiary",
+      "payor": "Payor",
+      "classComponents": "Class Components",
+      "costToBeneficiaryComponents": "Cost To Beneficiary Components",
+      "coverageEligibilityRequest": "Coverage Eligibility Request"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity CommunicationRequest.
+    -->
+    <changeSet id="20210603073839-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="subject_id"
+                                 baseTableName="communication_request"
+                                 constraintName="fk_communication_request__subject_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="patient"/>
+
+        <addForeignKeyConstraint baseColumnNames="about_id"
+                                 baseTableName="communication_request"
+                                 constraintName="fk_communication_request__about_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="claim"/>
+
+        <addForeignKeyConstraint baseColumnNames="sender_id"
+                                 baseTableName="communication_request"
+                                 constraintName="fk_communication_request__sender_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="organization"/>
+
+        <addForeignKeyConstraint baseColumnNames="communication_id"
+                                 baseTableName="communication_request"
+                                 constraintName="fk_communication_request__communication_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="communication"/>
+    </changeSet>
+</databaseChangeLog>

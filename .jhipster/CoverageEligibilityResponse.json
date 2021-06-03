@@ -1,0 +1,75 @@
+{
+  "name": "CoverageEligibilityResponse",
+  "fields": [
+    {
+      "fieldName": "value",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "system",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "parsed",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "outcome",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "serviced",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "servicedEnd",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "disposition",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "notInforceReason",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "patient",
+      "otherEntityRelationshipName": "coverageEligibilityResponse",
+      "relationshipName": "patient",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "coverageEligibilityResponse",
+      "relationshipName": "insurer",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "covEliRespErrorMessages",
+      "otherEntityRelationshipName": "coverageEligibilityResponse",
+      "relationshipName": "errors"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "responseInsurance",
+      "otherEntityRelationshipName": "coverageEligibilityResponse",
+      "relationshipName": "insurance"
+    }
+  ],
+  "entityTableName": "coverage_eligibility_response",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073846"
+}

@@ -1,0 +1,41 @@
+{
+  "name": "Note",
+  "fields": [
+    {
+      "fieldName": "text",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "author",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "time",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "communication",
+      "otherEntityRelationshipName": "note",
+      "relationshipName": "communication"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "communicationRequest",
+      "otherEntityRelationshipName": "note",
+      "relationshipName": "communicationRequest"
+    }
+  ],
+  "entityTableName": "note",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073838"
+}

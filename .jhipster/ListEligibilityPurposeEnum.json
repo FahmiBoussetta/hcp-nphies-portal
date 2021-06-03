@@ -1,0 +1,28 @@
+{
+  "name": "ListEligibilityPurposeEnum",
+  "fields": [
+    {
+      "fieldName": "erp",
+      "fieldType": "EligibilityPurposeEnum",
+      "fieldValues": "Benefits (Coverage benefits),Discovery (Coverage Discovery),Validation (Coverage Validation)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "coverageEligibilityRequest",
+      "otherEntityRelationshipName": "purposes",
+      "relationshipName": "coverageEligibilityRequest"
+    }
+  ],
+  "entityTableName": "list_eligibility_purpose_enum",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073814"
+}

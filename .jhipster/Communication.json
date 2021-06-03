@@ -1,0 +1,102 @@
+{
+  "name": "Communication",
+  "fields": [
+    {
+      "fieldName": "guid",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "isQueued",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "parsed",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "identifier",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "priority",
+      "fieldType": "CommunicationPriorityEnum",
+      "fieldValues": "Stat (Immediate - Priority 1),Asap (As soon as possible - Priority 2),Urgent (Urgent - Priority 3),Routine (Routine - Priority 4)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "patient",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "subject",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "sender",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "recipient",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "claim",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "about",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "communicationRequest",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "basedOn"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "listCommunicationMediumEnum",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "medium"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "listCommunicationReasonEnum",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "reasonCode"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "payload",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "payload"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "note",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "note"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "comErrorMessages",
+      "otherEntityRelationshipName": "communication",
+      "relationshipName": "errors"
+    }
+  ],
+  "entityTableName": "communication",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073835"
+}

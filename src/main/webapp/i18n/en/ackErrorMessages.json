@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "ackErrorMessages": {
+      "home": {
+        "title": "Ack Error Messages",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Ack Error Messages",
+        "createOrEditLabel": "Create or edit a Ack Error Messages",
+        "notFound": "No Ack Error Messages found"
+      },
+      "created": "A new Ack Error Messages is created with identifier {{ param }}",
+      "updated": "A Ack Error Messages is updated with identifier {{ param }}",
+      "deleted": "A Ack Error Messages is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Ack Error Messages {{ id }}?"
+      },
+      "detail": {
+        "title": "Ack Error Messages"
+      },
+      "id": "ID",
+      "message": "Message",
+      "acknowledgement": "Acknowledgement"
+    }
+  }
+}

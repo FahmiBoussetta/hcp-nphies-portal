@@ -1,0 +1,38 @@
+{
+  "hcpNphiesPortalApp": {
+    "supportingInfo": {
+      "home": {
+        "title": "Supporting Infos",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Supporting Info",
+        "createOrEditLabel": "Create or edit a Supporting Info",
+        "notFound": "No Supporting Infos found"
+      },
+      "created": "A new Supporting Info is created with identifier {{ param }}",
+      "updated": "A Supporting Info is updated with identifier {{ param }}",
+      "deleted": "A Supporting Info is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Supporting Info {{ id }}?"
+      },
+      "detail": {
+        "title": "Supporting Info"
+      },
+      "id": "ID",
+      "sequence": "Sequence",
+      "codeLOINC": "Code LOINC",
+      "category": "Category",
+      "codeVisit": "Code Visit",
+      "codeFdiOral": "Code Fdi Oral",
+      "timing": "Timing",
+      "timingEnd": "Timing End",
+      "valueBoolean": "Value Boolean",
+      "valueString": "Value String",
+      "reason": "Reason",
+      "reasonMissingTooth": "Reason Missing Tooth",
+      "valueQuantity": "Value Quantity",
+      "valueAttachment": "Value Attachment",
+      "valueReference": "Value Reference",
+      "claim": "Claim"
+    }
+  }
+}

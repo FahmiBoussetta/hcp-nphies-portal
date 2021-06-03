@@ -1,0 +1,27 @@
+{
+  "hcpNphiesPortalApp": {
+    "operationOutcome": {
+      "home": {
+        "title": "Operation Outcomes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Operation Outcome",
+        "createOrEditLabel": "Create or edit a Operation Outcome",
+        "notFound": "No Operation Outcomes found"
+      },
+      "created": "A new Operation Outcome is created with identifier {{ param }}",
+      "updated": "A Operation Outcome is updated with identifier {{ param }}",
+      "deleted": "A Operation Outcome is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Operation Outcome {{ id }}?"
+      },
+      "detail": {
+        "title": "Operation Outcome"
+      },
+      "id": "ID",
+      "value": "Value",
+      "system": "System",
+      "parsed": "Parsed",
+      "errors": "Errors"
+    }
+  }
+}

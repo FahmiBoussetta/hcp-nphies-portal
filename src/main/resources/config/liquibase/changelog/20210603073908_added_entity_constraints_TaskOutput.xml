@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity TaskOutput.
+    -->
+    <changeSet id="20210603073908-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="response_id"
+                                 baseTableName="task_output"
+                                 constraintName="fk_task_output__response_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="reference_identifier"/>
+
+        <addForeignKeyConstraint baseColumnNames="task_response_id"
+                                 baseTableName="task_output"
+                                 constraintName="fk_task_output__task_response_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="task_response"/>
+    </changeSet>
+</databaseChangeLog>

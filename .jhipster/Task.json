@@ -1,0 +1,71 @@
+{
+  "name": "Task",
+  "fields": [
+    {
+      "fieldName": "guid",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "isQueued",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "parsed",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "identifier",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "code",
+      "fieldType": "TaskCodeEnum",
+      "fieldValues": "Cancel (Cancel the focal resource),Nullify (Nullify the focal resource),Poll (Poll the focal resource),Release (Release the focal resource),Reprocess (Reprocess the focal resource),Status (Check status of the focal resource)"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "focus",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "reasonCode",
+      "fieldType": "TaskReasonCodeEnum",
+      "fieldValues": "WI (wrong information),NP (service not performed),TAS (transaction already submitted)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "requester",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "owner",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "taskInput",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "inputs"
+    }
+  ],
+  "entityTableName": "task",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073905"
+}

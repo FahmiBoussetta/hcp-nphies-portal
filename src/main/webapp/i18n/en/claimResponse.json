@@ -1,0 +1,30 @@
+{
+  "hcpNphiesPortalApp": {
+    "claimResponse": {
+      "home": {
+        "title": "Claim Responses",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Claim Response",
+        "createOrEditLabel": "Create or edit a Claim Response",
+        "notFound": "No Claim Responses found"
+      },
+      "created": "A new Claim Response is created with identifier {{ param }}",
+      "updated": "A Claim Response is updated with identifier {{ param }}",
+      "deleted": "A Claim Response is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Claim Response {{ id }}?"
+      },
+      "detail": {
+        "title": "Claim Response"
+      },
+      "id": "ID",
+      "value": "Value",
+      "system": "System",
+      "parsed": "Parsed",
+      "outcome": "Outcome",
+      "errors": "Errors",
+      "items": "Items",
+      "total": "Total"
+    }
+  }
+}

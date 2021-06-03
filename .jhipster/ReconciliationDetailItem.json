@@ -1,0 +1,71 @@
+{
+  "name": "ReconciliationDetailItem",
+  "fields": [
+    {
+      "fieldName": "identifier",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "predecessor",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "date",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "BigDecimal"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "claim",
+      "otherEntityRelationshipName": "reconciliationDetailItem",
+      "relationshipName": "request",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "reconciliationDetailItem",
+      "relationshipName": "submitter",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "claimResponse",
+      "otherEntityRelationshipName": "reconciliationDetailItem",
+      "relationshipName": "response",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "reconciliationDetailItem",
+      "relationshipName": "payee",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "paymentReconciliation",
+      "otherEntityRelationshipName": "detail",
+      "relationshipName": "paymentReconciliation"
+    }
+  ],
+  "entityTableName": "reconciliation_detail_item",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073859"
+}

@@ -1,0 +1,9 @@
+{
+  "hcpNphiesPortalApp": {
+    "PaymentStatusEnum": {
+      "null": "",
+      "Paid": "Paid",
+      "Cleared": "Cleared"
+    }
+  }
+}

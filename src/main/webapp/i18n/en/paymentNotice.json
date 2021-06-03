@@ -1,0 +1,31 @@
+{
+  "hcpNphiesPortalApp": {
+    "paymentNotice": {
+      "home": {
+        "title": "Payment Notices",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Payment Notice",
+        "createOrEditLabel": "Create or edit a Payment Notice",
+        "notFound": "No Payment Notices found"
+      },
+      "created": "A new Payment Notice is created with identifier {{ param }}",
+      "updated": "A Payment Notice is updated with identifier {{ param }}",
+      "deleted": "A Payment Notice is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Payment Notice {{ id }}?"
+      },
+      "detail": {
+        "title": "Payment Notice"
+      },
+      "id": "ID",
+      "guid": "Guid",
+      "parsed": "Parsed",
+      "identifier": "Identifier",
+      "paymentDate": "Payment Date",
+      "amount": "Amount",
+      "paymentStatus": "Payment Status",
+      "payment": "Payment",
+      "errors": "Errors"
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "Diagnosis",
+  "fields": [
+    {
+      "fieldName": "sequence",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "diagnosis",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "DiagnosisTypeEnum",
+      "fieldValues": "Admitting (Admitting Diagnosis),Clinical (Clinical Diagnosis),Differential (Differential Diagnosis),Discharge (Discharge Diagnosis),Laboratory (Laboratory Diagnosis),Nursing (Nursing Diagnosis),Prenatal (Prenatal Diagnosis),Principal (Principal Diagnosis),Radiology (Radiology Diagnosis),Remote (Remote Diagnosis),Retrospective (Retrospective Diagnosis),Self (Self Diagnosis)",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "onAdmission",
+      "fieldType": "DiagnosisOnAdmissionEnum",
+      "fieldValues": "Y (Yes),N (No),U (Unknown)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "claim",
+      "otherEntityRelationshipName": "diagnoses",
+      "relationshipName": "claim"
+    }
+  ],
+  "entityTableName": "diagnosis",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073823"
+}

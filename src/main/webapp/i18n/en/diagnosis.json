@@ -1,0 +1,28 @@
+{
+  "hcpNphiesPortalApp": {
+    "diagnosis": {
+      "home": {
+        "title": "Diagnoses",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Diagnosis",
+        "createOrEditLabel": "Create or edit a Diagnosis",
+        "notFound": "No Diagnoses found"
+      },
+      "created": "A new Diagnosis is created with identifier {{ param }}",
+      "updated": "A Diagnosis is updated with identifier {{ param }}",
+      "deleted": "A Diagnosis is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Diagnosis {{ id }}?"
+      },
+      "detail": {
+        "title": "Diagnosis"
+      },
+      "id": "ID",
+      "sequence": "Sequence",
+      "diagnosis": "Diagnosis",
+      "type": "Type",
+      "onAdmission": "On Admission",
+      "claim": "Claim"
+    }
+  }
+}

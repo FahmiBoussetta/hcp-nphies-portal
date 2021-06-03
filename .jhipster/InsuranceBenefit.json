@@ -1,0 +1,31 @@
+{
+  "name": "InsuranceBenefit",
+  "fields": [
+    {
+      "fieldName": "allowed",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "used",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "responseInsuranceItem",
+      "otherEntityRelationshipName": "benefit",
+      "relationshipName": "responseInsuranceItem"
+    }
+  ],
+  "entityTableName": "insurance_benefit",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073849"
+}

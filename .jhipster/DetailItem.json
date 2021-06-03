@@ -1,0 +1,90 @@
+{
+  "name": "DetailItem",
+  "fields": [
+    {
+      "fieldName": "sequence",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "tax",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "transportationSRCA",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "imaging",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "laboratory",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "medicalDevice",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "oralHealthIP",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "oralHealthOP",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "procedure",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "services",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "medicationCode",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "quantity",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "unitPrice",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "referenceIdentifier",
+      "otherEntityRelationshipName": "detailItem",
+      "relationshipName": "udi"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "subDetailItem",
+      "otherEntityRelationshipName": "detailItem",
+      "relationshipName": "subDetails"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "item",
+      "otherEntityRelationshipName": "details",
+      "relationshipName": "item"
+    }
+  ],
+  "entityTableName": "detail_item",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073827"
+}

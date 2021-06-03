@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity Claim.
+    -->
+    <changeSet id="20210603073819-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="encounter_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__encounter_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="encounter"/>
+
+        <addForeignKeyConstraint baseColumnNames="eligibility_response_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__eligibility_response_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="coverage_eligibility_response"/>
+
+        <addForeignKeyConstraint baseColumnNames="patient_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__patient_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="patient"/>
+
+        <addForeignKeyConstraint baseColumnNames="provider_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__provider_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="organization"/>
+
+        <addForeignKeyConstraint baseColumnNames="insurer_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__insurer_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="organization"/>
+
+        <addForeignKeyConstraint baseColumnNames="prescription_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__prescription_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="reference_identifier"/>
+
+        <addForeignKeyConstraint baseColumnNames="original_prescription_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__original_prescription_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="reference_identifier"/>
+
+        <addForeignKeyConstraint baseColumnNames="payee_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__payee_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="payee"/>
+
+        <addForeignKeyConstraint baseColumnNames="referral_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__referral_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="reference_identifier"/>
+
+        <addForeignKeyConstraint baseColumnNames="facility_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__facility_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="location"/>
+
+        <addForeignKeyConstraint baseColumnNames="accident_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim__accident_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="accident"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity Payload.
+    -->
+    <changeSet id="20210603073837-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="content_attachment_id"
+                                 baseTableName="payload"
+                                 constraintName="fk_payload__content_attachment_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="attachment"/>
+
+        <addForeignKeyConstraint baseColumnNames="content_reference_id"
+                                 baseTableName="payload"
+                                 constraintName="fk_payload__content_reference_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="reference_identifier"/>
+
+        <addForeignKeyConstraint baseColumnNames="communication_id"
+                                 baseTableName="payload"
+                                 constraintName="fk_payload__communication_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="communication"/>
+
+        <addForeignKeyConstraint baseColumnNames="communication_request_id"
+                                 baseTableName="payload"
+                                 constraintName="fk_payload__communication_request_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="communication_request"/>
+    </changeSet>
+</databaseChangeLog>

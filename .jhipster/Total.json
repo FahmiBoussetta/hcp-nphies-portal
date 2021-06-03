@@ -1,0 +1,31 @@
+{
+  "name": "Total",
+  "fields": [
+    {
+      "fieldName": "category",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "Integer"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "claimResponse",
+      "otherEntityRelationshipName": "total",
+      "relationshipName": "claimResponse"
+    }
+  ],
+  "entityTableName": "total",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073834"
+}

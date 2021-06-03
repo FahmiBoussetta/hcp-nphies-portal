@@ -1,0 +1,1038 @@
+
+application {
+  config {
+    baseName hcpNphiesPortal,
+    applicationType monolith,
+    packageName com.platformsandsolutions.hcpnphiesportal,
+    authenticationType jwt,
+    prodDatabaseType mysql,
+    clientFramework react
+  }
+  entities *
+}
+
+entity AckErrorMessages {
+	message String
+}
+
+entity ClaimErrorMessages {
+	message String
+}
+
+entity CRErrorMessages {
+	message String
+}
+
+entity ComErrorMessages {
+	message String
+}
+
+entity CovEliErrorMessages {
+	message String
+}
+
+entity CovEliRespErrorMessages {
+	message String
+}
+
+entity OpeOutErrorMessages {
+	message String
+}
+
+entity PayNotErrorMessages {
+	message String
+}
+
+entity DiagnosisSequence {
+    diagSeq Integer
+}
+
+entity InformationSequence {
+    infSeq Integer
+}
+
+entity AdjudicationNotes {
+    note String
+}
+
+entity AdjudicationDetailNotes {
+    note String
+}
+
+entity AdjudicationSubDetailNotes {
+    note String
+}
+
+entity Givens {
+    given String required,
+    prefix String,
+    suffix String,
+    textName String
+}
+
+entity ListCommunicationMediumEnum {
+    cm CommunicationMediumEnum
+}
+
+entity ListCommunicationReasonEnum {
+    cr CommunicationReasonEnum
+}
+
+entity ListEligibilityPurposeEnum {
+    erp EligibilityPurposeEnum
+}
+
+entity ListRoleCodeEnum {
+    r RoleCodeEnum
+}
+
+entity ListSpecialtyEnum {
+    s SpecialtyEnum
+}
+
+entity Acknowledgement {
+	value String,
+	system String,
+    parsed String
+}
+
+entity Address {
+	addressLine String required,
+	city String required,
+	district String,
+	state String,
+	postalCode String required,
+	country String
+}
+
+entity Claim {
+	guid String,
+    isQueued Boolean,
+    parsed String,
+	identifier String,
+    use Use required,
+    type ClaimTypeEnum required,
+    subType ClaimSubTypeEnum,
+	eligibilityOffline String,
+    eligibilityOfflineDate Instant,
+    authorizationOfflineDate Instant,
+    billableStart Instant,
+    billableEnd Instant,
+    priority PriorityEnum required,
+    fundsReserve FundsReserveEnum
+}
+
+entity Related {
+	relationShip ClaimRelationshipEnum
+}
+
+entity Payee {
+	type PayeeTypeEnum required
+}
+
+entity CareTeam {
+	sequence Integer required,
+	role CareTeamRoleEnum required
+}
+
+entity Diagnosis {
+	sequence Integer required,
+	diagnosis String required,
+	type DiagnosisTypeEnum required,
+	onAdmission DiagnosisOnAdmissionEnum
+}
+
+entity Insurance {
+	sequence Integer required,
+	focal Boolean required,
+	preAuthRef String
+}
+
+entity Accident {
+	date Instant required,
+	type AccidentTypeEnum required
+}
+
+entity Item {
+	sequence Integer required,
+	isPackage Boolean,
+    tax BigDecimal,
+    payerShare BigDecimal,
+    patientShare BigDecimal required,
+	careTeamSequence Integer required,
+	transportationSRCA String,
+	imaging String,
+	laboratory String,
+	medicalDevice String,
+	oralHealthIP String,
+	oralHealthOP String,
+	procedure String,
+	services String,
+	medicationCode String,
+	servicedDate Instant,
+	servicedDateStart Instant,
+	servicedDateEnd Instant,
+	quantity Integer required,
+	unitPrice Integer required,
+    factor BigDecimal,
+    bodySite BodySiteEnum,
+    subSite SubSiteEnum
+}
+
+entity DetailItem {
+	sequence Integer required,
+    tax BigDecimal,
+	transportationSRCA String,
+	imaging String,
+	laboratory String,
+	medicalDevice String,
+	oralHealthIP String,
+	oralHealthOP String,
+	procedure String,
+	services String,
+	medicationCode String,
+	quantity Integer required,
+	unitPrice Integer required
+}
+
+entity SubDetailItem {
+	sequence Integer required,
+    tax BigDecimal,
+	transportationSRCA String,
+	imaging String,
+	laboratory String,
+	medicalDevice String,
+	oralHealthIP String,
+	oralHealthOP String,
+	procedure String,
+	services String,
+	medicationCode String,
+	quantity Integer required,
+	unitPrice Integer required
+}
+
+entity ClaimResponse {
+	value String,
+	system String,
+    parsed String,
+    outcome String
+}
+
+entity AdjudicationItem {
+	outcome String,
+	sequence Integer required
+}
+
+entity AdjudicationDetailItem {
+	sequence Integer required
+}
+
+entity AdjudicationSubDetailItem {
+	sequence Integer required
+}
+
+entity Adjudication {
+	category String required,
+	reason String,
+	amount Integer required,
+    value BigDecimal
+}
+
+entity Total {
+	category String,
+	amount Integer
+}
+
+entity Communication {
+	guid String,
+    isQueued Boolean,
+    parsed String,
+	identifier String,
+    priority CommunicationPriorityEnum
+}
+
+entity Attachment {
+	contentType String,
+	title String,
+    language LanguageEnum,
+    isData Boolean,
+    dataFile Blob,
+    url String,
+    attachmentSize Integer,
+    hash Blob
+}
+
+entity Payload {
+	contentString String
+}
+
+entity Note {
+	text String,
+	author String,
+	time Instant
+}
+
+entity CommunicationRequest {
+	value String,
+	system String,
+    parsed String,
+    limitDate Instant
+}
+
+entity Contact {
+	phone String,
+	email String,
+	mobile String,
+	url String
+}
+
+entity Coverage {
+	guid String,
+    forceId String,
+	coverageType CoverageTypeEnum required,
+	subscriberId String,
+	dependent String,
+	relationShip RelationShipEnum required,
+	network String,
+    subrogation Boolean
+}
+
+entity ClassComponent {
+	type ClassTypeEnum required,
+	value String required,
+    name String,
+}
+
+entity CostToBeneficiaryComponent {
+	type CostToBeneficiaryTypeEnum,
+    isMoney Boolean,
+    value BigDecimal required
+}
+
+entity ExemptionComponent {
+	type ExemptionTypeEnum required,
+    start Instant,
+    end Instant
+}
+
+entity CoverageEligibilityRequest {
+	guid String,
+    parsed String,
+    priority PriorityEnum required,
+	identifier String,
+	servicedDate Instant required,
+	servicedDateEnd Instant,
+}
+
+entity CoverageEligibilityResponse {
+	value String,
+	system String,
+    parsed String,
+    outcome String,
+    serviced Instant,
+    servicedEnd Instant,
+    disposition String,
+    notInforceReason String
+}
+
+entity ResponseInsurance {
+	notInforceReason String,
+	inforce Boolean,
+    benefitStart Instant,
+    benefitEnd Instant,
+	notInforceReason String,
+	notInforceReason String,
+}
+
+entity ResponseInsuranceItem {
+	category String,
+	excluded Boolean,
+	name String,
+	description String,
+	network String,
+	unit String,
+	term String
+}
+
+entity InsuranceBenefit {
+	allowed String,
+	used String
+}
+
+entity Encounter {
+	guid String,
+    forceId String,
+	identifier String,
+	encounterClass EncounterClassEnum,
+	start Instant,
+	end Instant,
+	serviceType ServiceTypeEnum,
+	priority ActPriorityEnum
+}
+
+entity Hospitalization {
+	admitSource AdmitSourceEnum,
+	reAdmission ReAdmissionEnum,
+	dischargeDisposition DischargeDispositionEnum
+}
+
+entity HumanName {
+	family String required
+}
+
+entity Location {
+	guid String,
+	identifier String,
+    type LocationTypeEnum
+}
+
+entity OperationOutcome {
+	value String,
+	system String,
+    parsed String
+}
+
+entity Organization {
+	guid String,
+    forceId String,
+	organizationLicense String,
+    baseUrl String,
+    organizationType OrganizationTypeEnum,
+    name String
+}
+
+entity Patient {
+	guid String,
+    forceId String,
+	residentNumber String,
+	passportNumber String,
+	nationalHealthId String,
+	iqama String,
+	religion ReligionEnum,
+	gender AdministrativeGenderEnum,
+	birthDate Instant,
+	deceasedDate Instant,
+	maritalStatus MaritalStatusEnum
+}
+
+entity PaymentNotice {
+	guid String,
+    parsed String,
+    identifier String,
+    paymentDate Instant,
+    amount BigDecimal,
+    paymentStatus PaymentStatusEnum
+}
+
+entity PaymentReconciliation {
+	value String,
+	system String,
+    parsed String,
+    periodStart Instant,
+    periodEnd Instant,
+    outcome String,
+    disposition String,
+    paymentAmount BigDecimal,
+    paymentIdentifier String
+}
+
+entity ReconciliationDetailItem {
+	identifier String,
+	predecessor String,
+    type String,
+    date Instant,
+    amount BigDecimal
+}
+
+entity Practitioner {
+	guid String,
+    forceId String,
+	practitionerLicense String required,
+	gender AdministrativeGenderEnum
+}
+
+entity PractitionerRole {
+	guid String,
+    forceId String,
+	start Instant,
+	end Instant
+}
+
+entity ReferenceIdentifier {
+	ref String,
+	idValue String,
+	identifier String,
+	display String
+}
+
+entity SupportingInfo {
+	sequence Integer,
+	codeLOINC String,
+    category SupportingInfoCategoryEnum,
+    codeVisit SupportingInfoCodeVisitEnum,
+    codeFdiOral SupportingInfoCodeFdiEnum,
+	timing Instant,
+	timingEnd Instant,
+    valueBoolean Boolean,
+    valueString String,
+    reason SupportingInfoReasonEnum,
+    reasonMissingTooth SupportingInfoReasonMissingToothEnum
+}
+
+entity Quantity {
+	value BigDecimal,
+    unit String
+}
+
+entity Task {
+	guid String,
+    isQueued Boolean,
+    parsed String,
+    identifier String,
+    code TaskCodeEnum,
+    description String,
+    focus String,
+    reasonCode TaskReasonCodeEnum
+}
+
+entity TaskInput {
+    inputInclude ResourceTypeEnum,
+    inputExclude ResourceTypeEnum,
+	inputIncludeMessage EventCodingEnum,
+	inputExcludeMessage EventCodingEnum,
+    inputCount Integer,
+	inputStart Instant,
+	inputEnd Instant,
+    inputLineItem Integer
+}
+
+entity TaskResponse {
+	value String,
+	system String,
+    parsed String,
+    status String
+}
+
+entity TaskOutput {
+	status String,
+    errorOutput String
+}
+
+enum Use {
+    Claim(claim), PreAuthorization(preauthorization), Predetermination(predetermination)
+}
+
+enum ClaimTypeEnum {
+    Institutional(institutional), Oral(oral), Pharmacy(pharmacy), Professional(professional), Vision(vision)
+}
+
+enum ClaimSubTypeEnum {
+	Ip("InPatient"), Op("OutPatient"), Emr("Emergency")
+}
+
+enum PriorityEnum {
+	Stat("Immediate"), Normal("Normal"), Deferred("Deferred")
+}
+
+enum FundsReserveEnum {
+	Patient("Patient"), Provider("Provider"), None("None")
+}
+
+enum ClaimRelationshipEnum {
+	Prior("Prior Claim"), Associated("Associated Claim"), Extend("Authorization to extend")
+}
+
+enum PayeeTypeEnum {
+	Subscriber("Subscriber"), Provider("Provider"), Other("Other")
+}
+
+enum CareTeamRoleEnum {
+	Primary("Primary provider"), Assist("Assisting Provider"), Supervisor("Supervising Provider"), Other("Other")
+}
+
+enum DiagnosisTypeEnum {
+	Admitting("Admitting Diagnosis"), Clinical("Clinical Diagnosis"), Differential("Differential Diagnosis"),
+		Discharge("Discharge Diagnosis"), Laboratory("Laboratory Diagnosis"), Nursing("Nursing Diagnosis"),
+		Prenatal("Prenatal Diagnosis"), Principal("Principal Diagnosis"), Radiology("Radiology Diagnosis"),
+		Remote("Remote Diagnosis"), Retrospective("Retrospective Diagnosis"), Self("Self Diagnosis")
+}
+
+enum DiagnosisOnAdmissionEnum {
+	Y("Yes"), N("No"), U("Unknown")
+}
+
+enum AccidentTypeEnum {
+	MVA("Motor vehicle accident"), SCHOOL("School Accident"), SPT("Sporting Accident"), WPA("Workplace accident")
+}
+
+enum BodySiteEnum {
+	E1("Upper left eyelid"), E2("Lower left eyelid"), E3("Upper right eyelid"), E4("Lower right eyelid"),
+		F1("Left hand second digit"), F2("Left hand third digit"), F3("Left hand fourth digit"),
+		F4("Left hand fifth digit"), F5("Right hand thumb"), F6("Right hand second digit"),
+		F7("Right hand third digit"), F8("Right hand fourth digit"), F9("Right hand fifth digit"),
+		FA("Left hand thumb"), LC("Left circumflex coronary artery"), LD("Left anterior descending coronary artery"),
+		LM("Left main coronary artery"),
+		LT("Left side (used to identify procedures performed on the left side of the body)"),
+		RC("Right coronary artery"), RI("Ramus intermedius coronary artery"),
+		RT("Right side (used to identify procedures performed on the right side of the body)"),
+		T1("Left foot second digit"), T2("Left foot third digit"), T3("Left foot fourth digit"),
+		T4("Left foot fifth digit"), T5("Right foot great toe"), T6("Right foot second digit"),
+		T7("Right foot third digit"), T8("Right foot fourth digit"), T9("Right foot fifth digit"),
+		TA("Left foot great toe")
+}
+
+enum SubSiteEnum {
+	R("Right"), L("Left"), U("Upper"), D("Down"), A("Anterior"), P("Posterior"), I("interior"), E("Exterior")
+}
+
+enum CommunicationPriorityEnum {
+	Stat("Immediate - Priority 1"), Asap("As soon as possible - Priority 2"), Urgent("Urgent - Priority 3"),
+		Routine("Routine - Priority 4")
+}
+
+enum CommunicationMediumEnum {
+	ELECTRONIC("electronic data"), PHYSICAL("physical presence"), REMOTE("remote presence"), VERBAL("verbal"),
+		DICTATE("dictated"), FACE("face-to-face"), PHONE("telephone"), VIDEOCONF("videoconferencing"),
+		WRITTEN("written"), FAXWRIT("telefax"), HANDWRIT("handwritten"), MAILWRIT("mail"), ONLINEWRIT("online written"),
+		EMAILWRIT("email"), TYPEWRIT("typewritten")
+}
+
+enum CommunicationReasonEnum {
+	Missing_info("Missing information"), Missing_attach("Missing attachment"),
+		Info_correct("Information correction")
+}
+
+enum LanguageEnum {
+	AR("Arabic"), EN("English")
+}
+
+enum CoverageTypeEnum {
+	EHCPOL("Extended healthcare"), PUBLICPOL("Public healthcare")
+}
+
+enum RelationShipEnum {
+	Child("Child"), Parent("Parent"), Spouse("Spouse"), Common("Common Law Spouse"), Other("Other"), Self("Self"),
+		Injured("Injured")
+}
+
+enum ClassTypeEnum {
+	Group("Group"), Subgroup("SubGroup"), Plan("Plan"), Subplan("SubPlan"), Class("Class"),
+		Subclass("SubClass"), Sequence("Sequence"), Rxbin("RX BIN"), Rxpcn("RX PCN"), Rxid("RX Id"),
+		Rxgroup("RX Group")
+}
+
+enum CostToBeneficiaryTypeEnum {
+	Gpvisit("An office visit for a general practitioner of a discipline."),
+		Spvisit("An office visit for a specialist practitioner of a discipline"),
+		Copaypct("A standard percentage applied to all classes or service or product not otherwise specified."),
+		Copay("A standard fixed currency amount applied to all classes or service or product not otherwise specified."),
+		Deductible("The accumulated amount of patient payment before the coverage begins to pay for services."),
+		Maxoutofpocket(
+				"The maximum amout of payment for services which a patient or family is expected to incur - typically annually")
+}
+
+enum ExemptionTypeEnum {
+	Retired("Retired"), Foster("Foster child")
+}
+
+enum EligibilityPurposeEnum {
+	Benefits("Coverage benefits"), Discovery("Coverage Discovery"), Validation("Coverage Validation")
+}
+
+enum EncounterClassEnum {
+	AMB("ambulatory"), EMER("emergency"), HH("home health"), IMP("inpatient encounter"), SS("short stay")
+}
+
+enum ServiceTypeEnum {
+	N237("Acute Inpatient Serv"), N576("Rehabilitation"), N356("General Maintenance"), N621("Complex Maintenance"),
+		N179("Palliative medicine")
+}
+
+enum ActPriorityEnum {
+	EM("Emergency"), EL("Elective")
+}
+
+enum AdmitSourceEnum {
+	IA("Immediate Admission"), EER("Admission from hospital ER"),
+		EOP("Emergency Admission from hospital outpatient"),
+		EGPHC("Emergency Admission by referral from government primary healthcare center"),
+		EGGH("Emergency Admission by referral from general government hospital"),
+		EPPHC("Emergency Admission by referral from private primary healthcare center"),
+		EPH("Emergency Admission by referral from private hospital"), EIC("Emergency Admission by insurance company"),
+		EWGS("Elective waiting list admission government free Scheme"),
+		EWSS("Elective waiting list admission self-payment Scheme"),
+		EWIS("Elective waiting list admission insurance coverage Scheme"), EMBA("Emergency Maternity Birth Admission"),
+		PMBA("Planned Maternity Birth Admission"), Others("Others")
+}
+
+enum ReAdmissionEnum {
+	R("Re-admission")
+}
+
+enum DischargeDispositionEnum {
+	Home("Home"), DASHalt_home("Alternative home"), DASHother_hcf("Other healthcare facility"), Hosp("Hospice"),
+		DASHlong("Long-term care"), Aadvice("Left against advice"), Exp("Expired"), Psy("Psychiatric hospital"),
+		Rehab("Rehabilitation"), Snf("Skilled nursing facility"), Oth("Other")
+}
+
+enum LocationTypeEnum {
+	DedicatedServiceDeliveryLocationRoleType("DedicatedServiceDeliveryLocationRoleType"),
+		DedicatedClinicalLocationRoleType("DedicatedClinicalLocationRoleType"), DX("Diagnostics or therapeutics unit"),
+		CVDX("Cardiovascular diagnostics or therapeutics unit"), CATH("Cardiac catheterization lab"),
+		ECHO("Echocardiography lab"), GIDX("Gastroenterology diagnostics or therapeutics lab"), ENDOS("Endoscopy lab"),
+		RADDX("Radiology diagnostics or therapeutics unit"), RADO("Radiation oncology unit"),
+		RNEU("Neuroradiology unit"), HOSP("Hospital"), CHR("Chronic Care Facility"),
+		GACH("Hospitals; General Acute Care Hospital"), MHSP("Military Hospital"), PSYCHF("Psychatric Care Facility"),
+		RH("Rehabilitation hospital"), RHAT("addiction treatment center"), RHII("intellectual impairment center"),
+		RHMAD("parents with adjustment difficulties center"), RHPI("physical impairment center"),
+		RHPIH("physical impairment - hearing center"), RHPIMS("physical impairment - motor skills center"),
+		RHPIVS("physical impairment - visual skills center"), RHYAD("youths with adjustment difficulties center"),
+		HU("Hospital unit"), BMTU("Bone marrow transplant unit"), CCU("Coronary care unit"), CHEST("Chest unit"),
+		EPIL("Epilepsy unit"), ER("Emergency room"), ETU("Emergency trauma unit"), HD("Hemodialysis unit"),
+		HLAB("hospital laboratory"), INLAB("inpatient laboratory"), OUTLAB("outpatient laboratory"),
+		HRAD("radiology unit"), HUSCS("specimen collection site"), ICU("Intensive care unit"),
+		PEDICU("Pediatric intensive care unit"), PEDNICU("Pediatric neonatal intensive care unit"),
+		INPHARM("inpatient pharmacy"), MBL("medical laboratory"), NCCS("Neurology critical care and stroke unit"),
+		NS("Neurosurgery unit"), OUTPHARM("outpatient pharmacy"), PEDU("Pediatric unit"),
+		PHU("Psychiatric hospital unit"), RHU("Rehabilitation hospital unit"), SLEEP("Sleep disorders unit"),
+		NCCF("Nursing or custodial care facility"), SNF("Skilled nursing facility"), OF("Outpatient facility"),
+		ALL("Allergy clinic"), AMPUT("Amputee clinic"), BMTC("Bone marrow transplant clinic"), BREAST("Breast clinic"),
+		CANC("Child and adolescent neurology clinic"), CAPC("Child and adolescent psychiatry clinic"),
+		CARD("Ambulatory Health Care Facilities; Clinic/Center; Rehabilitation: Cardiac Facilities"),
+		PEDCARD("Pediatric cardiology clinic"), COAG("Coagulation clinic"), CRS("Colon and rectal surgery clinic"),
+		DERM("Dermatology clinic"), ENDO("Endocrinology clinic"), PEDE("Pediatric endocrinology clinic"),
+		ENT("Otorhinolaryngology clinic"), FMC("Family medicine clinic"), GI("Gastroenterology clinic"),
+		PEDGI("Pediatric gastroenterology clinic"), GIM("General internal medicine clinic"), GYN("Gynecology clinic"),
+		HEM("Hematology clinic"), PEDHEM("Pediatric hematology clinic"), HTN("Hypertension clinic"),
+		IEC("Impairment evaluation center"), INFD("Infectious disease clinic"),
+		PEDID("Pediatric infectious disease clinic"), INV("Infertility clinic"), LYMPH("Lympedema clinic"),
+		MGEN("Medical genetics clinic"), NEPH("Nephrology clinic"), PEDNEPH("Pediatric nephrology clinic"),
+		NEUR("Neurology clinic"), OB("Obstetrics clinic"), OMS("Oral and maxillofacial surgery clinic"),
+		ONCL("Medical oncology clinic"), PEDHO("Pediatric oncology clinic"), OPH("Opthalmology clinic"),
+		OPTC("optometry clinic"), ORTHO("Orthopedics clinic"), HAND("Hand clinic"), PAINCL("Pain clinic"),
+		PC("Primary care clinic"), PEDC("Pediatrics clinic"), PEDRHEUM("Pediatric rheumatology clinic"),
+		POD("Podiatry clinic"), PREV("Preventive medicine clinic"), PROCTO("Proctology clinic"),
+		PROFF("Provider's Office"), PROS("Prosthodontics clinic"), PSI("Psychology clinic"), PSY("Psychiatry clinic"),
+		RHEUM("Rheumatology clinic"), SPMED("Sports medicine clinic"), SU("Surgery clinic"),
+		PLS("Plastic surgery clinic"), URO("Urology clinic"), TR("Transplant clinic"),
+		TRAVEL("Travel and geographic medicine clinic"), WND("Wound clinic"), RTF("Residential treatment facility"),
+		PRC("Pain rehabilitation center"), SURF("Substance use rehabilitation facility"),
+		DedicatedNonClinicalLocationRoleType("DedicatedNonClinicalLocationRoleType"), DADDR("Delivery Address"),
+		MOBL("Mobile Unit"), AMB("Ambulance"), PHARM("Pharmacy"),
+		IncidentalServiceDeliveryLocationRoleType("IncidentalServiceDeliveryLocationRoleType"), ACC("accident site"),
+		COMM("Community Location"), CSC("community service center"), PTRES("Patient's Residence"), SCHOOL("school"),
+		UPC("underage protection center"), WORK("work site")
+}
+
+enum OrganizationTypeEnum {
+	Prov("Healthcare Provider"), Dept("Hospital Department"), Ins("Insurance Company"), Pay("Payer"),
+		Other("Other")
+}
+
+enum ReligionEnum {
+	N0("Other"), N1("Muslim"), N2("Christian"), N3("Judaism"), N4("Buddhism"), N5("Zoroastrian"), N7("Hinduism"),
+		N8("Sikh"), N9("Without"), N98("Not available"), N99("Not Mentioned")
+}
+
+enum AdministrativeGenderEnum {
+	Male("Male"), Female("Female"), Unknown("Unknown"), U("Undetermined"), N("Undifferentiated"),
+		A("Sex changed to Male"), B("Sex changed to female "), C("Not Completed")
+}
+
+enum MaritalStatusEnum {
+	L("Legally separated"), D("Divorced"), M("Married"), U("Unmarried"), W("Widowed"), UNK("Unknown")
+}
+
+enum PaymentStatusEnum {
+	Paid("Paid"), Cleared("Cleared")
+}
+
+enum RoleCodeEnum {
+	Doctor("Doctor"), Nurse("Nurse"), Pharmacist("Pharmacist"), Researcher("Researcher"),
+		Teacher("Teacher or educator"), Dentist("Dentist"), Physio("Physiotherapist"), Speech("Speechtherapist"),
+		Ict("ICT professional")
+}
+
+enum SpecialtyEnum {
+	DOT01_00("Anesthesiology Specialty"), DOT01_01("Ambulatory Anesthesia"), DOT01_02("Anesthesia Cardiology"),
+		DOT01_03("Neuro-Anesthesia"), DOT01_04("Obstetrics Anesthesia"), DOT01_05("Pediatrics Anesthesia"),
+		DOT01_06("Pediatrics Cardiac Anesthesia"), DOT01_07("Regional Anesthesia"),
+		DOT01_08("Vascular / Thoracic Anesthesia"), DOT02_00("Community Medicine Specialty"),
+		DOT02_01("Community Health"), DOT03_00("Dermatology Specialty"), DOT03_01("Dermatology Surgery"),
+		DOT03_02("Hair Implant Dermatology"), DOT03_03("Pediatrics Dermatology"),
+		DOT04_00("Emergency Medicine Specialty"), DOT04_01("Adult Emergency Medicine"),
+		DOT04_02("Pediatrics Emergency Medicine"), DOT05_00("Ear Nose & Throat Specialty"), DOT05_01("Adult ENT"),
+		DOT05_02("Laryngology"), DOT05_03("Neuro - Otology & Otology"), DOT05_04("Nose - Ear Surgery"),
+		DOT05_05("Oral & Maxillofacial Surgery"), DOT05_06("Otolaryngology"), DOT05_07("Pediatrics ENT"),
+		DOT05_08("Pediatrics Otolaryngology"), DOT05_09("Rhinology"), DOT05_10("Audiology"),
+		DOT06_00("Family Medicine Specialty"), DOT06_01("Family Medicine"), DOT06_02("Primary Care / Ophthalmology"),
+		DOT06_03("Primary Care / Pulmonary"), DOT06_04("Primary Care Preventive Pediatrics"),
+		DOT06_05("Primary Health Care"), DOT07_00("Forensic Medicine Specialty"),
+		DOT08_00("Internal Medicine Specialty"), DOT08_01("Adolescent Medicine"), DOT08_02("Cardiology"),
+		DOT08_03("Diabetics Medicine"), DOT08_04("Endocrinology"), DOT08_05("Gastrology/Gastroenterology"),
+		DOT08_06("Geriatrics"), DOT08_07("Hematology"), DOT08_08("Infectious Diseases"), DOT08_09("Nephrology"),
+		DOT08_10("Nuclear Medicine"), DOT08_11("Oncology"), DOT08_12("Palliative Medicine"),
+		DOT08_13("Pulmonology/Chest Medicine"), DOT08_14("Rheumatology"), DOT08_15("Sleep Medicine"),
+		DOT08_16("Sport Medicine"), DOT08_17("Hepatology"), DOT08_18("Neurology"), DOT08_19("Radiation Oncology"),
+		DOT08_20("Diabetes Foot Care"), DOT08_21("Head & Neck Oncology"), DOT08_22("Hematology - Stem Cell"),
+		DOT08_23("Congenital Heart Disease"), DOT08_24("Bariatric Medicine"), DOT08_25("Cardiothoracic"),
+		DOT08_26("General Medicine"), DOT09_00("Microbiology Specialty"), DOT10_00("Obstetrics & Gynecology Specialty"),
+		DOT10_01("Gynecology Oncology"), DOT10_02("Infertility"), DOT10_03("IVF"), DOT10_04("Perinatology"),
+		DOT10_05("Urogynecology"), DOT10_06("Obstetrics"), DOT10_07("Reproductive Endocrinology & Infertility"),
+		DOT10_08("Gynecology"), DOT10_09("Maternal Fetal Medicine"), DOT11_00("Ophthalmology Specialty"),
+		DOT11_01("Comprehensive Ophthalmology"), DOT11_02("Diseases & Surgery of the Retina"), DOT11_03("Glaucoma"),
+		DOT11_04("Neuro - Ophthalmology"), DOT11_05("Ocular Oncology"), DOT11_06("Oculoplastic"),
+		DOT11_07("Ophthalmology"), DOT11_08("Pediatrics Ophthalmology & Strabismus"),
+		DOT11_09("Primary Care / Ophthalmology"), DOT11_10("Uveitis / Medical Retina"), DOT11_11("Optometric"),
+		DOT11_12("Anterior Segment"), DOT11_13("Anaplastology"), DOT11_14("Macular Dystrophy"), DOT11_15("Abyplopia"),
+		DOT11_16("Ophthalmic Photography"), DOT12_00("Orthopedic Specialty"), DOT12_01("Oncology Orthopedic"),
+		DOT12_02("Orthopedic Surgery"), DOT12_03("Pediatrics Orthopedic"), DOT12_04("Upper Limp Orthopedic"),
+		DOT13_00("Pathology Specialty"), DOT13_01("Bone & Soft Tissue Pathology"), DOT13_02("Dermatopathology"),
+		DOT13_03("Gast_ & Hepat Pathology"), DOT13_04("Histopathology"), DOT13_05("Lymphoma Pathology"),
+		DOT13_06("Pathology Dermatology"), DOT13_07("Renal Pathology"), DOT14_00("Pediatric Specialty"),
+		DOT14_01("Fetal Medicine"), DOT14_02("Neonatal Intensive Care (NICU)"), DOT14_03("Pediatrics Imaging"),
+		DOT14_04("Pediatrics Endocrinology"), DOT14_05("Pediatrics Gastroenterology"), DOT14_06("Pediatrics Genetics"),
+		DOT14_07("Pediatrics Rheumatology"), DOT14_08("Pediatrics Sleep Medicine"), DOT14_09("Pediatrics Orthopedic"),
+		DOT14_10("Pediatrics Hematology"), DOT14_11("Pediatrics Infectious Diseases"),
+		DOT14_12("Pediatrics Intensive Care"), DOT14_13("Pediatrics Nephrology"),
+		DOT14_14("Pediatrics Pulmonary Diseases"), DOT14_15("Primary Care Preventive Pediatrics"),
+		DOT14_16("Pediatric Neurology"), DOT14_17("Fetal Cardiology"), DOT14_18("Neonatology"),
+		DOT14_19("Pediatric Allergy"), DOT14_20("Pediatric Cardiology"), DOT15_00("Pediatrics Surgery Specialty"),
+		DOT15_01("Pediatrics Cardiology"), DOT15_02("Pediatrics Neurosurgery"), DOT15_03("Pediatrics Oncology"),
+		DOT15_04("Pediatrics Plastic Surgery"), DOT15_05("Pediatrics General Surgery"),
+		DOT15_06("Pediatrics Hematology/Oncology"), DOT16_00("Physical Medicine & Rehabilitation Specialty"),
+		DOT16_01("Physical Medicine & Rehabilitation"), DOT16_02("Occupational Medicine"),
+		DOT17_00("Psychiatry Specialty"), DOT17_01("Addiction Medicine"), DOT17_02("Child / Adolescent Psychiatry"),
+		DOT17_03("Consultation - Liaison Psychiatry"), DOT17_04("Forensic Psychiatry"),
+		DOT17_05("Geriatric Psychiatry"), DOT17_06("Mental Health"), DOT17_07("Mood Disorders Psychiatry"),
+		DOT17_08("Psychiatry"), DOT17_09("Rehabilitation Psychiatry"), DOT17_10("Schizophrenia"),
+		DOT17_11("Pediatric Behavior"), DOT17_12("Youth Stress Reduction"), DOT18_00("Radiology Specialty"),
+		DOT18_01("Body Imaging"), DOT18_02("Breast Imaging"), DOT18_03("Cardiac Imaging"), DOT18_04("Chest Imaging"),
+		DOT18_05("Diagnostic Neuroradiology"), DOT18_06("Diagnostic Radiology"), DOT18_07("Emergency Radiology"),
+		DOT18_08("Interventional Neuroradiology"), DOT18_09("Interventional Radiology"),
+		DOT18_10("Musculoskeletal Imaging"), DOT18_11("Pediatrics Imaging"), DOT18_12("Women's Imaging"),
+		DOT19_00("Surgery Specialty"), DOT19_01("Arthroplasty Surgery"), DOT19_02("Bariatric Surgery"),
+		DOT19_03("Cosmetic Surgery"), DOT19_04("Craniofacial Surgery"), DOT19_05("Endocrinology Surgery"),
+		DOT19_06("Facioplastic"), DOT19_07("Foot & Ankle Surgery"), DOT19_08("General Surgery"),
+		DOT19_09("Hand Surgery"), DOT19_10("Hepatobiliary & Upper GI Surgery"),
+		DOT19_11("Neurosurgery (Spinal Surgery)"), DOT19_12("Neurosurgery / Oncology"),
+		DOT19_13("Neurosurgery Vascular"), DOT19_14("Plastic Surgery & Reconstruction"), DOT19_15("Skull Base Surgery"),
+		DOT19_16("Spine Surgery"), DOT19_17("Thoracic Surgery/Chest Surgery"), DOT19_18("Trauma Surgery"),
+		DOT19_19("Vascular Surgery"), DOT19_20("Colorectal Surgery"), DOT19_21("Transplant Surgery"),
+		DOT19_22("Liver Transplant Surgery"), DOT19_23("Renal and Pancreas Transplant Surgery"),
+		DOT19_24("Breast Surgery"), DOT19_25("Cardiothoracic Surgery"), DOT19_26("Burns"),
+		DOT20_00("Urology Specialty"), DOT20_01("Gynecology Urology"), DOT20_02("Laparoscopic Urology"),
+		DOT20_03("Neuro - Urology"), DOT20_04("Oncology Urology"), DOT20_05("Pediatrics Urology"),
+		DOT20_06("Reconstruction Urology"), DOT21_00("Critical Care"), DOT21_01("Pediatric Critical Care (PICU)"),
+		DOT21_02("Intensive Care (ICU)"), DOT22_00("Dental"), DOT22_01("Pediatric Dental"), DOT22_02("Prosthodontics"),
+		DOT22_03("Endodontics"), DOT22_04("Periodontics"), DOT22_05("Orthodontics"), DOT22_06("Dental Implants"),
+		DOT22_07("Dental Hygiene"), DOT22_08("Special Needs Dentistry"), DOT23_00("Neurophysiology"),
+		DOT24_00("Speech or Speech Language Pathology"), DOT25_00("Infection Control")
+}
+
+enum SupportingInfoCategoryEnum {
+	Info("Information"), Discharge("Discharge"), Onset("Onset"), Related("Related Services"),
+		Exception("Exception"), Material("Materials Forwarded"), Attachment("Attachment"),
+		Missingtooth("Missing Tooth"), Prosthesis("Prosthesis"), Other("Other"), Hospitalized("Hospitalized"),
+		EmploymentImpacted("EmploymentImpacted"), External_Cause("External Caause"),
+		Patient_Reason_for_Visit("Patient Reason for Visit"), Lab_test("lab-test"),
+		Reason_for_Visit("Reason for visit"), Days_Supply("Days supply"), Vital_Sign_Weight("Vital Sign Weight"),
+		Vital_Sign_Systolic("Vital Sign Systolic"), Vital_Sign_Diastolic("Vital Sign Diastolic"),
+		Icu_hours("ICU Hours"), Ventilation_hours("Ventilation Hours"), Vital_Sign_Height("Vital Sign Height")
+}
+
+enum SupportingInfoCodeVisitEnum {
+	New_visit("New Visit"), Follow_up("Follow Up"), Refill("Refill"), Walk_in("Walk in"), Referral("Referral")
+}
+
+enum SupportingInfoCodeFdiEnum {
+	N11("UPPER RIGHT; PERMANENT TEETH # 1"), N12("UPPER RIGHT; PERMANENT TEETH # 2"),
+		N13("UPPER RIGHT; PERMANENT TEETH # 3"), N14("UPPER RIGHT; PERMANENT TEETH # 4"),
+		N15("UPPER RIGHT; PERMANENT TEETH # 5"), N16("UPPER RIGHT; PERMANENT TEETH # 6"),
+		N17("UPPER RIGHT; PERMANENT TEETH # 7"), N18("UPPER RIGHT; PERMANENT TEETH # 8"),
+		N21("UPPER LEFT; PERMANENT TEETH # 1"), N22("UPPER LEFT; PERMANENT TEETH # 2"),
+		N23("UPPER LEFT; PERMANENT TEETH # 3"), N24("UPPER LEFT; PERMANENT TEETH # 4"),
+		N25("UPPER LEFT; PERMANENT TEETH # 5"), N26("UPPER LEFT; PERMANENT TEETH # 6"),
+		N27("UPPER LEFT; PERMANENT TEETH # 7"), N28("UPPER LEFT; PERMANENT TEETH # 8"),
+		N31("LOWER LEFT; PERMANENT TEETH # 1"), N32("LOWER LEFT; PERMANENT TEETH # 2"),
+		N33("LOWER LEFT; PERMANENT TEETH # 3"), N34("LOWER LEFT; PERMANENT TEETH # 4"),
+		N35("LOWER LEFT; PERMANENT TEETH # 5"), N36("LOWER LEFT; PERMANENT TEETH # 6"),
+		N37("LOWER LEFT; PERMANENT TEETH # 7"), N38("LOWER LEFT; PERMANENT TEETH # 8"),
+		N41("LOWER RIGHT; PERMANENT TEETH # 1"), N42("LOWER RIGHT; PERMANENT TEETH # 2"),
+		N43("LOWER RIGHT; PERMANENT TEETH # 3"), N44("LOWER RIGHT; PERMANENT TEETH # 4"),
+		N45("LOWER RIGHT; PERMANENT TEETH # 5"), N46("LOWER RIGHT; PERMANENT TEETH # 6"),
+		N47("LOWER RIGHT; PERMANENT TEETH # 7"), N48("LOWER RIGHT; PERMANENT TEETH # 8"),
+		N51("UPPER RIGHT; DECIDUOUS TEETH # 1"), N52("UPPER RIGHT; DECIDUOUS TEETH # 2"),
+		N53("UPPER RIGHT; DECIDUOUS TEETH # 3"), N54("UPPER RIGHT; DECIDUOUS TEETH # 4"),
+		N55("UPPER RIGHT; DECIDUOUS TEETH # 5"), N61("UPPER LEFT; DECIDUOUS TEETH # 1"),
+		N62("UPPER LEFT; DECIDUOUS TEETH # 2"), N63("UPPER LEFT; DECIDUOUS TEETH # 3"),
+		N64("UPPER LEFT; DECIDUOUS TEETH # 4"), N65("UPPER LEFT; DECIDUOUS TEETH # 5"),
+		N71("LOWER LEFT; DECIDUOUS TEETH # 1"), N72("LOWER LEFT; DECIDUOUS TEETH # 2"),
+		N73("LOWER LEFT; DECIDUOUS TEETH # 3"), N74("LOWER LEFT; DECIDUOUS TEETH # 4"),
+		N75("LOWER LEFT; DECIDUOUS TEETH # 5"), N81("LOWER RIGHT; DECIDUOUS TEETH # 1"),
+		N82("LOWER RIGHT; DECIDUOUS TEETH # 2"), N83("LOWER RIGHT; DECIDUOUS TEETH # 3"),
+		N84("LOWER RIGHT; DECIDUOUS TEETH # 4"), N85("LOWER RIGHT; DECIDUOUS TEETH # 5")
+}
+
+enum SupportingInfoReasonEnum {
+	Missing_info("Missing information"), Missing_attach("Missing attachement"),
+		Info_Correct("Information correction")
+}
+
+enum SupportingInfoReasonMissingToothEnum {
+	E("Extraction"), C("Congenital"), U("Unknown"), O("Other")
+}
+
+enum TaskCodeEnum {
+	Cancel("Cancel the focal resource"), Nullify("Nullify the focal resource"), Poll("Poll the focal resource"),
+		Release("Release the focal resource"), Reprocess("Reprocess the focal resource"),
+		Status("Check status of the focal resource")
+}
+
+enum TaskReasonCodeEnum {
+	WI("wrong information"), NP("service not performed"), TAS("transaction already submitted")
+}
+
+enum ResourceTypeEnum {
+	Claim("Claim"), ClaimResponse("ClaimResponse"), Communication("Communication"),
+		CommunicationRequest("CommunicationRequest"), CoverageEligibilityRequest("CoverageEligibilityRequest"),
+		CoverageEligibilityResponse("CoverageEligibilityResponse"), OperationOutcome("OperationOutcome"),
+		PaymentNotice("PaymentNotice"), PaymentReconciliation("PaymentReconciliation")
+}
+
+enum EventCodingEnum {
+	Eligibility_request("Eligibility Request"), Eligibility_response("Eligibility Response"),
+		Priorauth_request("Prior Authorization Request"), Priorauth_response("Prior Authorization Response"),
+		Claim_request("Claim Request"), Claim_response("Claim Response"), Batch_request("Batch-Request"),
+		Status_check("Status Check"), Status_response("Status Response"), Cancel_request("Cancel Request"),
+		Cancel_response("Cancel Response"), Payment_notice("Payment Notice"),
+		Payment_reconciliation("Payment Reconciliation"), Communication_request("Communication Request"),
+		Communication("Communication"), Acknowledgement("Acknowledgement"), Poll_request("Poll Request"),
+		Poll_response("Poll Response"), Nullify_request("Nullify Request"), Nullify_response("Nullify Response")
+}
+
+relationship OneToOne {
+  Claim{encounter} to Encounter
+  Claim{eligibilityResponse} to CoverageEligibilityResponse
+  Claim{patient} to Patient
+  Claim{provider} to Organization
+  Claim{insurer} to Organization
+  Claim{prescription} to ReferenceIdentifier
+  Claim{originalPrescription} to ReferenceIdentifier
+  Claim{payee} to Payee
+  Claim{referral} to ReferenceIdentifier
+  Claim{facility} to Location
+  Claim{accident} to Accident
+  Related{claimReference} to ReferenceIdentifier
+  Payee{partyPatient} to Patient
+  Payee{partyOrganization} to Organization
+  CareTeam{provider} to Practitioner
+  CareTeam{providerRole} to PractitionerRole
+  Insurance{coverage} to Coverage
+  Insurance{claimResponse} to ClaimResponse
+  Accident{location} to Address
+  Communication{subject} to Patient
+  Communication{sender} to Organization
+  Communication{recipient} to Organization
+  Communication{about} to Claim
+  Payload{contentAttachment} to Attachment
+  Payload{contentReference} to ReferenceIdentifier
+  CommunicationRequest{subject} to Patient
+  CommunicationRequest{about} to Claim
+  CommunicationRequest{sender} to Organization
+  Contact{name} to HumanName
+  Coverage{subscriberPatient} to Patient
+  Coverage{beneficiary} to Patient
+  Coverage{payor} to Organization
+  CoverageEligibilityRequest{patient} to Patient
+  CoverageEligibilityRequest{provider} to Organization
+  CoverageEligibilityRequest{insurer} to Organization
+  CoverageEligibilityRequest{facility} to Location
+  CoverageEligibilityResponse{patient} to Patient
+  CoverageEligibilityResponse{insurer} to Organization
+  ResponseInsurance{coverage} to Coverage
+  Encounter{subject} to Patient
+  Encounter{hospitalization} to Hospitalization
+  Encounter{serviceProvider} to Organization
+  Hospitalization{origin} to Organization
+  Location{managingOrganization} to Organization
+  Organization{address} to Address
+  Patient{contacts} to Contact
+  Patient{address} to Address
+  PaymentNotice{payment} to PaymentReconciliation{paymentNotice}
+  PaymentReconciliation{paymentIssuer} to Organization
+  ReconciliationDetailItem{request} to Claim
+  ReconciliationDetailItem{submitter} to Organization
+  ReconciliationDetailItem{response} to ClaimResponse
+  ReconciliationDetailItem{payee} to Organization
+  PractitionerRole{practitioner} to Practitioner
+  PractitionerRole{organization} to Organization
+  SupportingInfo{valueQuantity} to Quantity
+  SupportingInfo{valueAttachment} to Attachment
+  SupportingInfo{valueReference} to ReferenceIdentifier
+  Task{requester} to Organization
+  Task{owner} to Organization
+  TaskInput{inputOrigResponse} to ReferenceIdentifier
+  TaskOutput{response} to ReferenceIdentifier
+}
+
+relationship ManyToOne {
+  AckErrorMessages{acknowledgement} to Acknowledgement{errors}
+  ClaimErrorMessages{claim} to Claim{errors}
+  Related{claim} to Claim{relateds}
+  CareTeam{claim} to Claim{careTeam}
+  SupportingInfo{claim} to Claim{supportingInfos}
+}
+
+relationship OneToMany {
+  Claim{diagnoses} to Diagnosis{claim}
+  Claim{insurances} to Insurance{claim}
+  Claim{items} to Item{claim}
+  Item{diagnosisSequence} to DiagnosisSequence{item} 
+  Item{informationSequence} to InformationSequence{item}
+  Item{udi} to ReferenceIdentifier{item}
+  Item{details} to DetailItem{item}
+  DetailItem{udi} to ReferenceIdentifier{detailItem}
+  DetailItem{subDetails} to SubDetailItem{detailItem}
+  SubDetailItem{udi} to ReferenceIdentifier{subDetailItem}
+  ClaimResponse{errors} to CRErrorMessages{claimResponse}
+  ClaimResponse{items} to AdjudicationItem{claimResponse}
+  ClaimResponse{total} to Total{claimResponse}
+  AdjudicationItem{notes} to AdjudicationNotes{adjudicationItem}
+  AdjudicationItem{adjudications} to Adjudication{adjudicationItem}
+  AdjudicationItem{details} to AdjudicationDetailItem{adjudicationItem}
+  AdjudicationDetailItem{notes} to AdjudicationDetailNotes{adjudicationDetailItem}
+  AdjudicationDetailItem{adjudications} to Adjudication{adjudicationDetailItem}
+  AdjudicationDetailItem{subDetails} to AdjudicationSubDetailItem{adjudicationDetailItem}
+  AdjudicationSubDetailItem{notes} to AdjudicationSubDetailNotes{adjudicationSubDetailItem}
+  AdjudicationSubDetailItem{adjudications} to Adjudication{adjudicationSubDetailItem}
+  Communication{basedOn} to CommunicationRequest{communication}
+  Communication{medium} to ListCommunicationMediumEnum{communication}
+  Communication{reasonCode} to ListCommunicationReasonEnum{communication}
+  Communication{payload} to Payload{communication}
+  Communication{note} to Note{communication}
+  Communication{errors} to ComErrorMessages{communication}
+  CommunicationRequest{payload} to Payload{communicationRequest}
+  CommunicationRequest{note} to Note{communicationRequest}
+  Coverage{classComponents} to ClassComponent{coverage}
+  Coverage{costToBeneficiaryComponents} to CostToBeneficiaryComponent{coverage}
+  CostToBeneficiaryComponent{exceptions} to ExemptionComponent{costToBeneficiary}
+  CoverageEligibilityRequest{errors} to CovEliErrorMessages{coverageEligibilityRequest}
+  CoverageEligibilityRequest{purposes} to ListEligibilityPurposeEnum{coverageEligibilityRequest}
+  CoverageEligibilityRequest{coverages} to Coverage{coverageEligibilityRequest}
+  CoverageEligibilityResponse{errors} to CovEliRespErrorMessages{coverageEligibilityResponse}
+  CoverageEligibilityResponse{insurance} to ResponseInsurance{coverageEligibilityResponse}
+  ResponseInsurance{item} to ResponseInsuranceItem{responseInsurance}
+  ResponseInsuranceItem{benefit} to InsuranceBenefit{responseInsuranceItem}
+  HumanName{given} to Givens{human}
+  OperationOutcome{errors} to OpeOutErrorMessages{operationOutcome}
+  Organization{contacts} to Contact{organization}
+  Patient{names} to HumanName{patient}
+  PaymentNotice{errors} to PayNotErrorMessages{paymentNotice}
+  PaymentReconciliation{detail} to ReconciliationDetailItem{paymentReconciliation}
+  Practitioner{names} to HumanName{practitioner}
+  PractitionerRole{codes} to ListRoleCodeEnum{practitionerRole}
+  PractitionerRole{specialties} to ListSpecialtyEnum{practitionerRole}
+  Task{inputs} to TaskInput{task}
+  TaskResponse{outputs} to TaskOutput{taskResponse}
+}

@@ -1,0 +1,27 @@
+{
+  "hcpNphiesPortalApp": {
+    "taskOutput": {
+      "home": {
+        "title": "Task Outputs",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Task Output",
+        "createOrEditLabel": "Create or edit a Task Output",
+        "notFound": "No Task Outputs found"
+      },
+      "created": "A new Task Output is created with identifier {{ param }}",
+      "updated": "A Task Output is updated with identifier {{ param }}",
+      "deleted": "A Task Output is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Task Output {{ id }}?"
+      },
+      "detail": {
+        "title": "Task Output"
+      },
+      "id": "ID",
+      "status": "Status",
+      "errorOutput": "Error Output",
+      "response": "Response",
+      "taskResponse": "Task Response"
+    }
+  }
+}

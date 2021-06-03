@@ -1,0 +1,11 @@
+id;input_include;input_exclude;input_include_message;input_exclude_message;input_count;input_start;input_end;input_line_item
+1;CoverageEligibilityResponse;OperationOutcome;Status_check;Status_check;45909;2021-06-02T13:20:25;2021-06-02T20:49:52;28537
+2;CoverageEligibilityResponse;CommunicationRequest;Payment_reconciliation;Poll_response;65366;2021-06-02T14:09:45;2021-06-02T20:18:03;37097
+3;OperationOutcome;PaymentReconciliation;Communication;Batch_request;68112;2021-06-02T22:05:35;2021-06-02T08:37:54;18320
+4;Communication;PaymentReconciliation;Cancel_request;Cancel_request;48364;2021-06-03T00:14:59;2021-06-02T23:33:28;79301
+5;CoverageEligibilityResponse;PaymentReconciliation;Payment_notice;Claim_response;67612;2021-06-03T05:56:25;2021-06-02T16:18:08;61161
+6;CoverageEligibilityRequest;CoverageEligibilityRequest;Priorauth_response;Acknowledgement;68839;2021-06-03T02:35:09;2021-06-03T01:30:34;83783
+7;ClaimResponse;CoverageEligibilityResponse;Eligibility_request;Cancel_request;69605;2021-06-02T08:34:05;2021-06-02T16:47:10;2895
+8;CommunicationRequest;CoverageEligibilityRequest;Cancel_response;Status_check;44276;2021-06-02T17:48:14;2021-06-02T11:39:07;2241
+9;ClaimResponse;Claim;Poll_request;Nullify_response;57503;2021-06-02T19:33:02;2021-06-02T22:05:00;17369
+10;PaymentReconciliation;PaymentReconciliation;Nullify_request;Eligibility_response;99186;2021-06-02T21:50:16;2021-06-03T01:33:05;45666

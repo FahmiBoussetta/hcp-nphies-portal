@@ -1,0 +1,28 @@
+{
+  "hcpNphiesPortalApp": {
+    "practitioner": {
+      "home": {
+        "title": "Practitioners",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Practitioner",
+        "createOrEditLabel": "Create or edit a Practitioner",
+        "notFound": "No Practitioners found"
+      },
+      "created": "A new Practitioner is created with identifier {{ param }}",
+      "updated": "A Practitioner is updated with identifier {{ param }}",
+      "deleted": "A Practitioner is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Practitioner {{ id }}?"
+      },
+      "detail": {
+        "title": "Practitioner"
+      },
+      "id": "ID",
+      "guid": "Guid",
+      "forceId": "Force Id",
+      "practitionerLicense": "Practitioner License",
+      "gender": "Gender",
+      "names": "Names"
+    }
+  }
+}

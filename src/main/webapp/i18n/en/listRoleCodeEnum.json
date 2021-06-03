@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "listRoleCodeEnum": {
+      "home": {
+        "title": "List Role Code Enums",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new List Role Code Enum",
+        "createOrEditLabel": "Create or edit a List Role Code Enum",
+        "notFound": "No List Role Code Enums found"
+      },
+      "created": "A new List Role Code Enum is created with identifier {{ param }}",
+      "updated": "A List Role Code Enum is updated with identifier {{ param }}",
+      "deleted": "A List Role Code Enum is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete List Role Code Enum {{ id }}?"
+      },
+      "detail": {
+        "title": "List Role Code Enum"
+      },
+      "id": "ID",
+      "r": "R",
+      "practitionerRole": "Practitioner Role"
+    }
+  }
+}

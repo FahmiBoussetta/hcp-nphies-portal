@@ -1,0 +1,51 @@
+{
+  "name": "ReferenceIdentifier",
+  "fields": [
+    {
+      "fieldName": "ref",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "idValue",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "identifier",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "display",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "item",
+      "otherEntityRelationshipName": "udi",
+      "relationshipName": "item"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "detailItem",
+      "otherEntityRelationshipName": "udi",
+      "relationshipName": "detailItem"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "subDetailItem",
+      "otherEntityRelationshipName": "udi",
+      "relationshipName": "subDetailItem"
+    }
+  ],
+  "entityTableName": "reference_identifier",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073902"
+}

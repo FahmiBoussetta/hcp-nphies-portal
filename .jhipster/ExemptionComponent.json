@@ -1,0 +1,37 @@
+{
+  "name": "ExemptionComponent",
+  "fields": [
+    {
+      "fieldName": "type",
+      "fieldType": "ExemptionTypeEnum",
+      "fieldValues": "Retired (Retired),Foster (Foster child)",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "start",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "end",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "costToBeneficiaryComponent",
+      "otherEntityRelationshipName": "exceptions",
+      "relationshipName": "costToBeneficiary"
+    }
+  ],
+  "entityTableName": "exemption_component",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073844"
+}

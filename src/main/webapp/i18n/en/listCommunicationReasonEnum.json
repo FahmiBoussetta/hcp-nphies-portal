@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "listCommunicationReasonEnum": {
+      "home": {
+        "title": "List Communication Reason Enums",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new List Communication Reason Enum",
+        "createOrEditLabel": "Create or edit a List Communication Reason Enum",
+        "notFound": "No List Communication Reason Enums found"
+      },
+      "created": "A new List Communication Reason Enum is created with identifier {{ param }}",
+      "updated": "A List Communication Reason Enum is updated with identifier {{ param }}",
+      "deleted": "A List Communication Reason Enum is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete List Communication Reason Enum {{ id }}?"
+      },
+      "detail": {
+        "title": "List Communication Reason Enum"
+      },
+      "id": "ID",
+      "cr": "Cr",
+      "communication": "Communication"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "hcpNphiesPortalApp": {
+    "acknowledgement": {
+      "home": {
+        "title": "Acknowledgements",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Acknowledgement",
+        "createOrEditLabel": "Create or edit a Acknowledgement",
+        "notFound": "No Acknowledgements found"
+      },
+      "created": "A new Acknowledgement is created with identifier {{ param }}",
+      "updated": "A Acknowledgement is updated with identifier {{ param }}",
+      "deleted": "A Acknowledgement is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Acknowledgement {{ id }}?"
+      },
+      "detail": {
+        "title": "Acknowledgement"
+      },
+      "id": "ID",
+      "value": "Value",
+      "system": "System",
+      "parsed": "Parsed",
+      "errors": "Errors"
+    }
+  }
+}

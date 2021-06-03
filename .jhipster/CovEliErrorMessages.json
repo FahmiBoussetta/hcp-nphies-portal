@@ -1,0 +1,27 @@
+{
+  "name": "CovEliErrorMessages",
+  "fields": [
+    {
+      "fieldName": "message",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "coverageEligibilityRequest",
+      "otherEntityRelationshipName": "errors",
+      "relationshipName": "coverageEligibilityRequest"
+    }
+  ],
+  "entityTableName": "cov_eli_error_messages",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073802"
+}

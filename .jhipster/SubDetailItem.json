@@ -1,0 +1,84 @@
+{
+  "name": "SubDetailItem",
+  "fields": [
+    {
+      "fieldName": "sequence",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "tax",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "transportationSRCA",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "imaging",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "laboratory",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "medicalDevice",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "oralHealthIP",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "oralHealthOP",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "procedure",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "services",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "medicationCode",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "quantity",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "unitPrice",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "referenceIdentifier",
+      "otherEntityRelationshipName": "subDetailItem",
+      "relationshipName": "udi"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "detailItem",
+      "otherEntityRelationshipName": "subDetails",
+      "relationshipName": "detailItem"
+    }
+  ],
+  "entityTableName": "sub_detail_item",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073828"
+}

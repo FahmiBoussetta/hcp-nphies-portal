@@ -1,0 +1,55 @@
+{
+  "hcpNphiesPortalApp": {
+    "claim": {
+      "home": {
+        "title": "Claims",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Claim",
+        "createOrEditLabel": "Create or edit a Claim",
+        "notFound": "No Claims found"
+      },
+      "created": "A new Claim is created with identifier {{ param }}",
+      "updated": "A Claim is updated with identifier {{ param }}",
+      "deleted": "A Claim is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Claim {{ id }}?"
+      },
+      "detail": {
+        "title": "Claim"
+      },
+      "id": "ID",
+      "guid": "Guid",
+      "isQueued": "Is Queued",
+      "parsed": "Parsed",
+      "identifier": "Identifier",
+      "use": "Use",
+      "type": "Type",
+      "subType": "Sub Type",
+      "eligibilityOffline": "Eligibility Offline",
+      "eligibilityOfflineDate": "Eligibility Offline Date",
+      "authorizationOfflineDate": "Authorization Offline Date",
+      "billableStart": "Billable Start",
+      "billableEnd": "Billable End",
+      "priority": "Priority",
+      "fundsReserve": "Funds Reserve",
+      "encounter": "Encounter",
+      "eligibilityResponse": "Eligibility Response",
+      "patient": "Patient",
+      "provider": "Provider",
+      "insurer": "Insurer",
+      "prescription": "Prescription",
+      "originalPrescription": "Original Prescription",
+      "payee": "Payee",
+      "referral": "Referral",
+      "facility": "Facility",
+      "accident": "Accident",
+      "diagnoses": "Diagnoses",
+      "insurances": "Insurances",
+      "items": "Items",
+      "errors": "Errors",
+      "relateds": "Relateds",
+      "careTeam": "Care Team",
+      "supportingInfos": "Supporting Infos"
+    }
+  }
+}

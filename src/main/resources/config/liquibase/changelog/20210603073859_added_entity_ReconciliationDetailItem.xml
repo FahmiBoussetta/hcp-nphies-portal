@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity ReconciliationDetailItem.
+    -->
+    <changeSet id="20210603073859-1" author="jhipster">
+        <createTable tableName="reconciliation_detail_item">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="identifier" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="predecessor" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="date" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="amount" type="decimal(21,2)">
+                <constraints nullable="true" />
+            </column>
+            <column name="request_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_reconciliation_detail_item__request_id" />
+            </column>
+            <column name="submitter_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_reconciliation_detail_item__submitter_id" />
+            </column>
+            <column name="response_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_reconciliation_detail_item__response_id" />
+            </column>
+            <column name="payee_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_reconciliation_detail_item__payee_id" />
+            </column>
+            <column name="payment_reconciliation_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="reconciliation_detail_item" columnName="date" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20210603073859-1-data" author="jhipster" context="faker">
+        <loadData
+                  file="config/liquibase/fake-data/reconciliation_detail_item.csv"
+                  separator=";"
+                  tableName="reconciliation_detail_item">
+            <column name="id" type="numeric"/>
+            <column name="identifier" type="string"/>
+            <column name="predecessor" type="string"/>
+            <column name="type" type="string"/>
+            <column name="date" type="${datetimeType}"/>
+            <column name="amount" type="numeric"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

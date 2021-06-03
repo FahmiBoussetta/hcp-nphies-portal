@@ -1,0 +1,48 @@
+{
+  "name": "CareTeam",
+  "fields": [
+    {
+      "fieldName": "sequence",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "role",
+      "fieldType": "CareTeamRoleEnum",
+      "fieldValues": "Primary (Primary provider),Assist (Assisting Provider),Supervisor (Supervising Provider),Other (Other)",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "practitioner",
+      "otherEntityRelationshipName": "careTeam",
+      "relationshipName": "provider",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "practitionerRole",
+      "otherEntityRelationshipName": "careTeam",
+      "relationshipName": "providerRole",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "claim",
+      "otherEntityRelationshipName": "careTeam",
+      "relationshipName": "claim"
+    }
+  ],
+  "entityTableName": "care_team",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073822"
+}

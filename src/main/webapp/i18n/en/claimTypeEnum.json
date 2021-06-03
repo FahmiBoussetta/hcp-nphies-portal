@@ -1,0 +1,12 @@
+{
+  "hcpNphiesPortalApp": {
+    "ClaimTypeEnum": {
+      "null": "",
+      "Institutional": "institutional",
+      "Oral": "oral",
+      "Pharmacy": "pharmacy",
+      "Professional": "professional",
+      "Vision": "vision"
+    }
+  }
+}

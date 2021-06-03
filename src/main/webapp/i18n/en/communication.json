@@ -1,0 +1,38 @@
+{
+  "hcpNphiesPortalApp": {
+    "communication": {
+      "home": {
+        "title": "Communications",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Communication",
+        "createOrEditLabel": "Create or edit a Communication",
+        "notFound": "No Communications found"
+      },
+      "created": "A new Communication is created with identifier {{ param }}",
+      "updated": "A Communication is updated with identifier {{ param }}",
+      "deleted": "A Communication is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Communication {{ id }}?"
+      },
+      "detail": {
+        "title": "Communication"
+      },
+      "id": "ID",
+      "guid": "Guid",
+      "isQueued": "Is Queued",
+      "parsed": "Parsed",
+      "identifier": "Identifier",
+      "priority": "Priority",
+      "subject": "Subject",
+      "sender": "Sender",
+      "recipient": "Recipient",
+      "about": "About",
+      "basedOn": "Based On",
+      "medium": "Medium",
+      "reasonCode": "Reason Code",
+      "payload": "Payload",
+      "note": "Note",
+      "errors": "Errors"
+    }
+  }
+}

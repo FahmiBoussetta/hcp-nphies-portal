@@ -1,0 +1,9 @@
+{
+  "hcpNphiesPortalApp": {
+    "ExemptionTypeEnum": {
+      "null": "",
+      "Retired": "Retired",
+      "Foster": "Foster child"
+    }
+  }
+}

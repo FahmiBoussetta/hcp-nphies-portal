@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "comErrorMessages": {
+      "home": {
+        "title": "Com Error Messages",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Com Error Messages",
+        "createOrEditLabel": "Create or edit a Com Error Messages",
+        "notFound": "No Com Error Messages found"
+      },
+      "created": "A new Com Error Messages is created with identifier {{ param }}",
+      "updated": "A Com Error Messages is updated with identifier {{ param }}",
+      "deleted": "A Com Error Messages is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Com Error Messages {{ id }}?"
+      },
+      "detail": {
+        "title": "Com Error Messages"
+      },
+      "id": "ID",
+      "message": "Message",
+      "communication": "Communication"
+    }
+  }
+}

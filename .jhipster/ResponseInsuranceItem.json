@@ -1,0 +1,57 @@
+{
+  "name": "ResponseInsuranceItem",
+  "fields": [
+    {
+      "fieldName": "category",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "excluded",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "network",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "unit",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "term",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "insuranceBenefit",
+      "otherEntityRelationshipName": "responseInsuranceItem",
+      "relationshipName": "benefit"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "responseInsurance",
+      "otherEntityRelationshipName": "item",
+      "relationshipName": "responseInsurance"
+    }
+  ],
+  "entityTableName": "response_insurance_item",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073848"
+}

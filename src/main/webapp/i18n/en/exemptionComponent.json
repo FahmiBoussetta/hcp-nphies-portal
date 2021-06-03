@@ -1,0 +1,27 @@
+{
+  "hcpNphiesPortalApp": {
+    "exemptionComponent": {
+      "home": {
+        "title": "Exemption Components",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Exemption Component",
+        "createOrEditLabel": "Create or edit a Exemption Component",
+        "notFound": "No Exemption Components found"
+      },
+      "created": "A new Exemption Component is created with identifier {{ param }}",
+      "updated": "A Exemption Component is updated with identifier {{ param }}",
+      "deleted": "A Exemption Component is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Exemption Component {{ id }}?"
+      },
+      "detail": {
+        "title": "Exemption Component"
+      },
+      "id": "ID",
+      "type": "Type",
+      "start": "Start",
+      "end": "End",
+      "costToBeneficiary": "Cost To Beneficiary"
+    }
+  }
+}

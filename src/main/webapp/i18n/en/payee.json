@@ -1,0 +1,26 @@
+{
+  "hcpNphiesPortalApp": {
+    "payee": {
+      "home": {
+        "title": "Payees",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Payee",
+        "createOrEditLabel": "Create or edit a Payee",
+        "notFound": "No Payees found"
+      },
+      "created": "A new Payee is created with identifier {{ param }}",
+      "updated": "A Payee is updated with identifier {{ param }}",
+      "deleted": "A Payee is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Payee {{ id }}?"
+      },
+      "detail": {
+        "title": "Payee"
+      },
+      "id": "ID",
+      "type": "Type",
+      "partyPatient": "Party Patient",
+      "partyOrganization": "Party Organization"
+    }
+  }
+}

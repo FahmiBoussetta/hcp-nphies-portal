@@ -1,0 +1,35 @@
+{
+  "name": "Related",
+  "fields": [
+    {
+      "fieldName": "relationShip",
+      "fieldType": "ClaimRelationshipEnum",
+      "fieldValues": "Prior (Prior Claim),Associated (Associated Claim),Extend (Authorization to extend)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "referenceIdentifier",
+      "otherEntityRelationshipName": "related",
+      "relationshipName": "claimReference",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "claim",
+      "otherEntityRelationshipName": "relateds",
+      "relationshipName": "claim"
+    }
+  ],
+  "entityTableName": "related",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073820"
+}

@@ -1,0 +1,39 @@
+{
+  "hcpNphiesPortalApp": {
+    "detailItem": {
+      "home": {
+        "title": "Detail Items",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Detail Item",
+        "createOrEditLabel": "Create or edit a Detail Item",
+        "notFound": "No Detail Items found"
+      },
+      "created": "A new Detail Item is created with identifier {{ param }}",
+      "updated": "A Detail Item is updated with identifier {{ param }}",
+      "deleted": "A Detail Item is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Detail Item {{ id }}?"
+      },
+      "detail": {
+        "title": "Detail Item"
+      },
+      "id": "ID",
+      "sequence": "Sequence",
+      "tax": "Tax",
+      "transportationSRCA": "Transportation SRCA",
+      "imaging": "Imaging",
+      "laboratory": "Laboratory",
+      "medicalDevice": "Medical Device",
+      "oralHealthIP": "Oral Health IP",
+      "oralHealthOP": "Oral Health OP",
+      "procedure": "Procedure",
+      "services": "Services",
+      "medicationCode": "Medication Code",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price",
+      "udi": "Udi",
+      "subDetails": "Sub Details",
+      "item": "Item"
+    }
+  }
+}

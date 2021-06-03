@@ -1,0 +1,27 @@
+{
+  "hcpNphiesPortalApp": {
+    "classComponent": {
+      "home": {
+        "title": "Class Components",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Class Component",
+        "createOrEditLabel": "Create or edit a Class Component",
+        "notFound": "No Class Components found"
+      },
+      "created": "A new Class Component is created with identifier {{ param }}",
+      "updated": "A Class Component is updated with identifier {{ param }}",
+      "deleted": "A Class Component is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Class Component {{ id }}?"
+      },
+      "detail": {
+        "title": "Class Component"
+      },
+      "id": "ID",
+      "type": "Type",
+      "value": "Value",
+      "name": "Name",
+      "coverage": "Coverage"
+    }
+  }
+}

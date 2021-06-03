@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity ListCommunicationMediumEnum.
+    -->
+    <changeSet id="20210603073812-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="communication_id"
+                                 baseTableName="list_communication_medium_enum"
+                                 constraintName="fk_list_communication_medium_enum__communication_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="communication"/>
+    </changeSet>
+</databaseChangeLog>

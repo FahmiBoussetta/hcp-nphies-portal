@@ -1,0 +1,53 @@
+{
+  "name": "Adjudication",
+  "fields": [
+    {
+      "fieldName": "category",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "reason",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "value",
+      "fieldType": "BigDecimal"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "adjudicationItem",
+      "otherEntityRelationshipName": "adjudications",
+      "relationshipName": "adjudicationItem"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "adjudicationDetailItem",
+      "otherEntityRelationshipName": "adjudications",
+      "relationshipName": "adjudicationDetailItem"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "adjudicationSubDetailItem",
+      "otherEntityRelationshipName": "adjudications",
+      "relationshipName": "adjudicationSubDetailItem"
+    }
+  ],
+  "entityTableName": "adjudication",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073833"
+}

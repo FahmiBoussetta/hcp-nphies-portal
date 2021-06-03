@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity ReferenceIdentifier.
+    -->
+    <changeSet id="20210603073902-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="item_id"
+                                 baseTableName="reference_identifier"
+                                 constraintName="fk_reference_identifier__item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="item"/>
+
+        <addForeignKeyConstraint baseColumnNames="detail_item_id"
+                                 baseTableName="reference_identifier"
+                                 constraintName="fk_reference_identifier__detail_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="detail_item"/>
+
+        <addForeignKeyConstraint baseColumnNames="sub_detail_item_id"
+                                 baseTableName="reference_identifier"
+                                 constraintName="fk_reference_identifier__sub_detail_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="sub_detail_item"/>
+    </changeSet>
+</databaseChangeLog>

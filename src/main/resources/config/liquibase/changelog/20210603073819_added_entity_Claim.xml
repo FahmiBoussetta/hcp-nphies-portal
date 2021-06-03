@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Claim.
+    -->
+    <changeSet id="20210603073819-1" author="jhipster">
+        <createTable tableName="claim">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="guid" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_queued" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="parsed" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="identifier" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="jhi_use" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="sub_type" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="eligibility_offline" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="eligibility_offline_date" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="authorization_offline_date" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="billable_start" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="billable_end" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="priority" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="funds_reserve" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="encounter_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__encounter_id" />
+            </column>
+            <column name="eligibility_response_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__eligibility_response_id" />
+            </column>
+            <column name="patient_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__patient_id" />
+            </column>
+            <column name="provider_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__provider_id" />
+            </column>
+            <column name="insurer_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__insurer_id" />
+            </column>
+            <column name="prescription_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__prescription_id" />
+            </column>
+            <column name="original_prescription_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__original_prescription_id" />
+            </column>
+            <column name="payee_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__payee_id" />
+            </column>
+            <column name="referral_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__referral_id" />
+            </column>
+            <column name="facility_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__facility_id" />
+            </column>
+            <column name="accident_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_claim__accident_id" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="claim" columnName="eligibility_offline_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="claim" columnName="authorization_offline_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="claim" columnName="billable_start" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="claim" columnName="billable_end" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20210603073819-1-data" author="jhipster" context="faker">
+        <loadData
+                  file="config/liquibase/fake-data/claim.csv"
+                  separator=";"
+                  tableName="claim">
+            <column name="id" type="numeric"/>
+            <column name="guid" type="string"/>
+            <column name="is_queued" type="boolean"/>
+            <column name="parsed" type="string"/>
+            <column name="identifier" type="string"/>
+            <column name="jhi_use" type="string"/>
+            <column name="type" type="string"/>
+            <column name="sub_type" type="string"/>
+            <column name="eligibility_offline" type="string"/>
+            <column name="eligibility_offline_date" type="${datetimeType}"/>
+            <column name="authorization_offline_date" type="${datetimeType}"/>
+            <column name="billable_start" type="${datetimeType}"/>
+            <column name="billable_end" type="${datetimeType}"/>
+            <column name="priority" type="string"/>
+            <column name="funds_reserve" type="string"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

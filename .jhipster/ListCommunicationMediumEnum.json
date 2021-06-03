@@ -1,0 +1,28 @@
+{
+  "name": "ListCommunicationMediumEnum",
+  "fields": [
+    {
+      "fieldName": "cm",
+      "fieldType": "CommunicationMediumEnum",
+      "fieldValues": "ELECTRONIC (electronic data),PHYSICAL (physical presence),REMOTE (remote presence),VERBAL (verbal),DICTATE (dictated),FACE (face-to-face),PHONE (telephone),VIDEOCONF (videoconferencing),WRITTEN (written),FAXWRIT (telefax),HANDWRIT (handwritten),MAILWRIT (mail),ONLINEWRIT (online written),EMAILWRIT (email),TYPEWRIT (typewritten)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "communication",
+      "otherEntityRelationshipName": "medium",
+      "relationshipName": "communication"
+    }
+  ],
+  "entityTableName": "list_communication_medium_enum",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073812"
+}

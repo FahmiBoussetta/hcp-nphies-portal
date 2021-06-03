@@ -1,0 +1,10 @@
+{
+  "hcpNphiesPortalApp": {
+    "CommunicationReasonEnum": {
+      "null": "",
+      "Missing_info": "Missing information",
+      "Missing_attach": "Missing attachment",
+      "Info_correct": "Information correction"
+    }
+  }
+}

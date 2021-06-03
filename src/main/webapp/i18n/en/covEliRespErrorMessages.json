@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "covEliRespErrorMessages": {
+      "home": {
+        "title": "Cov Eli Resp Error Messages",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Cov Eli Resp Error Messages",
+        "createOrEditLabel": "Create or edit a Cov Eli Resp Error Messages",
+        "notFound": "No Cov Eli Resp Error Messages found"
+      },
+      "created": "A new Cov Eli Resp Error Messages is created with identifier {{ param }}",
+      "updated": "A Cov Eli Resp Error Messages is updated with identifier {{ param }}",
+      "deleted": "A Cov Eli Resp Error Messages is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Cov Eli Resp Error Messages {{ id }}?"
+      },
+      "detail": {
+        "title": "Cov Eli Resp Error Messages"
+      },
+      "id": "ID",
+      "message": "Message",
+      "coverageEligibilityResponse": "Coverage Eligibility Response"
+    }
+  }
+}

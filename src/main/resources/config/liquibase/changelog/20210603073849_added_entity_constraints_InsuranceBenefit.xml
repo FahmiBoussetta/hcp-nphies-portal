@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity InsuranceBenefit.
+    -->
+    <changeSet id="20210603073849-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="response_insurance_item_id"
+                                 baseTableName="insurance_benefit"
+                                 constraintName="fk_insurance_benefit__response_insurance_item_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="response_insurance_item"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,34 @@
+{
+  "hcpNphiesPortalApp": {
+    "encounter": {
+      "home": {
+        "title": "Encounters",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Encounter",
+        "createOrEditLabel": "Create or edit a Encounter",
+        "notFound": "No Encounters found"
+      },
+      "created": "A new Encounter is created with identifier {{ param }}",
+      "updated": "A Encounter is updated with identifier {{ param }}",
+      "deleted": "A Encounter is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Encounter {{ id }}?"
+      },
+      "detail": {
+        "title": "Encounter"
+      },
+      "id": "ID",
+      "guid": "Guid",
+      "forceId": "Force Id",
+      "identifier": "Identifier",
+      "encounterClass": "Encounter Class",
+      "start": "Start",
+      "end": "End",
+      "serviceType": "Service Type",
+      "priority": "Priority",
+      "subject": "Subject",
+      "hospitalization": "Hospitalization",
+      "serviceProvider": "Service Provider"
+    }
+  }
+}

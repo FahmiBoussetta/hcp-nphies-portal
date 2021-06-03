@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "diagnosisSequence": {
+      "home": {
+        "title": "Diagnosis Sequences",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Diagnosis Sequence",
+        "createOrEditLabel": "Create or edit a Diagnosis Sequence",
+        "notFound": "No Diagnosis Sequences found"
+      },
+      "created": "A new Diagnosis Sequence is created with identifier {{ param }}",
+      "updated": "A Diagnosis Sequence is updated with identifier {{ param }}",
+      "deleted": "A Diagnosis Sequence is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Diagnosis Sequence {{ id }}?"
+      },
+      "detail": {
+        "title": "Diagnosis Sequence"
+      },
+      "id": "ID",
+      "diagSeq": "Diag Seq",
+      "item": "Item"
+    }
+  }
+}

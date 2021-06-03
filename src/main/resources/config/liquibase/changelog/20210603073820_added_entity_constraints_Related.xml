@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity Related.
+    -->
+    <changeSet id="20210603073820-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="claim_reference_id"
+                                 baseTableName="related"
+                                 constraintName="fk_related__claim_reference_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="reference_identifier"/>
+
+        <addForeignKeyConstraint baseColumnNames="claim_id"
+                                 baseTableName="related"
+                                 constraintName="fk_related__claim_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="claim"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "listCommunicationMediumEnum": {
+      "home": {
+        "title": "List Communication Medium Enums",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new List Communication Medium Enum",
+        "createOrEditLabel": "Create or edit a List Communication Medium Enum",
+        "notFound": "No List Communication Medium Enums found"
+      },
+      "created": "A new List Communication Medium Enum is created with identifier {{ param }}",
+      "updated": "A List Communication Medium Enum is updated with identifier {{ param }}",
+      "deleted": "A List Communication Medium Enum is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete List Communication Medium Enum {{ id }}?"
+      },
+      "detail": {
+        "title": "List Communication Medium Enum"
+      },
+      "id": "ID",
+      "cm": "Cm",
+      "communication": "Communication"
+    }
+  }
+}

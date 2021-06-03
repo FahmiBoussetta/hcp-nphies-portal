@@ -1,0 +1,9 @@
+{
+  "hcpNphiesPortalApp": {
+    "ActPriorityEnum": {
+      "null": "",
+      "EM": "Emergency",
+      "EL": "Elective"
+    }
+  }
+}

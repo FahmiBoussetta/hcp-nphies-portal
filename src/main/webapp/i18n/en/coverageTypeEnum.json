@@ -1,0 +1,9 @@
+{
+  "hcpNphiesPortalApp": {
+    "CoverageTypeEnum": {
+      "null": "",
+      "EHCPOL": "Extended healthcare",
+      "PUBLICPOL": "Public healthcare"
+    }
+  }
+}

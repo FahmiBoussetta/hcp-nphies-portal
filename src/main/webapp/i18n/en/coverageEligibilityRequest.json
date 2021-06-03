@@ -1,0 +1,36 @@
+{
+  "hcpNphiesPortalApp": {
+    "coverageEligibilityRequest": {
+      "home": {
+        "title": "Coverage Eligibility Requests",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Coverage Eligibility Request",
+        "createOrEditLabel": "Create or edit a Coverage Eligibility Request",
+        "notFound": "No Coverage Eligibility Requests found"
+      },
+      "created": "A new Coverage Eligibility Request is created with identifier {{ param }}",
+      "updated": "A Coverage Eligibility Request is updated with identifier {{ param }}",
+      "deleted": "A Coverage Eligibility Request is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Coverage Eligibility Request {{ id }}?"
+      },
+      "detail": {
+        "title": "Coverage Eligibility Request"
+      },
+      "id": "ID",
+      "guid": "Guid",
+      "parsed": "Parsed",
+      "priority": "Priority",
+      "identifier": "Identifier",
+      "servicedDate": "Serviced Date",
+      "servicedDateEnd": "Serviced Date End",
+      "patient": "Patient",
+      "provider": "Provider",
+      "insurer": "Insurer",
+      "facility": "Facility",
+      "errors": "Errors",
+      "purposes": "Purposes",
+      "coverages": "Coverages"
+    }
+  }
+}

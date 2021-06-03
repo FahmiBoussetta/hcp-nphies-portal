@@ -1,0 +1,10 @@
+{
+  "hcpNphiesPortalApp": {
+    "ClaimSubTypeEnum": {
+      "null": "",
+      "Ip": "InPatient",
+      "Op": "OutPatient",
+      "Emr": "Emergency"
+    }
+  }
+}

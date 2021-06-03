@@ -2,6 +2,7 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { render } from '@testing-library/react';
+import { TranslatorContext } from 'react-jhipster';
 
 import { AUTHORITIES } from 'app/config/constants';
 import { PrivateRouteComponent, hasAnyAuthority } from './private-route';
@@ -9,6 +10,10 @@ import { PrivateRouteComponent, hasAnyAuthority } from './private-route';
 const TestComp = () => <div>Test</div>;
 
 describe('private-route component', () => {
+  beforeAll(() => {
+    TranslatorContext.registerTranslations('en', {});
+  });
+
   // All tests will go here
   it('Should throw error when no component is provided', () => {
     const originalError = console.error;
@@ -27,7 +32,7 @@ describe('private-route component', () => {
       </Router>
     );
     expect(container.innerHTML).toEqual(
-      '<div class="insufficient-authority"><div class="alert alert-danger">You are not authorized to access this page.</div></div>'
+      '<div class="insufficient-authority"><div class="alert alert-danger"><span>You are not authorized to access this page.</span></div></div>'
     );
   });
 

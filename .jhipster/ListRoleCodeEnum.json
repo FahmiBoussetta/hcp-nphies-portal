@@ -1,0 +1,28 @@
+{
+  "name": "ListRoleCodeEnum",
+  "fields": [
+    {
+      "fieldName": "r",
+      "fieldType": "RoleCodeEnum",
+      "fieldValues": "Doctor (Doctor),Nurse (Nurse),Pharmacist (Pharmacist),Researcher (Researcher),Teacher (Teacher or educator),Dentist (Dentist),Physio (Physiotherapist),Speech (Speechtherapist),Ict (ICT professional)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "practitionerRole",
+      "otherEntityRelationshipName": "codes",
+      "relationshipName": "practitionerRole"
+    }
+  ],
+  "entityTableName": "list_role_code_enum",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073815"
+}

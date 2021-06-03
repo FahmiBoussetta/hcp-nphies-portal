@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity ResponseInsurance.
+    -->
+    <changeSet id="20210603073847-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="coverage_id"
+                                 baseTableName="response_insurance"
+                                 constraintName="fk_response_insurance__coverage_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="coverage"/>
+
+        <addForeignKeyConstraint baseColumnNames="coverage_eligibility_response_id"
+                                 baseTableName="response_insurance"
+                                 constraintName="fk_response_insurance__coverage_eligibility_response_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="coverage_eligibility_response"/>
+    </changeSet>
+</databaseChangeLog>

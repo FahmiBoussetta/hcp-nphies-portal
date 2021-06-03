@@ -1,0 +1,73 @@
+{
+  "name": "Encounter",
+  "fields": [
+    {
+      "fieldName": "guid",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "forceId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "identifier",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "encounterClass",
+      "fieldType": "EncounterClassEnum",
+      "fieldValues": "AMB (ambulatory),EMER (emergency),HH (home health),IMP (inpatient encounter),SS (short stay)"
+    },
+    {
+      "fieldName": "start",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "end",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "serviceType",
+      "fieldType": "ServiceTypeEnum",
+      "fieldValues": "N237 (Acute Inpatient Serv),N576 (Rehabilitation),N356 (General Maintenance),N621 (Complex Maintenance),N179 (Palliative medicine)"
+    },
+    {
+      "fieldName": "priority",
+      "fieldType": "ActPriorityEnum",
+      "fieldValues": "EM (Emergency),EL (Elective)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "patient",
+      "otherEntityRelationshipName": "encounter",
+      "relationshipName": "subject",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "hospitalization",
+      "otherEntityRelationshipName": "encounter",
+      "relationshipName": "hospitalization",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "encounter",
+      "relationshipName": "serviceProvider",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "encounter",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073850"
+}

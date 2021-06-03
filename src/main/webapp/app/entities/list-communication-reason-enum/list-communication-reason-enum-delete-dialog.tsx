@@ -1,0 +1,77 @@
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
+import { RouteComponentProps } from 'react-router-dom';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
+import { Translate } from 'react-jhipster';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import { IRootState } from 'app/shared/reducers';
+import { getEntity, deleteEntity } from './list-communication-reason-enum.reducer';
+
+export interface IListCommunicationReasonEnumDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+
+export const ListCommunicationReasonEnumDeleteDialog = (props: IListCommunicationReasonEnumDeleteDialogProps) => {
+  useEffect(() => {
+    props.getEntity(props.match.params.id);
+  }, []);
+
+  const handleClose = () => {
+    props.history.push('/list-communication-reason-enum');
+  };
+
+  useEffect(() => {
+    if (props.updateSuccess) {
+      handleClose();
+    }
+  }, [props.updateSuccess]);
+
+  const confirmDelete = () => {
+    props.deleteEntity(props.listCommunicationReasonEnumEntity.id);
+  };
+
+  const { listCommunicationReasonEnumEntity } = props;
+  return (
+    <Modal isOpen toggle={handleClose}>
+      <ModalHeader toggle={handleClose} data-cy="listCommunicationReasonEnumDeleteDialogHeading">
+        <Translate contentKey="entity.delete.title">Confirm delete operation</Translate>
+      </ModalHeader>
+      <ModalBody id="hcpNphiesPortalApp.listCommunicationReasonEnum.delete.question">
+        <Translate
+          contentKey="hcpNphiesPortalApp.listCommunicationReasonEnum.delete.question"
+          interpolate={{ id: listCommunicationReasonEnumEntity.id }}
+        >
+          Are you sure you want to delete this ListCommunicationReasonEnum?
+        </Translate>
+      </ModalBody>
+      <ModalFooter>
+        <Button color="secondary" onClick={handleClose}>
+          <FontAwesomeIcon icon="ban" />
+          &nbsp;
+          <Translate contentKey="entity.action.cancel">Cancel</Translate>
+        </Button>
+        <Button
+          id="jhi-confirm-delete-listCommunicationReasonEnum"
+          data-cy="entityConfirmDeleteButton"
+          color="danger"
+          onClick={confirmDelete}
+        >
+          <FontAwesomeIcon icon="trash" />
+          &nbsp;
+          <Translate contentKey="entity.action.delete">Delete</Translate>
+        </Button>
+      </ModalFooter>
+    </Modal>
+  );
+};
+
+const mapStateToProps = ({ listCommunicationReasonEnum }: IRootState) => ({
+  listCommunicationReasonEnumEntity: listCommunicationReasonEnum.entity,
+  updateSuccess: listCommunicationReasonEnum.updateSuccess,
+});
+
+const mapDispatchToProps = { getEntity, deleteEntity };
+
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default connect(mapStateToProps, mapDispatchToProps)(ListCommunicationReasonEnumDeleteDialog);

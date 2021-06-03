@@ -1,0 +1,25 @@
+{
+  "hcpNphiesPortalApp": {
+    "quantity": {
+      "home": {
+        "title": "Quantities",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Quantity",
+        "createOrEditLabel": "Create or edit a Quantity",
+        "notFound": "No Quantities found"
+      },
+      "created": "A new Quantity is created with identifier {{ param }}",
+      "updated": "A Quantity is updated with identifier {{ param }}",
+      "deleted": "A Quantity is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Quantity {{ id }}?"
+      },
+      "detail": {
+        "title": "Quantity"
+      },
+      "id": "ID",
+      "value": "Value",
+      "unit": "Unit"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "Hospitalization",
+  "fields": [
+    {
+      "fieldName": "admitSource",
+      "fieldType": "AdmitSourceEnum",
+      "fieldValues": "IA (Immediate Admission),EER (Admission from hospital ER),EOP (Emergency Admission from hospital outpatient),EGPHC (Emergency Admission by referral from government primary healthcare center),EGGH (Emergency Admission by referral from general government hospital),EPPHC (Emergency Admission by referral from private primary healthcare center),EPH (Emergency Admission by referral from private hospital),EIC (Emergency Admission by insurance company),EWGS (Elective waiting list admission government free Scheme),EWSS (Elective waiting list admission self-payment Scheme),EWIS (Elective waiting list admission insurance coverage Scheme),EMBA (Emergency Maternity Birth Admission),PMBA (Planned Maternity Birth Admission),Others (Others)"
+    },
+    {
+      "fieldName": "reAdmission",
+      "fieldType": "ReAdmissionEnum",
+      "fieldValues": "R (Re-admission)"
+    },
+    {
+      "fieldName": "dischargeDisposition",
+      "fieldType": "DischargeDispositionEnum",
+      "fieldValues": "Home (Home),DASHalt_home (Alternative home),DASHother_hcf (Other healthcare facility),Hosp (Hospice),DASHlong (Long-term care),Aadvice (Left against advice),Exp (Expired),Psy (Psychiatric hospital),Rehab (Rehabilitation),Snf (Skilled nursing facility),Oth (Other)"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "organization",
+      "otherEntityRelationshipName": "hospitalization",
+      "relationshipName": "origin",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "hospitalization",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073851"
+}

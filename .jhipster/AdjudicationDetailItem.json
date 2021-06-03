@@ -1,0 +1,46 @@
+{
+  "name": "AdjudicationDetailItem",
+  "fields": [
+    {
+      "fieldName": "sequence",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "adjudicationDetailNotes",
+      "otherEntityRelationshipName": "adjudicationDetailItem",
+      "relationshipName": "notes"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "adjudication",
+      "otherEntityRelationshipName": "adjudicationDetailItem",
+      "relationshipName": "adjudications"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "adjudicationSubDetailItem",
+      "otherEntityRelationshipName": "adjudicationDetailItem",
+      "relationshipName": "subDetails"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "adjudicationItem",
+      "otherEntityRelationshipName": "details",
+      "relationshipName": "adjudicationItem"
+    }
+  ],
+  "entityTableName": "adjudication_detail_item",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["hcpNphiesPortal"],
+  "changelogDate": "20210603073831"
+}

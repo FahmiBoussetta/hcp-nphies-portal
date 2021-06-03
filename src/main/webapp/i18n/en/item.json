@@ -1,0 +1,51 @@
+{
+  "hcpNphiesPortalApp": {
+    "item": {
+      "home": {
+        "title": "Items",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Item",
+        "createOrEditLabel": "Create or edit a Item",
+        "notFound": "No Items found"
+      },
+      "created": "A new Item is created with identifier {{ param }}",
+      "updated": "A Item is updated with identifier {{ param }}",
+      "deleted": "A Item is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Item {{ id }}?"
+      },
+      "detail": {
+        "title": "Item"
+      },
+      "id": "ID",
+      "sequence": "Sequence",
+      "isPackage": "Is Package",
+      "tax": "Tax",
+      "payerShare": "Payer Share",
+      "patientShare": "Patient Share",
+      "careTeamSequence": "Care Team Sequence",
+      "transportationSRCA": "Transportation SRCA",
+      "imaging": "Imaging",
+      "laboratory": "Laboratory",
+      "medicalDevice": "Medical Device",
+      "oralHealthIP": "Oral Health IP",
+      "oralHealthOP": "Oral Health OP",
+      "procedure": "Procedure",
+      "services": "Services",
+      "medicationCode": "Medication Code",
+      "servicedDate": "Serviced Date",
+      "servicedDateStart": "Serviced Date Start",
+      "servicedDateEnd": "Serviced Date End",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price",
+      "factor": "Factor",
+      "bodySite": "Body Site",
+      "subSite": "Sub Site",
+      "diagnosisSequence": "Diagnosis Sequence",
+      "informationSequence": "Information Sequence",
+      "udi": "Udi",
+      "details": "Details",
+      "claim": "Claim"
+    }
+  }
+}
