@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IOperationOutcome } from 'app/shared/model/operation-outcome.model';
 import { getEntities as getOperationOutcomes } from 'app/entities/operation-outcome/operation-outcome.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './ope-out-error-me
 import { IOpeOutErrorMessages } from 'app/shared/model/ope-out-error-messages.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IOpeOutErrorMessagesUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const OpeOutErrorMessagesUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const OpeOutErrorMessagesUpdate = (props: IOpeOutErrorMessagesUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { opeOutErrorMessagesEntity, operationOutcomes, loading, updating } = props;
+  const operationOutcomes = useAppSelector(state => state.operationOutcome.entities);
+  const opeOutErrorMessagesEntity = useAppSelector(state => state.opeOutErrorMessages.entity);
+  const loading = useAppSelector(state => state.opeOutErrorMessages.loading);
+  const updating = useAppSelector(state => state.opeOutErrorMessages.updating);
+  const updateSuccess = useAppSelector(state => state.opeOutErrorMessages.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/ope-out-error-messages');
@@ -27,35 +29,41 @@ export const OpeOutErrorMessagesUpdate = (props: IOpeOutErrorMessagesUpdateProps
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getOperationOutcomes();
+    dispatch(getOperationOutcomes({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...opeOutErrorMessagesEntity,
-        ...values,
-        operationOutcome: operationOutcomes.find(it => it.id.toString() === values.operationOutcomeId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...opeOutErrorMessagesEntity,
+      ...values,
+      operationOutcome: operationOutcomes.find(it => it.id.toString() === values.operationOutcomeId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...opeOutErrorMessagesEntity,
+          operationOutcomeId: opeOutErrorMessagesEntity?.operationOutcome?.id,
+        };
 
   return (
     <div>
@@ -73,43 +81,41 @@ export const OpeOutErrorMessagesUpdate = (props: IOpeOutErrorMessagesUpdateProps
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : opeOutErrorMessagesEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="ope-out-error-messages-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="ope-out-error-messages-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="ope-out-error-messages-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="messageLabel" for="ope-out-error-messages-message">
-                  <Translate contentKey="hcpNphiesPortalApp.opeOutErrorMessages.message">Message</Translate>
-                </Label>
-                <AvField id="ope-out-error-messages-message" data-cy="message" type="text" name="message" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="ope-out-error-messages-operationOutcome">
-                  <Translate contentKey="hcpNphiesPortalApp.opeOutErrorMessages.operationOutcome">Operation Outcome</Translate>
-                </Label>
-                <AvInput
-                  id="ope-out-error-messages-operationOutcome"
-                  data-cy="operationOutcome"
-                  type="select"
-                  className="form-control"
-                  name="operationOutcomeId"
-                >
-                  <option value="" key="0" />
-                  {operationOutcomes
-                    ? operationOutcomes.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/ope-out-error-messages" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.opeOutErrorMessages.message')}
+                id="ope-out-error-messages-message"
+                name="message"
+                data-cy="message"
+                type="text"
+              />
+              <ValidatedField
+                id="ope-out-error-messages-operationOutcome"
+                name="operationOutcomeId"
+                data-cy="operationOutcome"
+                label={translate('hcpNphiesPortalApp.opeOutErrorMessages.operationOutcome')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {operationOutcomes
+                  ? operationOutcomes.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/ope-out-error-messages" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -122,7 +128,7 @@ export const OpeOutErrorMessagesUpdate = (props: IOpeOutErrorMessagesUpdateProps
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -130,23 +136,4 @@ export const OpeOutErrorMessagesUpdate = (props: IOpeOutErrorMessagesUpdateProps
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  operationOutcomes: storeState.operationOutcome.entities,
-  opeOutErrorMessagesEntity: storeState.opeOutErrorMessages.entity,
-  loading: storeState.opeOutErrorMessages.loading,
-  updating: storeState.opeOutErrorMessages.updating,
-  updateSuccess: storeState.opeOutErrorMessages.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getOperationOutcomes,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(OpeOutErrorMessagesUpdate);
+export default OpeOutErrorMessagesUpdate;

@@ -264,7 +264,7 @@ class OperationOutcomeResourceIT {
         OperationOutcome partialUpdatedOperationOutcome = new OperationOutcome();
         partialUpdatedOperationOutcome.setId(operationOutcome.getId());
 
-        partialUpdatedOperationOutcome.parsed(UPDATED_PARSED);
+        partialUpdatedOperationOutcome.system(UPDATED_SYSTEM);
 
         restOperationOutcomeMockMvc
             .perform(
@@ -279,8 +279,8 @@ class OperationOutcomeResourceIT {
         assertThat(operationOutcomeList).hasSize(databaseSizeBeforeUpdate);
         OperationOutcome testOperationOutcome = operationOutcomeList.get(operationOutcomeList.size() - 1);
         assertThat(testOperationOutcome.getValue()).isEqualTo(DEFAULT_VALUE);
-        assertThat(testOperationOutcome.getSystem()).isEqualTo(DEFAULT_SYSTEM);
-        assertThat(testOperationOutcome.getParsed()).isEqualTo(UPDATED_PARSED);
+        assertThat(testOperationOutcome.getSystem()).isEqualTo(UPDATED_SYSTEM);
+        assertThat(testOperationOutcome.getParsed()).isEqualTo(DEFAULT_PARSED);
     }
 
     @Test

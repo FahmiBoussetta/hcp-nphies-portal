@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { getEntity, updateEntity, createEntity, reset } from './quantity.reducer';
 import { IQuantity } from 'app/shared/model/quantity.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IQuantityUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const QuantityUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const QuantityUpdate = (props: IQuantityUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { quantityEntity, loading, updating } = props;
+  const quantityEntity = useAppSelector(state => state.quantity.entity);
+  const loading = useAppSelector(state => state.quantity.loading);
+  const updating = useAppSelector(state => state.quantity.updating);
+  const updateSuccess = useAppSelector(state => state.quantity.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/quantity');
@@ -25,32 +26,37 @@ export const QuantityUpdate = (props: IQuantityUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...quantityEntity,
-        ...values,
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...quantityEntity,
+      ...values,
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...quantityEntity,
+        };
 
   return (
     <div>
@@ -66,28 +72,32 @@ export const QuantityUpdate = (props: IQuantityUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : quantityEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="quantity-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="quantity-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="quantity-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="valueLabel" for="quantity-value">
-                  <Translate contentKey="hcpNphiesPortalApp.quantity.value">Value</Translate>
-                </Label>
-                <AvField id="quantity-value" data-cy="value" type="text" name="value" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="unitLabel" for="quantity-unit">
-                  <Translate contentKey="hcpNphiesPortalApp.quantity.unit">Unit</Translate>
-                </Label>
-                <AvField id="quantity-unit" data-cy="unit" type="text" name="unit" />
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/quantity" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.quantity.value')}
+                id="quantity-value"
+                name="value"
+                data-cy="value"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.quantity.unit')}
+                id="quantity-unit"
+                name="unit"
+                data-cy="unit"
+                type="text"
+              />
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/quantity" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -100,7 +110,7 @@ export const QuantityUpdate = (props: IQuantityUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -108,21 +118,4 @@ export const QuantityUpdate = (props: IQuantityUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  quantityEntity: storeState.quantity.entity,
-  loading: storeState.quantity.loading,
-  updating: storeState.quantity.updating,
-  updateSuccess: storeState.quantity.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(QuantityUpdate);
+export default QuantityUpdate;

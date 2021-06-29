@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './list-communication-medium-enum.reducer';
 import { IListCommunicationMediumEnum } from 'app/shared/model/list-communication-medium-enum.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IListCommunicationMediumEnumProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const ListCommunicationMediumEnum = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ListCommunicationMediumEnum = (props: IListCommunicationMediumEnumProps) => {
+  const listCommunicationMediumEnumList = useAppSelector(state => state.listCommunicationMediumEnum.entities);
+  const loading = useAppSelector(state => state.listCommunicationMediumEnum.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { listCommunicationMediumEnumList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="list-communication-medium-enum-heading" data-cy="ListCommunicationMediumEnumHeading">
@@ -135,16 +138,4 @@ export const ListCommunicationMediumEnum = (props: IListCommunicationMediumEnumP
   );
 };
 
-const mapStateToProps = ({ listCommunicationMediumEnum }: IRootState) => ({
-  listCommunicationMediumEnumList: listCommunicationMediumEnum.entities,
-  loading: listCommunicationMediumEnum.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListCommunicationMediumEnum);
+export default ListCommunicationMediumEnum;

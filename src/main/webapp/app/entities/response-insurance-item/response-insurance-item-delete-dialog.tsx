@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './response-insurance-item.reducer';
 
-export interface IResponseInsuranceItemDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ResponseInsuranceItemDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ResponseInsuranceItemDeleteDialog = (props: IResponseInsuranceItemDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const responseInsuranceItemEntity = useAppSelector(state => state.responseInsuranceItem.entity);
+  const updateSuccess = useAppSelector(state => state.responseInsuranceItem.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/response-insurance-item');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.responseInsuranceItemEntity.id);
+    dispatch(deleteEntity(responseInsuranceItemEntity.id));
   };
 
-  const { responseInsuranceItemEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="responseInsuranceItemDeleteDialogHeading">
@@ -59,14 +60,4 @@ export const ResponseInsuranceItemDeleteDialog = (props: IResponseInsuranceItemD
   );
 };
 
-const mapStateToProps = ({ responseInsuranceItem }: IRootState) => ({
-  responseInsuranceItemEntity: responseInsuranceItem.entity,
-  updateSuccess: responseInsuranceItem.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ResponseInsuranceItemDeleteDialog);
+export default ResponseInsuranceItemDeleteDialog;

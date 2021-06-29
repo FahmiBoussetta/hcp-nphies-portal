@@ -1,156 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IAdjudication, defaultValue } from 'app/shared/model/adjudication.model';
 
-export const ACTION_TYPES = {
-  FETCH_ADJUDICATION_LIST: 'adjudication/FETCH_ADJUDICATION_LIST',
-  FETCH_ADJUDICATION: 'adjudication/FETCH_ADJUDICATION',
-  CREATE_ADJUDICATION: 'adjudication/CREATE_ADJUDICATION',
-  UPDATE_ADJUDICATION: 'adjudication/UPDATE_ADJUDICATION',
-  PARTIAL_UPDATE_ADJUDICATION: 'adjudication/PARTIAL_UPDATE_ADJUDICATION',
-  DELETE_ADJUDICATION: 'adjudication/DELETE_ADJUDICATION',
-  RESET: 'adjudication/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<IAdjudication> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<IAdjudication>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type AdjudicationState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: AdjudicationState = initialState, action): AdjudicationState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_ADJUDICATION_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_ADJUDICATION):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_ADJUDICATION):
-    case REQUEST(ACTION_TYPES.UPDATE_ADJUDICATION):
-    case REQUEST(ACTION_TYPES.DELETE_ADJUDICATION):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_ADJUDICATION):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_ADJUDICATION_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_ADJUDICATION):
-    case FAILURE(ACTION_TYPES.CREATE_ADJUDICATION):
-    case FAILURE(ACTION_TYPES.UPDATE_ADJUDICATION):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_ADJUDICATION):
-    case FAILURE(ACTION_TYPES.DELETE_ADJUDICATION):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_ADJUDICATION_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_ADJUDICATION):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_ADJUDICATION):
-    case SUCCESS(ACTION_TYPES.UPDATE_ADJUDICATION):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_ADJUDICATION):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_ADJUDICATION):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/adjudications';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<IAdjudication> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_ADJUDICATION_LIST,
-  payload: axios.get<IAdjudication>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('adjudication/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<IAdjudication[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<IAdjudication> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_ADJUDICATION,
-    payload: axios.get<IAdjudication>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'adjudication/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<IAdjudication>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<IAdjudication> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_ADJUDICATION,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'adjudication/create_entity',
+  async (entity: IAdjudication, thunkAPI) => {
+    const result = await axios.post<IAdjudication>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<IAdjudication> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_ADJUDICATION,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'adjudication/update_entity',
+  async (entity: IAdjudication, thunkAPI) => {
+    const result = await axios.put<IAdjudication>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<IAdjudication> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_ADJUDICATION,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'adjudication/partial_update_entity',
+  async (entity: IAdjudication, thunkAPI) => {
+    const result = await axios.patch<IAdjudication>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<IAdjudication> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_ADJUDICATION,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'adjudication/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<IAdjudication>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
+// slice
+
+export const AdjudicationSlice = createEntitySlice({
+  name: 'adjudication',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
+  },
 });
+
+export const { reset } = AdjudicationSlice.actions;
+
+// Reducer
+export default AdjudicationSlice.reducer;

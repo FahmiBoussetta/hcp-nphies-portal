@@ -1,156 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { ICommunicationRequest, defaultValue } from 'app/shared/model/communication-request.model';
 
-export const ACTION_TYPES = {
-  FETCH_COMMUNICATIONREQUEST_LIST: 'communicationRequest/FETCH_COMMUNICATIONREQUEST_LIST',
-  FETCH_COMMUNICATIONREQUEST: 'communicationRequest/FETCH_COMMUNICATIONREQUEST',
-  CREATE_COMMUNICATIONREQUEST: 'communicationRequest/CREATE_COMMUNICATIONREQUEST',
-  UPDATE_COMMUNICATIONREQUEST: 'communicationRequest/UPDATE_COMMUNICATIONREQUEST',
-  PARTIAL_UPDATE_COMMUNICATIONREQUEST: 'communicationRequest/PARTIAL_UPDATE_COMMUNICATIONREQUEST',
-  DELETE_COMMUNICATIONREQUEST: 'communicationRequest/DELETE_COMMUNICATIONREQUEST',
-  RESET: 'communicationRequest/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<ICommunicationRequest> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<ICommunicationRequest>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type CommunicationRequestState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: CommunicationRequestState = initialState, action): CommunicationRequestState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_COMMUNICATIONREQUEST_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_COMMUNICATIONREQUEST):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_COMMUNICATIONREQUEST):
-    case REQUEST(ACTION_TYPES.UPDATE_COMMUNICATIONREQUEST):
-    case REQUEST(ACTION_TYPES.DELETE_COMMUNICATIONREQUEST):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_COMMUNICATIONREQUEST):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_COMMUNICATIONREQUEST_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_COMMUNICATIONREQUEST):
-    case FAILURE(ACTION_TYPES.CREATE_COMMUNICATIONREQUEST):
-    case FAILURE(ACTION_TYPES.UPDATE_COMMUNICATIONREQUEST):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_COMMUNICATIONREQUEST):
-    case FAILURE(ACTION_TYPES.DELETE_COMMUNICATIONREQUEST):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_COMMUNICATIONREQUEST_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_COMMUNICATIONREQUEST):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_COMMUNICATIONREQUEST):
-    case SUCCESS(ACTION_TYPES.UPDATE_COMMUNICATIONREQUEST):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_COMMUNICATIONREQUEST):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_COMMUNICATIONREQUEST):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/communication-requests';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<ICommunicationRequest> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_COMMUNICATIONREQUEST_LIST,
-  payload: axios.get<ICommunicationRequest>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('communicationRequest/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<ICommunicationRequest[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<ICommunicationRequest> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_COMMUNICATIONREQUEST,
-    payload: axios.get<ICommunicationRequest>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'communicationRequest/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<ICommunicationRequest>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<ICommunicationRequest> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_COMMUNICATIONREQUEST,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'communicationRequest/create_entity',
+  async (entity: ICommunicationRequest, thunkAPI) => {
+    const result = await axios.post<ICommunicationRequest>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<ICommunicationRequest> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_COMMUNICATIONREQUEST,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'communicationRequest/update_entity',
+  async (entity: ICommunicationRequest, thunkAPI) => {
+    const result = await axios.put<ICommunicationRequest>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<ICommunicationRequest> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_COMMUNICATIONREQUEST,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'communicationRequest/partial_update_entity',
+  async (entity: ICommunicationRequest, thunkAPI) => {
+    const result = await axios.patch<ICommunicationRequest>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<ICommunicationRequest> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_COMMUNICATIONREQUEST,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'communicationRequest/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<ICommunicationRequest>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
+// slice
+
+export const CommunicationRequestSlice = createEntitySlice({
+  name: 'communicationRequest',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
+  },
 });
+
+export const { reset } = CommunicationRequestSlice.actions;
+
+// Reducer
+export default CommunicationRequestSlice.reducer;

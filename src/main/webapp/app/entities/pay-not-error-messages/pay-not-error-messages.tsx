@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './pay-not-error-messages.reducer';
 import { IPayNotErrorMessages } from 'app/shared/model/pay-not-error-messages.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPayNotErrorMessagesProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const PayNotErrorMessages = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PayNotErrorMessages = (props: IPayNotErrorMessagesProps) => {
+  const payNotErrorMessagesList = useAppSelector(state => state.payNotErrorMessages.entities);
+  const loading = useAppSelector(state => state.payNotErrorMessages.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { payNotErrorMessagesList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="pay-not-error-messages-heading" data-cy="PayNotErrorMessagesHeading">
@@ -121,16 +124,4 @@ export const PayNotErrorMessages = (props: IPayNotErrorMessagesProps) => {
   );
 };
 
-const mapStateToProps = ({ payNotErrorMessages }: IRootState) => ({
-  payNotErrorMessagesList: payNotErrorMessages.entities,
-  loading: payNotErrorMessages.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PayNotErrorMessages);
+export default PayNotErrorMessages;

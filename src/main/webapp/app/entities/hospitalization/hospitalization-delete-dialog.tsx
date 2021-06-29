@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './hospitalization.reducer';
 
-export interface IHospitalizationDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const HospitalizationDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const HospitalizationDeleteDialog = (props: IHospitalizationDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const hospitalizationEntity = useAppSelector(state => state.hospitalization.entity);
+  const updateSuccess = useAppSelector(state => state.hospitalization.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/hospitalization');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.hospitalizationEntity.id);
+    dispatch(deleteEntity(hospitalizationEntity.id));
   };
 
-  const { hospitalizationEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="hospitalizationDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const HospitalizationDeleteDialog = (props: IHospitalizationDeleteDialogP
   );
 };
 
-const mapStateToProps = ({ hospitalization }: IRootState) => ({
-  hospitalizationEntity: hospitalization.entity,
-  updateSuccess: hospitalization.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(HospitalizationDeleteDialog);
+export default HospitalizationDeleteDialog;

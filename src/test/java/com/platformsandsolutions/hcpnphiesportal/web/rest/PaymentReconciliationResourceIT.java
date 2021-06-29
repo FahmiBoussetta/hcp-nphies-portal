@@ -343,11 +343,7 @@ class PaymentReconciliationResourceIT {
         PaymentReconciliation partialUpdatedPaymentReconciliation = new PaymentReconciliation();
         partialUpdatedPaymentReconciliation.setId(paymentReconciliation.getId());
 
-        partialUpdatedPaymentReconciliation
-            .value(UPDATED_VALUE)
-            .periodStart(UPDATED_PERIOD_START)
-            .periodEnd(UPDATED_PERIOD_END)
-            .paymentIdentifier(UPDATED_PAYMENT_IDENTIFIER);
+        partialUpdatedPaymentReconciliation.parsed(UPDATED_PARSED);
 
         restPaymentReconciliationMockMvc
             .perform(
@@ -361,15 +357,15 @@ class PaymentReconciliationResourceIT {
         List<PaymentReconciliation> paymentReconciliationList = paymentReconciliationRepository.findAll();
         assertThat(paymentReconciliationList).hasSize(databaseSizeBeforeUpdate);
         PaymentReconciliation testPaymentReconciliation = paymentReconciliationList.get(paymentReconciliationList.size() - 1);
-        assertThat(testPaymentReconciliation.getValue()).isEqualTo(UPDATED_VALUE);
+        assertThat(testPaymentReconciliation.getValue()).isEqualTo(DEFAULT_VALUE);
         assertThat(testPaymentReconciliation.getSystem()).isEqualTo(DEFAULT_SYSTEM);
-        assertThat(testPaymentReconciliation.getParsed()).isEqualTo(DEFAULT_PARSED);
-        assertThat(testPaymentReconciliation.getPeriodStart()).isEqualTo(UPDATED_PERIOD_START);
-        assertThat(testPaymentReconciliation.getPeriodEnd()).isEqualTo(UPDATED_PERIOD_END);
+        assertThat(testPaymentReconciliation.getParsed()).isEqualTo(UPDATED_PARSED);
+        assertThat(testPaymentReconciliation.getPeriodStart()).isEqualTo(DEFAULT_PERIOD_START);
+        assertThat(testPaymentReconciliation.getPeriodEnd()).isEqualTo(DEFAULT_PERIOD_END);
         assertThat(testPaymentReconciliation.getOutcome()).isEqualTo(DEFAULT_OUTCOME);
         assertThat(testPaymentReconciliation.getDisposition()).isEqualTo(DEFAULT_DISPOSITION);
         assertThat(testPaymentReconciliation.getPaymentAmount()).isEqualByComparingTo(DEFAULT_PAYMENT_AMOUNT);
-        assertThat(testPaymentReconciliation.getPaymentIdentifier()).isEqualTo(UPDATED_PAYMENT_IDENTIFIER);
+        assertThat(testPaymentReconciliation.getPaymentIdentifier()).isEqualTo(DEFAULT_PAYMENT_IDENTIFIER);
     }
 
     @Test

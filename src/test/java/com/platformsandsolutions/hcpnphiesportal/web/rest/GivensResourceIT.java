@@ -282,7 +282,7 @@ class GivensResourceIT {
         Givens partialUpdatedGivens = new Givens();
         partialUpdatedGivens.setId(givens.getId());
 
-        partialUpdatedGivens.textName(UPDATED_TEXT_NAME);
+        partialUpdatedGivens.prefix(UPDATED_PREFIX);
 
         restGivensMockMvc
             .perform(
@@ -297,9 +297,9 @@ class GivensResourceIT {
         assertThat(givensList).hasSize(databaseSizeBeforeUpdate);
         Givens testGivens = givensList.get(givensList.size() - 1);
         assertThat(testGivens.getGiven()).isEqualTo(DEFAULT_GIVEN);
-        assertThat(testGivens.getPrefix()).isEqualTo(DEFAULT_PREFIX);
+        assertThat(testGivens.getPrefix()).isEqualTo(UPDATED_PREFIX);
         assertThat(testGivens.getSuffix()).isEqualTo(DEFAULT_SUFFIX);
-        assertThat(testGivens.getTextName()).isEqualTo(UPDATED_TEXT_NAME);
+        assertThat(testGivens.getTextName()).isEqualTo(DEFAULT_TEXT_NAME);
     }
 
     @Test

@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './coverage-eligibility-request.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICoverageEligibilityRequestDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CoverageEligibilityRequestDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CoverageEligibilityRequestDetail = (props: ICoverageEligibilityRequestDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { coverageEligibilityRequestEntity } = props;
+  const coverageEligibilityRequestEntity = useAppSelector(state => state.coverageEligibilityRequest.entity);
   return (
     <Row>
       <Col md="8">
@@ -90,6 +89,19 @@ export const CoverageEligibilityRequestDetail = (props: ICoverageEligibilityRequ
             <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.facility">Facility</Translate>
           </dt>
           <dd>{coverageEligibilityRequestEntity.facility ? coverageEligibilityRequestEntity.facility.id : ''}</dd>
+          <dt>
+            <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.coverages">Coverages</Translate>
+          </dt>
+          <dd>
+            {coverageEligibilityRequestEntity.coverages
+              ? coverageEligibilityRequestEntity.coverages.map((val, i) => (
+                  <span key={val.id}>
+                    <a>{val.id}</a>
+                    {coverageEligibilityRequestEntity.coverages && i === coverageEligibilityRequestEntity.coverages.length - 1 ? '' : ', '}
+                  </span>
+                ))
+              : null}
+          </dd>
         </dl>
         <Button tag={Link} to="/coverage-eligibility-request" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}
@@ -109,13 +121,4 @@ export const CoverageEligibilityRequestDetail = (props: ICoverageEligibilityRequ
   );
 };
 
-const mapStateToProps = ({ coverageEligibilityRequest }: IRootState) => ({
-  coverageEligibilityRequestEntity: coverageEligibilityRequest.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CoverageEligibilityRequestDetail);
+export default CoverageEligibilityRequestDetail;

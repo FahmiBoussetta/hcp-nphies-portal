@@ -250,8 +250,6 @@ class ClaimErrorMessagesResourceIT {
         ClaimErrorMessages partialUpdatedClaimErrorMessages = new ClaimErrorMessages();
         partialUpdatedClaimErrorMessages.setId(claimErrorMessages.getId());
 
-        partialUpdatedClaimErrorMessages.message(UPDATED_MESSAGE);
-
         restClaimErrorMessagesMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedClaimErrorMessages.getId())
@@ -264,7 +262,7 @@ class ClaimErrorMessagesResourceIT {
         List<ClaimErrorMessages> claimErrorMessagesList = claimErrorMessagesRepository.findAll();
         assertThat(claimErrorMessagesList).hasSize(databaseSizeBeforeUpdate);
         ClaimErrorMessages testClaimErrorMessages = claimErrorMessagesList.get(claimErrorMessagesList.size() - 1);
-        assertThat(testClaimErrorMessages.getMessage()).isEqualTo(UPDATED_MESSAGE);
+        assertThat(testClaimErrorMessages.getMessage()).isEqualTo(DEFAULT_MESSAGE);
     }
 
     @Test

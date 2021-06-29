@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './note.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface INoteDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const NoteDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const NoteDetail = (props: INoteDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { noteEntity } = props;
+  const noteEntity = useAppSelector(state => state.note.entity);
   return (
     <Row>
       <Col md="8">
@@ -75,13 +74,4 @@ export const NoteDetail = (props: INoteDetailProps) => {
   );
 };
 
-const mapStateToProps = ({ note }: IRootState) => ({
-  noteEntity: note.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(NoteDetail);
+export default NoteDetail;

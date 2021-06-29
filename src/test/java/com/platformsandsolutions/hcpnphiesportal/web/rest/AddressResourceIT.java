@@ -348,12 +348,7 @@ class AddressResourceIT {
         Address partialUpdatedAddress = new Address();
         partialUpdatedAddress.setId(address.getId());
 
-        partialUpdatedAddress
-            .addressLine(UPDATED_ADDRESS_LINE)
-            .district(UPDATED_DISTRICT)
-            .state(UPDATED_STATE)
-            .postalCode(UPDATED_POSTAL_CODE)
-            .country(UPDATED_COUNTRY);
+        partialUpdatedAddress.city(UPDATED_CITY).district(UPDATED_DISTRICT).state(UPDATED_STATE).postalCode(UPDATED_POSTAL_CODE);
 
         restAddressMockMvc
             .perform(
@@ -367,12 +362,12 @@ class AddressResourceIT {
         List<Address> addressList = addressRepository.findAll();
         assertThat(addressList).hasSize(databaseSizeBeforeUpdate);
         Address testAddress = addressList.get(addressList.size() - 1);
-        assertThat(testAddress.getAddressLine()).isEqualTo(UPDATED_ADDRESS_LINE);
-        assertThat(testAddress.getCity()).isEqualTo(DEFAULT_CITY);
+        assertThat(testAddress.getAddressLine()).isEqualTo(DEFAULT_ADDRESS_LINE);
+        assertThat(testAddress.getCity()).isEqualTo(UPDATED_CITY);
         assertThat(testAddress.getDistrict()).isEqualTo(UPDATED_DISTRICT);
         assertThat(testAddress.getState()).isEqualTo(UPDATED_STATE);
         assertThat(testAddress.getPostalCode()).isEqualTo(UPDATED_POSTAL_CODE);
-        assertThat(testAddress.getCountry()).isEqualTo(UPDATED_COUNTRY);
+        assertThat(testAddress.getCountry()).isEqualTo(DEFAULT_COUNTRY);
     }
 
     @Test

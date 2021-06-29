@@ -319,12 +319,7 @@ class ResponseInsuranceItemResourceIT {
         ResponseInsuranceItem partialUpdatedResponseInsuranceItem = new ResponseInsuranceItem();
         partialUpdatedResponseInsuranceItem.setId(responseInsuranceItem.getId());
 
-        partialUpdatedResponseInsuranceItem
-            .category(UPDATED_CATEGORY)
-            .excluded(UPDATED_EXCLUDED)
-            .name(UPDATED_NAME)
-            .description(UPDATED_DESCRIPTION)
-            .term(UPDATED_TERM);
+        partialUpdatedResponseInsuranceItem.category(UPDATED_CATEGORY).excluded(UPDATED_EXCLUDED).description(UPDATED_DESCRIPTION);
 
         restResponseInsuranceItemMockMvc
             .perform(
@@ -340,11 +335,11 @@ class ResponseInsuranceItemResourceIT {
         ResponseInsuranceItem testResponseInsuranceItem = responseInsuranceItemList.get(responseInsuranceItemList.size() - 1);
         assertThat(testResponseInsuranceItem.getCategory()).isEqualTo(UPDATED_CATEGORY);
         assertThat(testResponseInsuranceItem.getExcluded()).isEqualTo(UPDATED_EXCLUDED);
-        assertThat(testResponseInsuranceItem.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testResponseInsuranceItem.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testResponseInsuranceItem.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
         assertThat(testResponseInsuranceItem.getNetwork()).isEqualTo(DEFAULT_NETWORK);
         assertThat(testResponseInsuranceItem.getUnit()).isEqualTo(DEFAULT_UNIT);
-        assertThat(testResponseInsuranceItem.getTerm()).isEqualTo(UPDATED_TERM);
+        assertThat(testResponseInsuranceItem.getTerm()).isEqualTo(DEFAULT_TERM);
     }
 
     @Test

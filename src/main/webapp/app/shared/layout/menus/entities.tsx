@@ -11,6 +11,7 @@ export const EntitiesMenu = props => (
     data-cy="entity"
     style={{ maxHeight: '80vh', overflow: 'auto' }}
   >
+    <>{/* to avoid warnings when empty */}</>
     <MenuItem icon="asterisk" to="/ack-error-messages">
       <Translate contentKey="global.menu.entities.ackErrorMessages" />
     </MenuItem>

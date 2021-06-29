@@ -31,7 +31,7 @@
       "payor": "Payor",
       "classComponents": "Class Components",
       "costToBeneficiaryComponents": "Cost To Beneficiary Components",
-      "coverageEligibilityRequest": "Coverage Eligibility Request"
+      "coverageEligibilityRequests": "Coverage Eligibility Requests"
     }
   }
 }

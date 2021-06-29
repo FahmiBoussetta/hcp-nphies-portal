@@ -1,156 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IReferenceIdentifier, defaultValue } from 'app/shared/model/reference-identifier.model';
 
-export const ACTION_TYPES = {
-  FETCH_REFERENCEIDENTIFIER_LIST: 'referenceIdentifier/FETCH_REFERENCEIDENTIFIER_LIST',
-  FETCH_REFERENCEIDENTIFIER: 'referenceIdentifier/FETCH_REFERENCEIDENTIFIER',
-  CREATE_REFERENCEIDENTIFIER: 'referenceIdentifier/CREATE_REFERENCEIDENTIFIER',
-  UPDATE_REFERENCEIDENTIFIER: 'referenceIdentifier/UPDATE_REFERENCEIDENTIFIER',
-  PARTIAL_UPDATE_REFERENCEIDENTIFIER: 'referenceIdentifier/PARTIAL_UPDATE_REFERENCEIDENTIFIER',
-  DELETE_REFERENCEIDENTIFIER: 'referenceIdentifier/DELETE_REFERENCEIDENTIFIER',
-  RESET: 'referenceIdentifier/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<IReferenceIdentifier> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<IReferenceIdentifier>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type ReferenceIdentifierState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: ReferenceIdentifierState = initialState, action): ReferenceIdentifierState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_REFERENCEIDENTIFIER_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_REFERENCEIDENTIFIER):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_REFERENCEIDENTIFIER):
-    case REQUEST(ACTION_TYPES.UPDATE_REFERENCEIDENTIFIER):
-    case REQUEST(ACTION_TYPES.DELETE_REFERENCEIDENTIFIER):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_REFERENCEIDENTIFIER):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_REFERENCEIDENTIFIER_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_REFERENCEIDENTIFIER):
-    case FAILURE(ACTION_TYPES.CREATE_REFERENCEIDENTIFIER):
-    case FAILURE(ACTION_TYPES.UPDATE_REFERENCEIDENTIFIER):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_REFERENCEIDENTIFIER):
-    case FAILURE(ACTION_TYPES.DELETE_REFERENCEIDENTIFIER):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_REFERENCEIDENTIFIER_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_REFERENCEIDENTIFIER):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_REFERENCEIDENTIFIER):
-    case SUCCESS(ACTION_TYPES.UPDATE_REFERENCEIDENTIFIER):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_REFERENCEIDENTIFIER):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_REFERENCEIDENTIFIER):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/reference-identifiers';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<IReferenceIdentifier> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_REFERENCEIDENTIFIER_LIST,
-  payload: axios.get<IReferenceIdentifier>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('referenceIdentifier/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<IReferenceIdentifier[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<IReferenceIdentifier> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_REFERENCEIDENTIFIER,
-    payload: axios.get<IReferenceIdentifier>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'referenceIdentifier/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<IReferenceIdentifier>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<IReferenceIdentifier> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_REFERENCEIDENTIFIER,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'referenceIdentifier/create_entity',
+  async (entity: IReferenceIdentifier, thunkAPI) => {
+    const result = await axios.post<IReferenceIdentifier>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<IReferenceIdentifier> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_REFERENCEIDENTIFIER,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'referenceIdentifier/update_entity',
+  async (entity: IReferenceIdentifier, thunkAPI) => {
+    const result = await axios.put<IReferenceIdentifier>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<IReferenceIdentifier> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_REFERENCEIDENTIFIER,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'referenceIdentifier/partial_update_entity',
+  async (entity: IReferenceIdentifier, thunkAPI) => {
+    const result = await axios.patch<IReferenceIdentifier>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<IReferenceIdentifier> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_REFERENCEIDENTIFIER,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'referenceIdentifier/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<IReferenceIdentifier>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
+// slice
+
+export const ReferenceIdentifierSlice = createEntitySlice({
+  name: 'referenceIdentifier',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
+  },
 });
+
+export const { reset } = ReferenceIdentifierSlice.actions;
+
+// Reducer
+export default ReferenceIdentifierSlice.reducer;

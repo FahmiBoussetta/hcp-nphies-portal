@@ -21,7 +21,7 @@ export interface ICoverage {
   payor?: IOrganization | null;
   classComponents?: IClassComponent[] | null;
   costToBeneficiaryComponents?: ICostToBeneficiaryComponent[] | null;
-  coverageEligibilityRequest?: ICoverageEligibilityRequest | null;
+  coverageEligibilityRequests?: ICoverageEligibilityRequest[] | null;
 }
 
 export const defaultValue: Readonly<ICoverage> = {

@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './practitioner-role.reducer';
 
-export interface IPractitionerRoleDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const PractitionerRoleDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PractitionerRoleDeleteDialog = (props: IPractitionerRoleDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const practitionerRoleEntity = useAppSelector(state => state.practitionerRole.entity);
+  const updateSuccess = useAppSelector(state => state.practitionerRole.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/practitioner-role');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.practitionerRoleEntity.id);
+    dispatch(deleteEntity(practitionerRoleEntity.id));
   };
 
-  const { practitionerRoleEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="practitionerRoleDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const PractitionerRoleDeleteDialog = (props: IPractitionerRoleDeleteDialo
   );
 };
 
-const mapStateToProps = ({ practitionerRole }: IRootState) => ({
-  practitionerRoleEntity: practitionerRole.entity,
-  updateSuccess: practitionerRole.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PractitionerRoleDeleteDialog);
+export default PractitionerRoleDeleteDialog;

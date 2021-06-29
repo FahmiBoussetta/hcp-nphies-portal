@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './ope-out-error-messages.reducer';
 import { IOpeOutErrorMessages } from 'app/shared/model/ope-out-error-messages.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IOpeOutErrorMessagesProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const OpeOutErrorMessages = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const OpeOutErrorMessages = (props: IOpeOutErrorMessagesProps) => {
+  const opeOutErrorMessagesList = useAppSelector(state => state.opeOutErrorMessages.entities);
+  const loading = useAppSelector(state => state.opeOutErrorMessages.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { opeOutErrorMessagesList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="ope-out-error-messages-heading" data-cy="OpeOutErrorMessagesHeading">
@@ -123,16 +126,4 @@ export const OpeOutErrorMessages = (props: IOpeOutErrorMessagesProps) => {
   );
 };
 
-const mapStateToProps = ({ opeOutErrorMessages }: IRootState) => ({
-  opeOutErrorMessagesList: opeOutErrorMessages.entities,
-  loading: opeOutErrorMessages.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(OpeOutErrorMessages);
+export default OpeOutErrorMessages;

@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './insurance.reducer';
 import { IInsurance } from 'app/shared/model/insurance.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IInsuranceProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Insurance = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Insurance = (props: IInsuranceProps) => {
+  const insuranceList = useAppSelector(state => state.insurance.entities);
+  const loading = useAppSelector(state => state.insurance.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { insuranceList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="insurance-heading" data-cy="InsuranceHeading">
@@ -125,16 +128,4 @@ export const Insurance = (props: IInsuranceProps) => {
   );
 };
 
-const mapStateToProps = ({ insurance }: IRootState) => ({
-  insuranceList: insurance.entities,
-  loading: insurance.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Insurance);
+export default Insurance;

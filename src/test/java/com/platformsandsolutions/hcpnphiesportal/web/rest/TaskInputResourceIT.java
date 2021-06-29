@@ -323,7 +323,12 @@ class TaskInputResourceIT {
         TaskInput partialUpdatedTaskInput = new TaskInput();
         partialUpdatedTaskInput.setId(taskInput.getId());
 
-        partialUpdatedTaskInput.inputInclude(UPDATED_INPUT_INCLUDE).inputExclude(UPDATED_INPUT_EXCLUDE).inputStart(UPDATED_INPUT_START);
+        partialUpdatedTaskInput
+            .inputExclude(UPDATED_INPUT_EXCLUDE)
+            .inputExcludeMessage(UPDATED_INPUT_EXCLUDE_MESSAGE)
+            .inputCount(UPDATED_INPUT_COUNT)
+            .inputEnd(UPDATED_INPUT_END)
+            .inputLineItem(UPDATED_INPUT_LINE_ITEM);
 
         restTaskInputMockMvc
             .perform(
@@ -337,14 +342,14 @@ class TaskInputResourceIT {
         List<TaskInput> taskInputList = taskInputRepository.findAll();
         assertThat(taskInputList).hasSize(databaseSizeBeforeUpdate);
         TaskInput testTaskInput = taskInputList.get(taskInputList.size() - 1);
-        assertThat(testTaskInput.getInputInclude()).isEqualTo(UPDATED_INPUT_INCLUDE);
+        assertThat(testTaskInput.getInputInclude()).isEqualTo(DEFAULT_INPUT_INCLUDE);
         assertThat(testTaskInput.getInputExclude()).isEqualTo(UPDATED_INPUT_EXCLUDE);
         assertThat(testTaskInput.getInputIncludeMessage()).isEqualTo(DEFAULT_INPUT_INCLUDE_MESSAGE);
-        assertThat(testTaskInput.getInputExcludeMessage()).isEqualTo(DEFAULT_INPUT_EXCLUDE_MESSAGE);
-        assertThat(testTaskInput.getInputCount()).isEqualTo(DEFAULT_INPUT_COUNT);
-        assertThat(testTaskInput.getInputStart()).isEqualTo(UPDATED_INPUT_START);
-        assertThat(testTaskInput.getInputEnd()).isEqualTo(DEFAULT_INPUT_END);
-        assertThat(testTaskInput.getInputLineItem()).isEqualTo(DEFAULT_INPUT_LINE_ITEM);
+        assertThat(testTaskInput.getInputExcludeMessage()).isEqualTo(UPDATED_INPUT_EXCLUDE_MESSAGE);
+        assertThat(testTaskInput.getInputCount()).isEqualTo(UPDATED_INPUT_COUNT);
+        assertThat(testTaskInput.getInputStart()).isEqualTo(DEFAULT_INPUT_START);
+        assertThat(testTaskInput.getInputEnd()).isEqualTo(UPDATED_INPUT_END);
+        assertThat(testTaskInput.getInputLineItem()).isEqualTo(UPDATED_INPUT_LINE_ITEM);
     }
 
     @Test

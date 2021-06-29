@@ -421,15 +421,11 @@ class SubDetailItemResourceIT {
         partialUpdatedSubDetailItem.setId(subDetailItem.getId());
 
         partialUpdatedSubDetailItem
-            .sequence(UPDATED_SEQUENCE)
             .tax(UPDATED_TAX)
-            .transportationSRCA(UPDATED_TRANSPORTATION_SRCA)
-            .imaging(UPDATED_IMAGING)
             .medicalDevice(UPDATED_MEDICAL_DEVICE)
-            .oralHealthOP(UPDATED_ORAL_HEALTH_OP)
-            .services(UPDATED_SERVICES)
-            .medicationCode(UPDATED_MEDICATION_CODE)
-            .quantity(UPDATED_QUANTITY);
+            .oralHealthIP(UPDATED_ORAL_HEALTH_IP)
+            .procedure(UPDATED_PROCEDURE)
+            .unitPrice(UPDATED_UNIT_PRICE);
 
         restSubDetailItemMockMvc
             .perform(
@@ -443,19 +439,19 @@ class SubDetailItemResourceIT {
         List<SubDetailItem> subDetailItemList = subDetailItemRepository.findAll();
         assertThat(subDetailItemList).hasSize(databaseSizeBeforeUpdate);
         SubDetailItem testSubDetailItem = subDetailItemList.get(subDetailItemList.size() - 1);
-        assertThat(testSubDetailItem.getSequence()).isEqualTo(UPDATED_SEQUENCE);
+        assertThat(testSubDetailItem.getSequence()).isEqualTo(DEFAULT_SEQUENCE);
         assertThat(testSubDetailItem.getTax()).isEqualByComparingTo(UPDATED_TAX);
-        assertThat(testSubDetailItem.getTransportationSRCA()).isEqualTo(UPDATED_TRANSPORTATION_SRCA);
-        assertThat(testSubDetailItem.getImaging()).isEqualTo(UPDATED_IMAGING);
+        assertThat(testSubDetailItem.getTransportationSRCA()).isEqualTo(DEFAULT_TRANSPORTATION_SRCA);
+        assertThat(testSubDetailItem.getImaging()).isEqualTo(DEFAULT_IMAGING);
         assertThat(testSubDetailItem.getLaboratory()).isEqualTo(DEFAULT_LABORATORY);
         assertThat(testSubDetailItem.getMedicalDevice()).isEqualTo(UPDATED_MEDICAL_DEVICE);
-        assertThat(testSubDetailItem.getOralHealthIP()).isEqualTo(DEFAULT_ORAL_HEALTH_IP);
-        assertThat(testSubDetailItem.getOralHealthOP()).isEqualTo(UPDATED_ORAL_HEALTH_OP);
-        assertThat(testSubDetailItem.getProcedure()).isEqualTo(DEFAULT_PROCEDURE);
-        assertThat(testSubDetailItem.getServices()).isEqualTo(UPDATED_SERVICES);
-        assertThat(testSubDetailItem.getMedicationCode()).isEqualTo(UPDATED_MEDICATION_CODE);
-        assertThat(testSubDetailItem.getQuantity()).isEqualTo(UPDATED_QUANTITY);
-        assertThat(testSubDetailItem.getUnitPrice()).isEqualTo(DEFAULT_UNIT_PRICE);
+        assertThat(testSubDetailItem.getOralHealthIP()).isEqualTo(UPDATED_ORAL_HEALTH_IP);
+        assertThat(testSubDetailItem.getOralHealthOP()).isEqualTo(DEFAULT_ORAL_HEALTH_OP);
+        assertThat(testSubDetailItem.getProcedure()).isEqualTo(UPDATED_PROCEDURE);
+        assertThat(testSubDetailItem.getServices()).isEqualTo(DEFAULT_SERVICES);
+        assertThat(testSubDetailItem.getMedicationCode()).isEqualTo(DEFAULT_MEDICATION_CODE);
+        assertThat(testSubDetailItem.getQuantity()).isEqualTo(DEFAULT_QUANTITY);
+        assertThat(testSubDetailItem.getUnitPrice()).isEqualTo(UPDATED_UNIT_PRICE);
     }
 
     @Test

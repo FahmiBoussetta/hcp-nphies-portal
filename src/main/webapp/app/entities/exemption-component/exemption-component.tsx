@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './exemption-component.reducer';
 import { IExemptionComponent } from 'app/shared/model/exemption-component.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IExemptionComponentProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const ExemptionComponent = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ExemptionComponent = (props: IExemptionComponentProps) => {
+  const exemptionComponentList = useAppSelector(state => state.exemptionComponent.entities);
+  const loading = useAppSelector(state => state.exemptionComponent.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { exemptionComponentList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="exemption-component-heading" data-cy="ExemptionComponentHeading">
@@ -137,16 +140,4 @@ export const ExemptionComponent = (props: IExemptionComponentProps) => {
   );
 };
 
-const mapStateToProps = ({ exemptionComponent }: IRootState) => ({
-  exemptionComponentList: exemptionComponent.entities,
-  loading: exemptionComponent.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ExemptionComponent);
+export default ExemptionComponent;

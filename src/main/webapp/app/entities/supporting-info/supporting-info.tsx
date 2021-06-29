@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './supporting-info.reducer';
 import { ISupportingInfo } from 'app/shared/model/supporting-info.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ISupportingInfoProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const SupportingInfo = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const SupportingInfo = (props: ISupportingInfoProps) => {
+  const supportingInfoList = useAppSelector(state => state.supportingInfo.entities);
+  const loading = useAppSelector(state => state.supportingInfo.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { supportingInfoList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="supporting-info-heading" data-cy="SupportingInfoHeading">
@@ -195,16 +198,4 @@ export const SupportingInfo = (props: ISupportingInfoProps) => {
   );
 };
 
-const mapStateToProps = ({ supportingInfo }: IRootState) => ({
-  supportingInfoList: supportingInfo.entities,
-  loading: supportingInfo.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(SupportingInfo);
+export default SupportingInfo;

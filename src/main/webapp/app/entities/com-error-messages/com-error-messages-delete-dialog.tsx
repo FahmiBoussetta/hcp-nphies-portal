@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './com-error-messages.reducer';
 
-export interface IComErrorMessagesDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ComErrorMessagesDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ComErrorMessagesDeleteDialog = (props: IComErrorMessagesDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const comErrorMessagesEntity = useAppSelector(state => state.comErrorMessages.entity);
+  const updateSuccess = useAppSelector(state => state.comErrorMessages.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/com-error-messages');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.comErrorMessagesEntity.id);
+    dispatch(deleteEntity(comErrorMessagesEntity.id));
   };
 
-  const { comErrorMessagesEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="comErrorMessagesDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const ComErrorMessagesDeleteDialog = (props: IComErrorMessagesDeleteDialo
   );
 };
 
-const mapStateToProps = ({ comErrorMessages }: IRootState) => ({
-  comErrorMessagesEntity: comErrorMessages.entity,
-  updateSuccess: comErrorMessages.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ComErrorMessagesDeleteDialog);
+export default ComErrorMessagesDeleteDialog;

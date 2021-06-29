@@ -292,7 +292,7 @@ class InsuranceResourceIT {
         Insurance partialUpdatedInsurance = new Insurance();
         partialUpdatedInsurance.setId(insurance.getId());
 
-        partialUpdatedInsurance.sequence(UPDATED_SEQUENCE).focal(UPDATED_FOCAL);
+        partialUpdatedInsurance.focal(UPDATED_FOCAL);
 
         restInsuranceMockMvc
             .perform(
@@ -306,7 +306,7 @@ class InsuranceResourceIT {
         List<Insurance> insuranceList = insuranceRepository.findAll();
         assertThat(insuranceList).hasSize(databaseSizeBeforeUpdate);
         Insurance testInsurance = insuranceList.get(insuranceList.size() - 1);
-        assertThat(testInsurance.getSequence()).isEqualTo(UPDATED_SEQUENCE);
+        assertThat(testInsurance.getSequence()).isEqualTo(DEFAULT_SEQUENCE);
         assertThat(testInsurance.getFocal()).isEqualTo(UPDATED_FOCAL);
         assertThat(testInsurance.getPreAuthRef()).isEqualTo(DEFAULT_PRE_AUTH_REF);
     }

@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { ICoverage } from 'app/shared/model/coverage.model';
 import { getEntities as getCoverages } from 'app/entities/coverage/coverage.reducer';
@@ -17,13 +14,20 @@ import { getEntity, updateEntity, createEntity, reset } from './insurance.reduce
 import { IInsurance } from 'app/shared/model/insurance.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IInsuranceUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const InsuranceUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const InsuranceUpdate = (props: IInsuranceUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { insuranceEntity, coverages, claimResponses, claims, loading, updating } = props;
+  const coverages = useAppSelector(state => state.coverage.entities);
+  const claimResponses = useAppSelector(state => state.claimResponse.entities);
+  const claims = useAppSelector(state => state.claim.entities);
+  const insuranceEntity = useAppSelector(state => state.insurance.entity);
+  const loading = useAppSelector(state => state.insurance.loading);
+  const updating = useAppSelector(state => state.insurance.updating);
+  const updateSuccess = useAppSelector(state => state.insurance.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/insurance');
@@ -31,39 +35,47 @@ export const InsuranceUpdate = (props: IInsuranceUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getCoverages();
-    props.getClaimResponses();
-    props.getClaims();
+    dispatch(getCoverages({}));
+    dispatch(getClaimResponses({}));
+    dispatch(getClaims({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...insuranceEntity,
-        ...values,
-        coverage: coverages.find(it => it.id.toString() === values.coverageId.toString()),
-        claimResponse: claimResponses.find(it => it.id.toString() === values.claimResponseId.toString()),
-        claim: claims.find(it => it.id.toString() === values.claimId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...insuranceEntity,
+      ...values,
+      coverage: coverages.find(it => it.id.toString() === values.coverageId.toString()),
+      claimResponse: claimResponses.find(it => it.id.toString() === values.claimResponseId.toString()),
+      claim: claims.find(it => it.id.toString() === values.claimId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...insuranceEntity,
+          coverageId: insuranceEntity?.coverage?.id,
+          claimResponseId: insuranceEntity?.claimResponse?.id,
+          claimId: insuranceEntity?.claim?.id,
+        };
 
   return (
     <div>
@@ -79,89 +91,92 @@ export const InsuranceUpdate = (props: IInsuranceUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : insuranceEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="insurance-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="insurance-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
-              ) : null}
-              <AvGroup>
-                <Label id="sequenceLabel" for="insurance-sequence">
-                  <Translate contentKey="hcpNphiesPortalApp.insurance.sequence">Sequence</Translate>
-                </Label>
-                <AvField
-                  id="insurance-sequence"
-                  data-cy="sequence"
-                  type="string"
-                  className="form-control"
-                  name="sequence"
-                  validate={{
-                    required: { value: true, errorMessage: translate('entity.validation.required') },
-                    number: { value: true, errorMessage: translate('entity.validation.number') },
-                  }}
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="insurance-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
                 />
-              </AvGroup>
-              <AvGroup check>
-                <Label id="focalLabel">
-                  <AvInput id="insurance-focal" data-cy="focal" type="checkbox" className="form-check-input" name="focal" />
-                  <Translate contentKey="hcpNphiesPortalApp.insurance.focal">Focal</Translate>
-                </Label>
-              </AvGroup>
-              <AvGroup>
-                <Label id="preAuthRefLabel" for="insurance-preAuthRef">
-                  <Translate contentKey="hcpNphiesPortalApp.insurance.preAuthRef">Pre Auth Ref</Translate>
-                </Label>
-                <AvField id="insurance-preAuthRef" data-cy="preAuthRef" type="text" name="preAuthRef" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="insurance-coverage">
-                  <Translate contentKey="hcpNphiesPortalApp.insurance.coverage">Coverage</Translate>
-                </Label>
-                <AvInput id="insurance-coverage" data-cy="coverage" type="select" className="form-control" name="coverageId">
-                  <option value="" key="0" />
-                  {coverages
-                    ? coverages.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="insurance-claimResponse">
-                  <Translate contentKey="hcpNphiesPortalApp.insurance.claimResponse">Claim Response</Translate>
-                </Label>
-                <AvInput id="insurance-claimResponse" data-cy="claimResponse" type="select" className="form-control" name="claimResponseId">
-                  <option value="" key="0" />
-                  {claimResponses
-                    ? claimResponses.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="insurance-claim">
-                  <Translate contentKey="hcpNphiesPortalApp.insurance.claim">Claim</Translate>
-                </Label>
-                <AvInput id="insurance-claim" data-cy="claim" type="select" className="form-control" name="claimId">
-                  <option value="" key="0" />
-                  {claims
-                    ? claims.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/insurance" replace color="info">
+              ) : null}
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.insurance.sequence')}
+                id="insurance-sequence"
+                name="sequence"
+                data-cy="sequence"
+                type="text"
+                validate={{
+                  required: { value: true, message: translate('entity.validation.required') },
+                  validate: v => isNumber(v) || translate('entity.validation.number'),
+                }}
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.insurance.focal')}
+                id="insurance-focal"
+                name="focal"
+                data-cy="focal"
+                check
+                type="checkbox"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.insurance.preAuthRef')}
+                id="insurance-preAuthRef"
+                name="preAuthRef"
+                data-cy="preAuthRef"
+                type="text"
+              />
+              <ValidatedField
+                id="insurance-coverage"
+                name="coverageId"
+                data-cy="coverage"
+                label={translate('hcpNphiesPortalApp.insurance.coverage')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {coverages
+                  ? coverages.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="insurance-claimResponse"
+                name="claimResponseId"
+                data-cy="claimResponse"
+                label={translate('hcpNphiesPortalApp.insurance.claimResponse')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {claimResponses
+                  ? claimResponses.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="insurance-claim"
+                name="claimId"
+                data-cy="claim"
+                label={translate('hcpNphiesPortalApp.insurance.claim')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {claims
+                  ? claims.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/insurance" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -174,7 +189,7 @@ export const InsuranceUpdate = (props: IInsuranceUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -182,27 +197,4 @@ export const InsuranceUpdate = (props: IInsuranceUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  coverages: storeState.coverage.entities,
-  claimResponses: storeState.claimResponse.entities,
-  claims: storeState.claim.entities,
-  insuranceEntity: storeState.insurance.entity,
-  loading: storeState.insurance.loading,
-  updating: storeState.insurance.updating,
-  updateSuccess: storeState.insurance.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getCoverages,
-  getClaimResponses,
-  getClaims,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(InsuranceUpdate);
+export default InsuranceUpdate;

@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './claim.reducer';
 import { IClaim } from 'app/shared/model/claim.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IClaimProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Claim = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Claim = (props: IClaimProps) => {
+  const claimList = useAppSelector(state => state.claim.entities);
+  const loading = useAppSelector(state => state.claim.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { claimList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="claim-heading" data-cy="ClaimHeading">
@@ -227,16 +230,4 @@ export const Claim = (props: IClaimProps) => {
   );
 };
 
-const mapStateToProps = ({ claim }: IRootState) => ({
-  claimList: claim.entities,
-  loading: claim.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Claim);
+export default Claim;

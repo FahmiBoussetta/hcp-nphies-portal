@@ -1,177 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IAttachment, defaultValue } from 'app/shared/model/attachment.model';
 
-export const ACTION_TYPES = {
-  FETCH_ATTACHMENT_LIST: 'attachment/FETCH_ATTACHMENT_LIST',
-  FETCH_ATTACHMENT: 'attachment/FETCH_ATTACHMENT',
-  CREATE_ATTACHMENT: 'attachment/CREATE_ATTACHMENT',
-  UPDATE_ATTACHMENT: 'attachment/UPDATE_ATTACHMENT',
-  PARTIAL_UPDATE_ATTACHMENT: 'attachment/PARTIAL_UPDATE_ATTACHMENT',
-  DELETE_ATTACHMENT: 'attachment/DELETE_ATTACHMENT',
-  SET_BLOB: 'attachment/SET_BLOB',
-  RESET: 'attachment/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<IAttachment> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<IAttachment>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type AttachmentState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: AttachmentState = initialState, action): AttachmentState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_ATTACHMENT_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_ATTACHMENT):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_ATTACHMENT):
-    case REQUEST(ACTION_TYPES.UPDATE_ATTACHMENT):
-    case REQUEST(ACTION_TYPES.DELETE_ATTACHMENT):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_ATTACHMENT):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_ATTACHMENT_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_ATTACHMENT):
-    case FAILURE(ACTION_TYPES.CREATE_ATTACHMENT):
-    case FAILURE(ACTION_TYPES.UPDATE_ATTACHMENT):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_ATTACHMENT):
-    case FAILURE(ACTION_TYPES.DELETE_ATTACHMENT):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_ATTACHMENT_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_ATTACHMENT):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_ATTACHMENT):
-    case SUCCESS(ACTION_TYPES.UPDATE_ATTACHMENT):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_ATTACHMENT):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_ATTACHMENT):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.SET_BLOB: {
-      const { name, data, contentType } = action.payload;
-      return {
-        ...state,
-        entity: {
-          ...state.entity,
-          [name]: data,
-          [name + 'ContentType']: contentType,
-        },
-      };
-    }
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/attachments';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<IAttachment> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_ATTACHMENT_LIST,
-  payload: axios.get<IAttachment>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('attachment/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<IAttachment[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<IAttachment> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_ATTACHMENT,
-    payload: axios.get<IAttachment>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'attachment/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<IAttachment>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<IAttachment> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_ATTACHMENT,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'attachment/create_entity',
+  async (entity: IAttachment, thunkAPI) => {
+    const result = await axios.post<IAttachment>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<IAttachment> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_ATTACHMENT,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'attachment/update_entity',
+  async (entity: IAttachment, thunkAPI) => {
+    const result = await axios.put<IAttachment>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<IAttachment> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_ATTACHMENT,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'attachment/partial_update_entity',
+  async (entity: IAttachment, thunkAPI) => {
+    const result = await axios.patch<IAttachment>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<IAttachment> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_ATTACHMENT,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'attachment/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<IAttachment>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const setBlob = (name, data, contentType?) => ({
-  type: ACTION_TYPES.SET_BLOB,
-  payload: {
-    name,
-    data,
-    contentType,
+// slice
+
+export const AttachmentSlice = createEntitySlice({
+  name: 'attachment',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
   },
 });
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
-});
+export const { reset } = AttachmentSlice.actions;
+
+// Reducer
+export default AttachmentSlice.reducer;

@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './com-error-messages.reducer';
 import { IComErrorMessages } from 'app/shared/model/com-error-messages.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IComErrorMessagesProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const ComErrorMessages = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ComErrorMessages = (props: IComErrorMessagesProps) => {
+  const comErrorMessagesList = useAppSelector(state => state.comErrorMessages.entities);
+  const loading = useAppSelector(state => state.comErrorMessages.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { comErrorMessagesList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="com-error-messages-heading" data-cy="ComErrorMessagesHeading">
@@ -121,16 +124,4 @@ export const ComErrorMessages = (props: IComErrorMessagesProps) => {
   );
 };
 
-const mapStateToProps = ({ comErrorMessages }: IRootState) => ({
-  comErrorMessagesList: comErrorMessages.entities,
-  loading: comErrorMessages.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ComErrorMessages);
+export default ComErrorMessages;

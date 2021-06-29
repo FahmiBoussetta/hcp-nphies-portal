@@ -251,7 +251,7 @@ class TaskOutputResourceIT {
         TaskOutput partialUpdatedTaskOutput = new TaskOutput();
         partialUpdatedTaskOutput.setId(taskOutput.getId());
 
-        partialUpdatedTaskOutput.status(UPDATED_STATUS);
+        partialUpdatedTaskOutput.status(UPDATED_STATUS).errorOutput(UPDATED_ERROR_OUTPUT);
 
         restTaskOutputMockMvc
             .perform(
@@ -266,7 +266,7 @@ class TaskOutputResourceIT {
         assertThat(taskOutputList).hasSize(databaseSizeBeforeUpdate);
         TaskOutput testTaskOutput = taskOutputList.get(taskOutputList.size() - 1);
         assertThat(testTaskOutput.getStatus()).isEqualTo(UPDATED_STATUS);
-        assertThat(testTaskOutput.getErrorOutput()).isEqualTo(DEFAULT_ERROR_OUTPUT);
+        assertThat(testTaskOutput.getErrorOutput()).isEqualTo(UPDATED_ERROR_OUTPUT);
     }
 
     @Test

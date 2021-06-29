@@ -298,7 +298,7 @@ class OrganizationResourceIT {
         Organization partialUpdatedOrganization = new Organization();
         partialUpdatedOrganization.setId(organization.getId());
 
-        partialUpdatedOrganization.guid(UPDATED_GUID);
+        partialUpdatedOrganization.guid(UPDATED_GUID).baseUrl(UPDATED_BASE_URL).organizationType(UPDATED_ORGANIZATION_TYPE);
 
         restOrganizationMockMvc
             .perform(
@@ -315,8 +315,8 @@ class OrganizationResourceIT {
         assertThat(testOrganization.getGuid()).isEqualTo(UPDATED_GUID);
         assertThat(testOrganization.getForceId()).isEqualTo(DEFAULT_FORCE_ID);
         assertThat(testOrganization.getOrganizationLicense()).isEqualTo(DEFAULT_ORGANIZATION_LICENSE);
-        assertThat(testOrganization.getBaseUrl()).isEqualTo(DEFAULT_BASE_URL);
-        assertThat(testOrganization.getOrganizationType()).isEqualTo(DEFAULT_ORGANIZATION_TYPE);
+        assertThat(testOrganization.getBaseUrl()).isEqualTo(UPDATED_BASE_URL);
+        assertThat(testOrganization.getOrganizationType()).isEqualTo(UPDATED_ORGANIZATION_TYPE);
         assertThat(testOrganization.getName()).isEqualTo(DEFAULT_NAME);
     }
 

@@ -71,10 +71,11 @@
       "relationshipName": "purposes"
     },
     {
-      "relationshipType": "one-to-many",
+      "relationshipType": "many-to-many",
       "otherEntityName": "coverage",
-      "otherEntityRelationshipName": "coverageEligibilityRequest",
-      "relationshipName": "coverages"
+      "otherEntityRelationshipName": "coverageEligibilityRequests",
+      "relationshipName": "coverages",
+      "ownerSide": true
     }
   ],
   "entityTableName": "coverage_eligibility_request",

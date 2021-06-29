@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { getEntity, updateEntity, createEntity, reset } from './acknowledgement.reducer';
 import { IAcknowledgement } from 'app/shared/model/acknowledgement.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAcknowledgementUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AcknowledgementUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AcknowledgementUpdate = (props: IAcknowledgementUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { acknowledgementEntity, loading, updating } = props;
+  const acknowledgementEntity = useAppSelector(state => state.acknowledgement.entity);
+  const loading = useAppSelector(state => state.acknowledgement.loading);
+  const updating = useAppSelector(state => state.acknowledgement.updating);
+  const updateSuccess = useAppSelector(state => state.acknowledgement.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/acknowledgement');
@@ -25,32 +26,37 @@ export const AcknowledgementUpdate = (props: IAcknowledgementUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...acknowledgementEntity,
-        ...values,
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...acknowledgementEntity,
+      ...values,
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...acknowledgementEntity,
+        };
 
   return (
     <div>
@@ -66,34 +72,39 @@ export const AcknowledgementUpdate = (props: IAcknowledgementUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : acknowledgementEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="acknowledgement-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="acknowledgement-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="acknowledgement-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="valueLabel" for="acknowledgement-value">
-                  <Translate contentKey="hcpNphiesPortalApp.acknowledgement.value">Value</Translate>
-                </Label>
-                <AvField id="acknowledgement-value" data-cy="value" type="text" name="value" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="systemLabel" for="acknowledgement-system">
-                  <Translate contentKey="hcpNphiesPortalApp.acknowledgement.system">System</Translate>
-                </Label>
-                <AvField id="acknowledgement-system" data-cy="system" type="text" name="system" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="parsedLabel" for="acknowledgement-parsed">
-                  <Translate contentKey="hcpNphiesPortalApp.acknowledgement.parsed">Parsed</Translate>
-                </Label>
-                <AvField id="acknowledgement-parsed" data-cy="parsed" type="text" name="parsed" />
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/acknowledgement" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.acknowledgement.value')}
+                id="acknowledgement-value"
+                name="value"
+                data-cy="value"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.acknowledgement.system')}
+                id="acknowledgement-system"
+                name="system"
+                data-cy="system"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.acknowledgement.parsed')}
+                id="acknowledgement-parsed"
+                name="parsed"
+                data-cy="parsed"
+                type="text"
+              />
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/acknowledgement" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -106,7 +117,7 @@ export const AcknowledgementUpdate = (props: IAcknowledgementUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -114,21 +125,4 @@ export const AcknowledgementUpdate = (props: IAcknowledgementUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  acknowledgementEntity: storeState.acknowledgement.entity,
-  loading: storeState.acknowledgement.loading,
-  updating: storeState.acknowledgement.updating,
-  updateSuccess: storeState.acknowledgement.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AcknowledgementUpdate);
+export default AcknowledgementUpdate;

@@ -1,156 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IContact, defaultValue } from 'app/shared/model/contact.model';
 
-export const ACTION_TYPES = {
-  FETCH_CONTACT_LIST: 'contact/FETCH_CONTACT_LIST',
-  FETCH_CONTACT: 'contact/FETCH_CONTACT',
-  CREATE_CONTACT: 'contact/CREATE_CONTACT',
-  UPDATE_CONTACT: 'contact/UPDATE_CONTACT',
-  PARTIAL_UPDATE_CONTACT: 'contact/PARTIAL_UPDATE_CONTACT',
-  DELETE_CONTACT: 'contact/DELETE_CONTACT',
-  RESET: 'contact/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<IContact> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<IContact>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type ContactState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: ContactState = initialState, action): ContactState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_CONTACT_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_CONTACT):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_CONTACT):
-    case REQUEST(ACTION_TYPES.UPDATE_CONTACT):
-    case REQUEST(ACTION_TYPES.DELETE_CONTACT):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_CONTACT):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_CONTACT_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_CONTACT):
-    case FAILURE(ACTION_TYPES.CREATE_CONTACT):
-    case FAILURE(ACTION_TYPES.UPDATE_CONTACT):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_CONTACT):
-    case FAILURE(ACTION_TYPES.DELETE_CONTACT):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_CONTACT_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_CONTACT):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_CONTACT):
-    case SUCCESS(ACTION_TYPES.UPDATE_CONTACT):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_CONTACT):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_CONTACT):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/contacts';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<IContact> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_CONTACT_LIST,
-  payload: axios.get<IContact>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('contact/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<IContact[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<IContact> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_CONTACT,
-    payload: axios.get<IContact>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'contact/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<IContact>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<IContact> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_CONTACT,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'contact/create_entity',
+  async (entity: IContact, thunkAPI) => {
+    const result = await axios.post<IContact>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<IContact> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_CONTACT,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'contact/update_entity',
+  async (entity: IContact, thunkAPI) => {
+    const result = await axios.put<IContact>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<IContact> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_CONTACT,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'contact/partial_update_entity',
+  async (entity: IContact, thunkAPI) => {
+    const result = await axios.patch<IContact>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<IContact> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_CONTACT,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'contact/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<IContact>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
+// slice
+
+export const ContactSlice = createEntitySlice({
+  name: 'contact',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
+  },
 });
+
+export const { reset } = ContactSlice.actions;
+
+// Reducer
+export default ContactSlice.reducer;

@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './response-insurance-item.reducer';
 import { IResponseInsuranceItem } from 'app/shared/model/response-insurance-item.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IResponseInsuranceItemProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const ResponseInsuranceItem = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ResponseInsuranceItem = (props: IResponseInsuranceItemProps) => {
+  const responseInsuranceItemList = useAppSelector(state => state.responseInsuranceItem.entities);
+  const loading = useAppSelector(state => state.responseInsuranceItem.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { responseInsuranceItemList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="response-insurance-item-heading" data-cy="ResponseInsuranceItemHeading">
@@ -153,16 +156,4 @@ export const ResponseInsuranceItem = (props: IResponseInsuranceItemProps) => {
   );
 };
 
-const mapStateToProps = ({ responseInsuranceItem }: IRootState) => ({
-  responseInsuranceItemList: responseInsuranceItem.entities,
-  loading: responseInsuranceItem.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ResponseInsuranceItem);
+export default ResponseInsuranceItem;

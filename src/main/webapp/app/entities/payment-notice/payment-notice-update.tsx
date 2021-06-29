@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IPaymentReconciliation } from 'app/shared/model/payment-reconciliation.model';
 import { getEntities as getPaymentReconciliations } from 'app/entities/payment-reconciliation/payment-reconciliation.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './payment-notice.r
 import { IPaymentNotice } from 'app/shared/model/payment-notice.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPaymentNoticeUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const PaymentNoticeUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PaymentNoticeUpdate = (props: IPaymentNoticeUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { paymentNoticeEntity, paymentReconciliations, loading, updating } = props;
+  const paymentReconciliations = useAppSelector(state => state.paymentReconciliation.entities);
+  const paymentNoticeEntity = useAppSelector(state => state.paymentNotice.entity);
+  const loading = useAppSelector(state => state.paymentNotice.loading);
+  const updating = useAppSelector(state => state.paymentNotice.updating);
+  const updateSuccess = useAppSelector(state => state.paymentNotice.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/payment-notice');
@@ -27,37 +29,47 @@ export const PaymentNoticeUpdate = (props: IPaymentNoticeUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getPaymentReconciliations();
+    dispatch(getPaymentReconciliations({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
+  const saveEntity = values => {
     values.paymentDate = convertDateTimeToServer(values.paymentDate);
 
-    if (errors.length === 0) {
-      const entity = {
-        ...paymentNoticeEntity,
-        ...values,
-        payment: paymentReconciliations.find(it => it.id.toString() === values.paymentId.toString()),
-      };
+    const entity = {
+      ...paymentNoticeEntity,
+      ...values,
+      payment: paymentReconciliations.find(it => it.id.toString() === values.paymentId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {
+          paymentDate: displayDefaultDateTime(),
+        }
+      : {
+          ...paymentNoticeEntity,
+          paymentDate: convertDateTimeFromServer(paymentNoticeEntity.paymentDate),
+          paymentStatus: 'Paid',
+          paymentId: paymentNoticeEntity?.payment?.id,
+        };
 
   return (
     <div>
@@ -73,85 +85,80 @@ export const PaymentNoticeUpdate = (props: IPaymentNoticeUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : paymentNoticeEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="payment-notice-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="payment-notice-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
-              ) : null}
-              <AvGroup>
-                <Label id="guidLabel" for="payment-notice-guid">
-                  <Translate contentKey="hcpNphiesPortalApp.paymentNotice.guid">Guid</Translate>
-                </Label>
-                <AvField id="payment-notice-guid" data-cy="guid" type="text" name="guid" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="parsedLabel" for="payment-notice-parsed">
-                  <Translate contentKey="hcpNphiesPortalApp.paymentNotice.parsed">Parsed</Translate>
-                </Label>
-                <AvField id="payment-notice-parsed" data-cy="parsed" type="text" name="parsed" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="identifierLabel" for="payment-notice-identifier">
-                  <Translate contentKey="hcpNphiesPortalApp.paymentNotice.identifier">Identifier</Translate>
-                </Label>
-                <AvField id="payment-notice-identifier" data-cy="identifier" type="text" name="identifier" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="paymentDateLabel" for="payment-notice-paymentDate">
-                  <Translate contentKey="hcpNphiesPortalApp.paymentNotice.paymentDate">Payment Date</Translate>
-                </Label>
-                <AvInput
-                  id="payment-notice-paymentDate"
-                  data-cy="paymentDate"
-                  type="datetime-local"
-                  className="form-control"
-                  name="paymentDate"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.paymentNoticeEntity.paymentDate)}
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="payment-notice-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
                 />
-              </AvGroup>
-              <AvGroup>
-                <Label id="amountLabel" for="payment-notice-amount">
-                  <Translate contentKey="hcpNphiesPortalApp.paymentNotice.amount">Amount</Translate>
-                </Label>
-                <AvField id="payment-notice-amount" data-cy="amount" type="text" name="amount" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="paymentStatusLabel" for="payment-notice-paymentStatus">
-                  <Translate contentKey="hcpNphiesPortalApp.paymentNotice.paymentStatus">Payment Status</Translate>
-                </Label>
-                <AvInput
-                  id="payment-notice-paymentStatus"
-                  data-cy="paymentStatus"
-                  type="select"
-                  className="form-control"
-                  name="paymentStatus"
-                  value={(!isNew && paymentNoticeEntity.paymentStatus) || 'Paid'}
-                >
-                  <option value="Paid">{translate('hcpNphiesPortalApp.PaymentStatusEnum.Paid')}</option>
-                  <option value="Cleared">{translate('hcpNphiesPortalApp.PaymentStatusEnum.Cleared')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="payment-notice-payment">
-                  <Translate contentKey="hcpNphiesPortalApp.paymentNotice.payment">Payment</Translate>
-                </Label>
-                <AvInput id="payment-notice-payment" data-cy="payment" type="select" className="form-control" name="paymentId">
-                  <option value="" key="0" />
-                  {paymentReconciliations
-                    ? paymentReconciliations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/payment-notice" replace color="info">
+              ) : null}
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.paymentNotice.guid')}
+                id="payment-notice-guid"
+                name="guid"
+                data-cy="guid"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.paymentNotice.parsed')}
+                id="payment-notice-parsed"
+                name="parsed"
+                data-cy="parsed"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.paymentNotice.identifier')}
+                id="payment-notice-identifier"
+                name="identifier"
+                data-cy="identifier"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.paymentNotice.paymentDate')}
+                id="payment-notice-paymentDate"
+                name="paymentDate"
+                data-cy="paymentDate"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.paymentNotice.amount')}
+                id="payment-notice-amount"
+                name="amount"
+                data-cy="amount"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.paymentNotice.paymentStatus')}
+                id="payment-notice-paymentStatus"
+                name="paymentStatus"
+                data-cy="paymentStatus"
+                type="select"
+              >
+                <option value="Paid">{translate('hcpNphiesPortalApp.PaymentStatusEnum.Paid')}</option>
+                <option value="Cleared">{translate('hcpNphiesPortalApp.PaymentStatusEnum.Cleared')}</option>
+              </ValidatedField>
+              <ValidatedField
+                id="payment-notice-payment"
+                name="paymentId"
+                data-cy="payment"
+                label={translate('hcpNphiesPortalApp.paymentNotice.payment')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {paymentReconciliations
+                  ? paymentReconciliations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/payment-notice" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -164,7 +171,7 @@ export const PaymentNoticeUpdate = (props: IPaymentNoticeUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -172,23 +179,4 @@ export const PaymentNoticeUpdate = (props: IPaymentNoticeUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  paymentReconciliations: storeState.paymentReconciliation.entities,
-  paymentNoticeEntity: storeState.paymentNotice.entity,
-  loading: storeState.paymentNotice.loading,
-  updating: storeState.paymentNotice.updating,
-  updateSuccess: storeState.paymentNotice.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getPaymentReconciliations,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PaymentNoticeUpdate);
+export default PaymentNoticeUpdate;

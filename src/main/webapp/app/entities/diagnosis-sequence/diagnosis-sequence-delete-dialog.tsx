@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './diagnosis-sequence.reducer';
 
-export interface IDiagnosisSequenceDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const DiagnosisSequenceDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const DiagnosisSequenceDeleteDialog = (props: IDiagnosisSequenceDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const diagnosisSequenceEntity = useAppSelector(state => state.diagnosisSequence.entity);
+  const updateSuccess = useAppSelector(state => state.diagnosisSequence.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/diagnosis-sequence');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.diagnosisSequenceEntity.id);
+    dispatch(deleteEntity(diagnosisSequenceEntity.id));
   };
 
-  const { diagnosisSequenceEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="diagnosisSequenceDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const DiagnosisSequenceDeleteDialog = (props: IDiagnosisSequenceDeleteDia
   );
 };
 
-const mapStateToProps = ({ diagnosisSequence }: IRootState) => ({
-  diagnosisSequenceEntity: diagnosisSequence.entity,
-  updateSuccess: diagnosisSequence.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(DiagnosisSequenceDeleteDialog);
+export default DiagnosisSequenceDeleteDialog;

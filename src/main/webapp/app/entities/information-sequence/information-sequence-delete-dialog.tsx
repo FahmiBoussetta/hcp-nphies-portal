@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './information-sequence.reducer';
 
-export interface IInformationSequenceDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const InformationSequenceDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const InformationSequenceDeleteDialog = (props: IInformationSequenceDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const informationSequenceEntity = useAppSelector(state => state.informationSequence.entity);
+  const updateSuccess = useAppSelector(state => state.informationSequence.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/information-sequence');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.informationSequenceEntity.id);
+    dispatch(deleteEntity(informationSequenceEntity.id));
   };
 
-  const { informationSequenceEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="informationSequenceDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const InformationSequenceDeleteDialog = (props: IInformationSequenceDelet
   );
 };
 
-const mapStateToProps = ({ informationSequence }: IRootState) => ({
-  informationSequenceEntity: informationSequence.entity,
-  updateSuccess: informationSequence.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(InformationSequenceDeleteDialog);
+export default InformationSequenceDeleteDialog;

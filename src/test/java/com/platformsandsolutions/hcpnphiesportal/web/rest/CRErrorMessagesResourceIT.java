@@ -250,6 +250,8 @@ class CRErrorMessagesResourceIT {
         CRErrorMessages partialUpdatedCRErrorMessages = new CRErrorMessages();
         partialUpdatedCRErrorMessages.setId(cRErrorMessages.getId());
 
+        partialUpdatedCRErrorMessages.message(UPDATED_MESSAGE);
+
         restCRErrorMessagesMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCRErrorMessages.getId())
@@ -262,7 +264,7 @@ class CRErrorMessagesResourceIT {
         List<CRErrorMessages> cRErrorMessagesList = cRErrorMessagesRepository.findAll();
         assertThat(cRErrorMessagesList).hasSize(databaseSizeBeforeUpdate);
         CRErrorMessages testCRErrorMessages = cRErrorMessagesList.get(cRErrorMessagesList.size() - 1);
-        assertThat(testCRErrorMessages.getMessage()).isEqualTo(DEFAULT_MESSAGE);
+        assertThat(testCRErrorMessages.getMessage()).isEqualTo(UPDATED_MESSAGE);
     }
 
     @Test

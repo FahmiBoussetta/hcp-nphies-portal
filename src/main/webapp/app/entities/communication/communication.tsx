@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './communication.reducer';
 import { ICommunication } from 'app/shared/model/communication.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICommunicationProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Communication = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Communication = (props: ICommunicationProps) => {
+  const communicationList = useAppSelector(state => state.communication.entities);
+  const loading = useAppSelector(state => state.communication.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { communicationList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="communication-heading" data-cy="CommunicationHeading">
@@ -147,16 +150,4 @@ export const Communication = (props: ICommunicationProps) => {
   );
 };
 
-const mapStateToProps = ({ communication }: IRootState) => ({
-  communicationList: communication.entities,
-  loading: communication.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Communication);
+export default Communication;

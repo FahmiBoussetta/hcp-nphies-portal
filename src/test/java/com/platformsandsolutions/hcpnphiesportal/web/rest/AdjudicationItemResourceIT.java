@@ -276,7 +276,7 @@ class AdjudicationItemResourceIT {
         AdjudicationItem partialUpdatedAdjudicationItem = new AdjudicationItem();
         partialUpdatedAdjudicationItem.setId(adjudicationItem.getId());
 
-        partialUpdatedAdjudicationItem.outcome(UPDATED_OUTCOME).sequence(UPDATED_SEQUENCE);
+        partialUpdatedAdjudicationItem.outcome(UPDATED_OUTCOME);
 
         restAdjudicationItemMockMvc
             .perform(
@@ -291,7 +291,7 @@ class AdjudicationItemResourceIT {
         assertThat(adjudicationItemList).hasSize(databaseSizeBeforeUpdate);
         AdjudicationItem testAdjudicationItem = adjudicationItemList.get(adjudicationItemList.size() - 1);
         assertThat(testAdjudicationItem.getOutcome()).isEqualTo(UPDATED_OUTCOME);
-        assertThat(testAdjudicationItem.getSequence()).isEqualTo(UPDATED_SEQUENCE);
+        assertThat(testAdjudicationItem.getSequence()).isEqualTo(DEFAULT_SEQUENCE);
     }
 
     @Test

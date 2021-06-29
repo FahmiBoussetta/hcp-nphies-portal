@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './response-insurance.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IResponseInsuranceDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ResponseInsuranceDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ResponseInsuranceDetail = (props: IResponseInsuranceDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { responseInsuranceEntity } = props;
+  const responseInsuranceEntity = useAppSelector(state => state.responseInsurance.entity);
   return (
     <Row>
       <Col md="8">
@@ -91,13 +90,4 @@ export const ResponseInsuranceDetail = (props: IResponseInsuranceDetailProps) =>
   );
 };
 
-const mapStateToProps = ({ responseInsurance }: IRootState) => ({
-  responseInsuranceEntity: responseInsurance.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ResponseInsuranceDetail);
+export default ResponseInsuranceDetail;

@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './practitioner.reducer';
 import { IPractitioner } from 'app/shared/model/practitioner.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPractitionerProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Practitioner = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Practitioner = (props: IPractitionerProps) => {
+  const practitionerList = useAppSelector(state => state.practitioner.entities);
+  const loading = useAppSelector(state => state.practitioner.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { practitionerList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="practitioner-heading" data-cy="PractitionerHeading">
@@ -119,16 +122,4 @@ export const Practitioner = (props: IPractitionerProps) => {
   );
 };
 
-const mapStateToProps = ({ practitioner }: IRootState) => ({
-  practitionerList: practitioner.entities,
-  loading: practitioner.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Practitioner);
+export default Practitioner;

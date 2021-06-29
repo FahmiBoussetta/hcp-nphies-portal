@@ -295,7 +295,7 @@ class PractitionerResourceIT {
         Practitioner partialUpdatedPractitioner = new Practitioner();
         partialUpdatedPractitioner.setId(practitioner.getId());
 
-        partialUpdatedPractitioner.gender(UPDATED_GENDER);
+        partialUpdatedPractitioner.guid(UPDATED_GUID);
 
         restPractitionerMockMvc
             .perform(
@@ -309,10 +309,10 @@ class PractitionerResourceIT {
         List<Practitioner> practitionerList = practitionerRepository.findAll();
         assertThat(practitionerList).hasSize(databaseSizeBeforeUpdate);
         Practitioner testPractitioner = practitionerList.get(practitionerList.size() - 1);
-        assertThat(testPractitioner.getGuid()).isEqualTo(DEFAULT_GUID);
+        assertThat(testPractitioner.getGuid()).isEqualTo(UPDATED_GUID);
         assertThat(testPractitioner.getForceId()).isEqualTo(DEFAULT_FORCE_ID);
         assertThat(testPractitioner.getPractitionerLicense()).isEqualTo(DEFAULT_PRACTITIONER_LICENSE);
-        assertThat(testPractitioner.getGender()).isEqualTo(UPDATED_GENDER);
+        assertThat(testPractitioner.getGender()).isEqualTo(DEFAULT_GENDER);
     }
 
     @Test

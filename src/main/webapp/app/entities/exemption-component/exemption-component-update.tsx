@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { ICostToBeneficiaryComponent } from 'app/shared/model/cost-to-beneficiary-component.model';
 import { getEntities as getCostToBeneficiaryComponents } from 'app/entities/cost-to-beneficiary-component/cost-to-beneficiary-component.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './exemption-compon
 import { IExemptionComponent } from 'app/shared/model/exemption-component.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IExemptionComponentUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ExemptionComponentUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ExemptionComponentUpdate = (props: IExemptionComponentUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { exemptionComponentEntity, costToBeneficiaryComponents, loading, updating } = props;
+  const costToBeneficiaryComponents = useAppSelector(state => state.costToBeneficiaryComponent.entities);
+  const exemptionComponentEntity = useAppSelector(state => state.exemptionComponent.entity);
+  const loading = useAppSelector(state => state.exemptionComponent.loading);
+  const updating = useAppSelector(state => state.exemptionComponent.updating);
+  const updateSuccess = useAppSelector(state => state.exemptionComponent.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/exemption-component');
@@ -27,38 +29,50 @@ export const ExemptionComponentUpdate = (props: IExemptionComponentUpdateProps) 
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getCostToBeneficiaryComponents();
+    dispatch(getCostToBeneficiaryComponents({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
+  const saveEntity = values => {
     values.start = convertDateTimeToServer(values.start);
     values.end = convertDateTimeToServer(values.end);
 
-    if (errors.length === 0) {
-      const entity = {
-        ...exemptionComponentEntity,
-        ...values,
-        costToBeneficiary: costToBeneficiaryComponents.find(it => it.id.toString() === values.costToBeneficiaryId.toString()),
-      };
+    const entity = {
+      ...exemptionComponentEntity,
+      ...values,
+      costToBeneficiary: costToBeneficiaryComponents.find(it => it.id.toString() === values.costToBeneficiaryId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {
+          start: displayDefaultDateTime(),
+          end: displayDefaultDateTime(),
+        }
+      : {
+          ...exemptionComponentEntity,
+          type: 'Retired',
+          start: convertDateTimeFromServer(exemptionComponentEntity.start),
+          end: convertDateTimeFromServer(exemptionComponentEntity.end),
+          costToBeneficiaryId: exemptionComponentEntity?.costToBeneficiary?.id,
+        };
 
   return (
     <div>
@@ -76,81 +90,60 @@ export const ExemptionComponentUpdate = (props: IExemptionComponentUpdateProps) 
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : exemptionComponentEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="exemption-component-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="exemption-component-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="exemption-component-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="typeLabel" for="exemption-component-type">
-                  <Translate contentKey="hcpNphiesPortalApp.exemptionComponent.type">Type</Translate>
-                </Label>
-                <AvInput
-                  id="exemption-component-type"
-                  data-cy="type"
-                  type="select"
-                  className="form-control"
-                  name="type"
-                  value={(!isNew && exemptionComponentEntity.type) || 'Retired'}
-                >
-                  <option value="Retired">{translate('hcpNphiesPortalApp.ExemptionTypeEnum.Retired')}</option>
-                  <option value="Foster">{translate('hcpNphiesPortalApp.ExemptionTypeEnum.Foster')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label id="startLabel" for="exemption-component-start">
-                  <Translate contentKey="hcpNphiesPortalApp.exemptionComponent.start">Start</Translate>
-                </Label>
-                <AvInput
-                  id="exemption-component-start"
-                  data-cy="start"
-                  type="datetime-local"
-                  className="form-control"
-                  name="start"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.exemptionComponentEntity.start)}
-                />
-              </AvGroup>
-              <AvGroup>
-                <Label id="endLabel" for="exemption-component-end">
-                  <Translate contentKey="hcpNphiesPortalApp.exemptionComponent.end">End</Translate>
-                </Label>
-                <AvInput
-                  id="exemption-component-end"
-                  data-cy="end"
-                  type="datetime-local"
-                  className="form-control"
-                  name="end"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.exemptionComponentEntity.end)}
-                />
-              </AvGroup>
-              <AvGroup>
-                <Label for="exemption-component-costToBeneficiary">
-                  <Translate contentKey="hcpNphiesPortalApp.exemptionComponent.costToBeneficiary">Cost To Beneficiary</Translate>
-                </Label>
-                <AvInput
-                  id="exemption-component-costToBeneficiary"
-                  data-cy="costToBeneficiary"
-                  type="select"
-                  className="form-control"
-                  name="costToBeneficiaryId"
-                >
-                  <option value="" key="0" />
-                  {costToBeneficiaryComponents
-                    ? costToBeneficiaryComponents.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/exemption-component" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.exemptionComponent.type')}
+                id="exemption-component-type"
+                name="type"
+                data-cy="type"
+                type="select"
+              >
+                <option value="Retired">{translate('hcpNphiesPortalApp.ExemptionTypeEnum.Retired')}</option>
+                <option value="Foster">{translate('hcpNphiesPortalApp.ExemptionTypeEnum.Foster')}</option>
+              </ValidatedField>
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.exemptionComponent.start')}
+                id="exemption-component-start"
+                name="start"
+                data-cy="start"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.exemptionComponent.end')}
+                id="exemption-component-end"
+                name="end"
+                data-cy="end"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                id="exemption-component-costToBeneficiary"
+                name="costToBeneficiaryId"
+                data-cy="costToBeneficiary"
+                label={translate('hcpNphiesPortalApp.exemptionComponent.costToBeneficiary')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {costToBeneficiaryComponents
+                  ? costToBeneficiaryComponents.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/exemption-component" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -163,7 +156,7 @@ export const ExemptionComponentUpdate = (props: IExemptionComponentUpdateProps) 
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -171,23 +164,4 @@ export const ExemptionComponentUpdate = (props: IExemptionComponentUpdateProps) 
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  costToBeneficiaryComponents: storeState.costToBeneficiaryComponent.entities,
-  exemptionComponentEntity: storeState.exemptionComponent.entity,
-  loading: storeState.exemptionComponent.loading,
-  updating: storeState.exemptionComponent.updating,
-  updateSuccess: storeState.exemptionComponent.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getCostToBeneficiaryComponents,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ExemptionComponentUpdate);
+export default ExemptionComponentUpdate;

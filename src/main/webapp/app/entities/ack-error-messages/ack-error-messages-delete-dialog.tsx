@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './ack-error-messages.reducer';
 
-export interface IAckErrorMessagesDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AckErrorMessagesDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AckErrorMessagesDeleteDialog = (props: IAckErrorMessagesDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const ackErrorMessagesEntity = useAppSelector(state => state.ackErrorMessages.entity);
+  const updateSuccess = useAppSelector(state => state.ackErrorMessages.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/ack-error-messages');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.ackErrorMessagesEntity.id);
+    dispatch(deleteEntity(ackErrorMessagesEntity.id));
   };
 
-  const { ackErrorMessagesEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="ackErrorMessagesDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const AckErrorMessagesDeleteDialog = (props: IAckErrorMessagesDeleteDialo
   );
 };
 
-const mapStateToProps = ({ ackErrorMessages }: IRootState) => ({
-  ackErrorMessagesEntity: ackErrorMessages.entity,
-  updateSuccess: ackErrorMessages.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AckErrorMessagesDeleteDialog);
+export default AckErrorMessagesDeleteDialog;

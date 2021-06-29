@@ -29,7 +29,7 @@
     "withAdminUi": true,
     "blueprints": [],
     "otherModules": [],
-    "jhipsterVersion": "7.0.1",
+    "jhipsterVersion": "7.1.0",
     "skipClient": false,
     "skipServer": false,
     "skipUserManagement": false,
@@ -116,7 +116,9 @@
       "TaskResponse",
       "TaskOutput"
     ],
-    "lastLiquibaseTimestamp": 1622705948000
+    "lastLiquibaseTimestamp": 1622705948000,
+    "applicationIndex": 0,
+    "devServerPort": 9060
   },
   "git-provider": "GitHub",
   "git-company": "FahmiBoussetta",

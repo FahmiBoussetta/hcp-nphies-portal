@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './related.reducer';
 import { IRelated } from 'app/shared/model/related.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IRelatedProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Related = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Related = (props: IRelatedProps) => {
+  const relatedList = useAppSelector(state => state.related.entities);
+  const loading = useAppSelector(state => state.related.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { relatedList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="related-heading" data-cy="RelatedHeading">
@@ -115,16 +118,4 @@ export const Related = (props: IRelatedProps) => {
   );
 };
 
-const mapStateToProps = ({ related }: IRootState) => ({
-  relatedList: related.entities,
-  loading: related.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Related);
+export default Related;

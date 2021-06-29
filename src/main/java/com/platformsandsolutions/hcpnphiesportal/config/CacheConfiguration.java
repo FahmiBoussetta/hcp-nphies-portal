@@ -128,6 +128,7 @@ public class CacheConfiguration {
             createCache(cm, com.platformsandsolutions.hcpnphiesportal.domain.Coverage.class.getName());
             createCache(cm, com.platformsandsolutions.hcpnphiesportal.domain.Coverage.class.getName() + ".classComponents");
             createCache(cm, com.platformsandsolutions.hcpnphiesportal.domain.Coverage.class.getName() + ".costToBeneficiaryComponents");
+            createCache(cm, com.platformsandsolutions.hcpnphiesportal.domain.Coverage.class.getName() + ".coverageEligibilityRequests");
             createCache(cm, com.platformsandsolutions.hcpnphiesportal.domain.ClassComponent.class.getName());
             createCache(cm, com.platformsandsolutions.hcpnphiesportal.domain.CostToBeneficiaryComponent.class.getName());
             createCache(cm, com.platformsandsolutions.hcpnphiesportal.domain.CostToBeneficiaryComponent.class.getName() + ".exceptions");

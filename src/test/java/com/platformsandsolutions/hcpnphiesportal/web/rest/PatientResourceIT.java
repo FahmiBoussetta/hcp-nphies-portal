@@ -354,10 +354,11 @@ class PatientResourceIT {
 
         partialUpdatedPatient
             .guid(UPDATED_GUID)
-            .religion(UPDATED_RELIGION)
-            .gender(UPDATED_GENDER)
-            .birthDate(UPDATED_BIRTH_DATE)
-            .deceasedDate(UPDATED_DECEASED_DATE);
+            .forceId(UPDATED_FORCE_ID)
+            .residentNumber(UPDATED_RESIDENT_NUMBER)
+            .passportNumber(UPDATED_PASSPORT_NUMBER)
+            .iqama(UPDATED_IQAMA)
+            .maritalStatus(UPDATED_MARITAL_STATUS);
 
         restPatientMockMvc
             .perform(
@@ -372,16 +373,16 @@ class PatientResourceIT {
         assertThat(patientList).hasSize(databaseSizeBeforeUpdate);
         Patient testPatient = patientList.get(patientList.size() - 1);
         assertThat(testPatient.getGuid()).isEqualTo(UPDATED_GUID);
-        assertThat(testPatient.getForceId()).isEqualTo(DEFAULT_FORCE_ID);
-        assertThat(testPatient.getResidentNumber()).isEqualTo(DEFAULT_RESIDENT_NUMBER);
-        assertThat(testPatient.getPassportNumber()).isEqualTo(DEFAULT_PASSPORT_NUMBER);
+        assertThat(testPatient.getForceId()).isEqualTo(UPDATED_FORCE_ID);
+        assertThat(testPatient.getResidentNumber()).isEqualTo(UPDATED_RESIDENT_NUMBER);
+        assertThat(testPatient.getPassportNumber()).isEqualTo(UPDATED_PASSPORT_NUMBER);
         assertThat(testPatient.getNationalHealthId()).isEqualTo(DEFAULT_NATIONAL_HEALTH_ID);
-        assertThat(testPatient.getIqama()).isEqualTo(DEFAULT_IQAMA);
-        assertThat(testPatient.getReligion()).isEqualTo(UPDATED_RELIGION);
-        assertThat(testPatient.getGender()).isEqualTo(UPDATED_GENDER);
-        assertThat(testPatient.getBirthDate()).isEqualTo(UPDATED_BIRTH_DATE);
-        assertThat(testPatient.getDeceasedDate()).isEqualTo(UPDATED_DECEASED_DATE);
-        assertThat(testPatient.getMaritalStatus()).isEqualTo(DEFAULT_MARITAL_STATUS);
+        assertThat(testPatient.getIqama()).isEqualTo(UPDATED_IQAMA);
+        assertThat(testPatient.getReligion()).isEqualTo(DEFAULT_RELIGION);
+        assertThat(testPatient.getGender()).isEqualTo(DEFAULT_GENDER);
+        assertThat(testPatient.getBirthDate()).isEqualTo(DEFAULT_BIRTH_DATE);
+        assertThat(testPatient.getDeceasedDate()).isEqualTo(DEFAULT_DECEASED_DATE);
+        assertThat(testPatient.getMaritalStatus()).isEqualTo(UPDATED_MARITAL_STATUS);
     }
 
     @Test

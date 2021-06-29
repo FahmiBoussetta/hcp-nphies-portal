@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './task-output.reducer';
 
-export interface ITaskOutputDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const TaskOutputDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const TaskOutputDeleteDialog = (props: ITaskOutputDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const taskOutputEntity = useAppSelector(state => state.taskOutput.entity);
+  const updateSuccess = useAppSelector(state => state.taskOutput.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/task-output');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.taskOutputEntity.id);
+    dispatch(deleteEntity(taskOutputEntity.id));
   };
 
-  const { taskOutputEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="taskOutputDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const TaskOutputDeleteDialog = (props: ITaskOutputDeleteDialogProps) => {
   );
 };
 
-const mapStateToProps = ({ taskOutput }: IRootState) => ({
-  taskOutputEntity: taskOutput.entity,
-  updateSuccess: taskOutput.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(TaskOutputDeleteDialog);
+export default TaskOutputDeleteDialog;

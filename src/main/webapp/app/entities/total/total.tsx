@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './total.reducer';
 import { ITotal } from 'app/shared/model/total.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ITotalProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Total = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Total = (props: ITotalProps) => {
+  const totalList = useAppSelector(state => state.total.entities);
+  const loading = useAppSelector(state => state.total.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { totalList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="total-heading" data-cy="TotalHeading">
@@ -109,16 +112,4 @@ export const Total = (props: ITotalProps) => {
   );
 };
 
-const mapStateToProps = ({ total }: IRootState) => ({
-  totalList: total.entities,
-  loading: total.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Total);
+export default Total;

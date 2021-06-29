@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './encounter.reducer';
 import { IEncounter } from 'app/shared/model/encounter.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IEncounterProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Encounter = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Encounter = (props: IEncounterProps) => {
+  const encounterList = useAppSelector(state => state.encounter.entities);
+  const loading = useAppSelector(state => state.encounter.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { encounterList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="encounter-heading" data-cy="EncounterHeading">
@@ -157,16 +160,4 @@ export const Encounter = (props: IEncounterProps) => {
   );
 };
 
-const mapStateToProps = ({ encounter }: IRootState) => ({
-  encounterList: encounter.entities,
-  loading: encounter.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Encounter);
+export default Encounter;

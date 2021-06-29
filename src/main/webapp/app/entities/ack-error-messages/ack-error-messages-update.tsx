@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IAcknowledgement } from 'app/shared/model/acknowledgement.model';
 import { getEntities as getAcknowledgements } from 'app/entities/acknowledgement/acknowledgement.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './ack-error-messag
 import { IAckErrorMessages } from 'app/shared/model/ack-error-messages.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAckErrorMessagesUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AckErrorMessagesUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AckErrorMessagesUpdate = (props: IAckErrorMessagesUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { ackErrorMessagesEntity, acknowledgements, loading, updating } = props;
+  const acknowledgements = useAppSelector(state => state.acknowledgement.entities);
+  const ackErrorMessagesEntity = useAppSelector(state => state.ackErrorMessages.entity);
+  const loading = useAppSelector(state => state.ackErrorMessages.loading);
+  const updating = useAppSelector(state => state.ackErrorMessages.updating);
+  const updateSuccess = useAppSelector(state => state.ackErrorMessages.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/ack-error-messages');
@@ -27,35 +29,41 @@ export const AckErrorMessagesUpdate = (props: IAckErrorMessagesUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getAcknowledgements();
+    dispatch(getAcknowledgements({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...ackErrorMessagesEntity,
-        ...values,
-        acknowledgement: acknowledgements.find(it => it.id.toString() === values.acknowledgementId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...ackErrorMessagesEntity,
+      ...values,
+      acknowledgement: acknowledgements.find(it => it.id.toString() === values.acknowledgementId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...ackErrorMessagesEntity,
+          acknowledgementId: ackErrorMessagesEntity?.acknowledgement?.id,
+        };
 
   return (
     <div>
@@ -71,43 +79,41 @@ export const AckErrorMessagesUpdate = (props: IAckErrorMessagesUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : ackErrorMessagesEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="ack-error-messages-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="ack-error-messages-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="ack-error-messages-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="messageLabel" for="ack-error-messages-message">
-                  <Translate contentKey="hcpNphiesPortalApp.ackErrorMessages.message">Message</Translate>
-                </Label>
-                <AvField id="ack-error-messages-message" data-cy="message" type="text" name="message" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="ack-error-messages-acknowledgement">
-                  <Translate contentKey="hcpNphiesPortalApp.ackErrorMessages.acknowledgement">Acknowledgement</Translate>
-                </Label>
-                <AvInput
-                  id="ack-error-messages-acknowledgement"
-                  data-cy="acknowledgement"
-                  type="select"
-                  className="form-control"
-                  name="acknowledgementId"
-                >
-                  <option value="" key="0" />
-                  {acknowledgements
-                    ? acknowledgements.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/ack-error-messages" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.ackErrorMessages.message')}
+                id="ack-error-messages-message"
+                name="message"
+                data-cy="message"
+                type="text"
+              />
+              <ValidatedField
+                id="ack-error-messages-acknowledgement"
+                name="acknowledgementId"
+                data-cy="acknowledgement"
+                label={translate('hcpNphiesPortalApp.ackErrorMessages.acknowledgement')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {acknowledgements
+                  ? acknowledgements.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/ack-error-messages" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -120,7 +126,7 @@ export const AckErrorMessagesUpdate = (props: IAckErrorMessagesUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -128,23 +134,4 @@ export const AckErrorMessagesUpdate = (props: IAckErrorMessagesUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  acknowledgements: storeState.acknowledgement.entities,
-  ackErrorMessagesEntity: storeState.ackErrorMessages.entity,
-  loading: storeState.ackErrorMessages.loading,
-  updating: storeState.ackErrorMessages.updating,
-  updateSuccess: storeState.ackErrorMessages.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getAcknowledgements,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AckErrorMessagesUpdate);
+export default AckErrorMessagesUpdate;

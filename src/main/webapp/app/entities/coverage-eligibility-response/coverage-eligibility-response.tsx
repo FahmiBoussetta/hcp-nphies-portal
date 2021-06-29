@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './coverage-eligibility-response.reducer';
 import { ICoverageEligibilityResponse } from 'app/shared/model/coverage-eligibility-response.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICoverageEligibilityResponseProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const CoverageEligibilityResponse = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CoverageEligibilityResponse = (props: ICoverageEligibilityResponseProps) => {
+  const coverageEligibilityResponseList = useAppSelector(state => state.coverageEligibilityResponse.entities);
+  const loading = useAppSelector(state => state.coverageEligibilityResponse.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { coverageEligibilityResponseList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="coverage-eligibility-response-heading" data-cy="CoverageEligibilityResponseHeading">
@@ -177,16 +180,4 @@ export const CoverageEligibilityResponse = (props: ICoverageEligibilityResponseP
   );
 };
 
-const mapStateToProps = ({ coverageEligibilityResponse }: IRootState) => ({
-  coverageEligibilityResponseList: coverageEligibilityResponse.entities,
-  loading: coverageEligibilityResponse.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CoverageEligibilityResponse);
+export default CoverageEligibilityResponse;

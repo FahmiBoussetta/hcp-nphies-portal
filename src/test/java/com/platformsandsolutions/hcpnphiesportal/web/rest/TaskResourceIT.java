@@ -319,7 +319,7 @@ class TaskResourceIT {
         Task partialUpdatedTask = new Task();
         partialUpdatedTask.setId(task.getId());
 
-        partialUpdatedTask.guid(UPDATED_GUID).isQueued(UPDATED_IS_QUEUED).identifier(UPDATED_IDENTIFIER).code(UPDATED_CODE);
+        partialUpdatedTask.isQueued(UPDATED_IS_QUEUED).identifier(UPDATED_IDENTIFIER).reasonCode(UPDATED_REASON_CODE);
 
         restTaskMockMvc
             .perform(
@@ -333,14 +333,14 @@ class TaskResourceIT {
         List<Task> taskList = taskRepository.findAll();
         assertThat(taskList).hasSize(databaseSizeBeforeUpdate);
         Task testTask = taskList.get(taskList.size() - 1);
-        assertThat(testTask.getGuid()).isEqualTo(UPDATED_GUID);
+        assertThat(testTask.getGuid()).isEqualTo(DEFAULT_GUID);
         assertThat(testTask.getIsQueued()).isEqualTo(UPDATED_IS_QUEUED);
         assertThat(testTask.getParsed()).isEqualTo(DEFAULT_PARSED);
         assertThat(testTask.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
-        assertThat(testTask.getCode()).isEqualTo(UPDATED_CODE);
+        assertThat(testTask.getCode()).isEqualTo(DEFAULT_CODE);
         assertThat(testTask.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
         assertThat(testTask.getFocus()).isEqualTo(DEFAULT_FOCUS);
-        assertThat(testTask.getReasonCode()).isEqualTo(DEFAULT_REASON_CODE);
+        assertThat(testTask.getReasonCode()).isEqualTo(UPDATED_REASON_CODE);
     }
 
     @Test

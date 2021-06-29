@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './task.reducer';
 import { ITask } from 'app/shared/model/task.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ITaskProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Task = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Task = (props: ITaskProps) => {
+  const taskList = useAppSelector(state => state.task.entities);
+  const loading = useAppSelector(state => state.task.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { taskList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="task-heading" data-cy="TaskHeading">
@@ -139,16 +142,4 @@ export const Task = (props: ITaskProps) => {
   );
 };
 
-const mapStateToProps = ({ task }: IRootState) => ({
-  taskList: task.entities,
-  loading: task.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Task);
+export default Task;

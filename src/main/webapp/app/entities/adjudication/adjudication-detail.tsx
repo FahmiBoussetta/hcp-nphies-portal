@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './adjudication.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAdjudicationDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AdjudicationDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AdjudicationDetail = (props: IAdjudicationDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { adjudicationEntity } = props;
+  const adjudicationEntity = useAppSelector(state => state.adjudication.entity);
   return (
     <Row>
       <Col md="8">
@@ -85,13 +84,4 @@ export const AdjudicationDetail = (props: IAdjudicationDetailProps) => {
   );
 };
 
-const mapStateToProps = ({ adjudication }: IRootState) => ({
-  adjudicationEntity: adjudication.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdjudicationDetail);
+export default AdjudicationDetail;

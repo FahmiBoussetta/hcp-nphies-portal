@@ -301,7 +301,7 @@ class ClassComponentResourceIT {
         ClassComponent partialUpdatedClassComponent = new ClassComponent();
         partialUpdatedClassComponent.setId(classComponent.getId());
 
-        partialUpdatedClassComponent.type(UPDATED_TYPE).value(UPDATED_VALUE).name(UPDATED_NAME);
+        partialUpdatedClassComponent.value(UPDATED_VALUE).name(UPDATED_NAME);
 
         restClassComponentMockMvc
             .perform(
@@ -315,7 +315,7 @@ class ClassComponentResourceIT {
         List<ClassComponent> classComponentList = classComponentRepository.findAll();
         assertThat(classComponentList).hasSize(databaseSizeBeforeUpdate);
         ClassComponent testClassComponent = classComponentList.get(classComponentList.size() - 1);
-        assertThat(testClassComponent.getType()).isEqualTo(UPDATED_TYPE);
+        assertThat(testClassComponent.getType()).isEqualTo(DEFAULT_TYPE);
         assertThat(testClassComponent.getValue()).isEqualTo(UPDATED_VALUE);
         assertThat(testClassComponent.getName()).isEqualTo(UPDATED_NAME);
     }

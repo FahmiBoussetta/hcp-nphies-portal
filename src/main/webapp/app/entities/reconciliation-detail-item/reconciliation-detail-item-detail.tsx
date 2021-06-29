@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './reconciliation-detail-item.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IReconciliationDetailItemDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ReconciliationDetailItemDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ReconciliationDetailItemDetail = (props: IReconciliationDetailItemDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { reconciliationDetailItemEntity } = props;
+  const reconciliationDetailItemEntity = useAppSelector(state => state.reconciliationDetailItem.entity);
   return (
     <Row>
       <Col md="8">
@@ -103,13 +102,4 @@ export const ReconciliationDetailItemDetail = (props: IReconciliationDetailItemD
   );
 };
 
-const mapStateToProps = ({ reconciliationDetailItem }: IRootState) => ({
-  reconciliationDetailItemEntity: reconciliationDetailItem.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ReconciliationDetailItemDetail);
+export default ReconciliationDetailItemDetail;

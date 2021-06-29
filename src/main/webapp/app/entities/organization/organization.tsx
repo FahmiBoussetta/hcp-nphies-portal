@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './organization.reducer';
 import { IOrganization } from 'app/shared/model/organization.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IOrganizationProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Organization = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Organization = (props: IOrganizationProps) => {
+  const organizationList = useAppSelector(state => state.organization.entities);
+  const loading = useAppSelector(state => state.organization.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { organizationList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="organization-heading" data-cy="OrganizationHeading">
@@ -131,16 +134,4 @@ export const Organization = (props: IOrganizationProps) => {
   );
 };
 
-const mapStateToProps = ({ organization }: IRootState) => ({
-  organizationList: organization.entities,
-  loading: organization.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Organization);
+export default Organization;

@@ -279,11 +279,7 @@ class ReferenceIdentifierResourceIT {
         ReferenceIdentifier partialUpdatedReferenceIdentifier = new ReferenceIdentifier();
         partialUpdatedReferenceIdentifier.setId(referenceIdentifier.getId());
 
-        partialUpdatedReferenceIdentifier
-            .ref(UPDATED_REF)
-            .idValue(UPDATED_ID_VALUE)
-            .identifier(UPDATED_IDENTIFIER)
-            .display(UPDATED_DISPLAY);
+        partialUpdatedReferenceIdentifier.ref(UPDATED_REF).display(UPDATED_DISPLAY);
 
         restReferenceIdentifierMockMvc
             .perform(
@@ -298,8 +294,8 @@ class ReferenceIdentifierResourceIT {
         assertThat(referenceIdentifierList).hasSize(databaseSizeBeforeUpdate);
         ReferenceIdentifier testReferenceIdentifier = referenceIdentifierList.get(referenceIdentifierList.size() - 1);
         assertThat(testReferenceIdentifier.getRef()).isEqualTo(UPDATED_REF);
-        assertThat(testReferenceIdentifier.getIdValue()).isEqualTo(UPDATED_ID_VALUE);
-        assertThat(testReferenceIdentifier.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
+        assertThat(testReferenceIdentifier.getIdValue()).isEqualTo(DEFAULT_ID_VALUE);
+        assertThat(testReferenceIdentifier.getIdentifier()).isEqualTo(DEFAULT_IDENTIFIER);
         assertThat(testReferenceIdentifier.getDisplay()).isEqualTo(UPDATED_DISPLAY);
     }
 

@@ -265,7 +265,7 @@ class ContactResourceIT {
         Contact partialUpdatedContact = new Contact();
         partialUpdatedContact.setId(contact.getId());
 
-        partialUpdatedContact.email(UPDATED_EMAIL).url(UPDATED_URL);
+        partialUpdatedContact.phone(UPDATED_PHONE).mobile(UPDATED_MOBILE).url(UPDATED_URL);
 
         restContactMockMvc
             .perform(
@@ -279,9 +279,9 @@ class ContactResourceIT {
         List<Contact> contactList = contactRepository.findAll();
         assertThat(contactList).hasSize(databaseSizeBeforeUpdate);
         Contact testContact = contactList.get(contactList.size() - 1);
-        assertThat(testContact.getPhone()).isEqualTo(DEFAULT_PHONE);
-        assertThat(testContact.getEmail()).isEqualTo(UPDATED_EMAIL);
-        assertThat(testContact.getMobile()).isEqualTo(DEFAULT_MOBILE);
+        assertThat(testContact.getPhone()).isEqualTo(UPDATED_PHONE);
+        assertThat(testContact.getEmail()).isEqualTo(DEFAULT_EMAIL);
+        assertThat(testContact.getMobile()).isEqualTo(UPDATED_MOBILE);
         assertThat(testContact.getUrl()).isEqualTo(UPDATED_URL);
     }
 

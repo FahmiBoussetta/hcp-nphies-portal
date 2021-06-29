@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IAddress } from 'app/shared/model/address.model';
 import { getEntities as getAddresses } from 'app/entities/address/address.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './organization.red
 import { IOrganization } from 'app/shared/model/organization.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IOrganizationUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const OrganizationUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const OrganizationUpdate = (props: IOrganizationUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { organizationEntity, addresses, loading, updating } = props;
+  const addresses = useAppSelector(state => state.address.entities);
+  const organizationEntity = useAppSelector(state => state.organization.entity);
+  const loading = useAppSelector(state => state.organization.loading);
+  const updating = useAppSelector(state => state.organization.updating);
+  const updateSuccess = useAppSelector(state => state.organization.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/organization');
@@ -27,35 +29,42 @@ export const OrganizationUpdate = (props: IOrganizationUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getAddresses();
+    dispatch(getAddresses({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...organizationEntity,
-        ...values,
-        address: addresses.find(it => it.id.toString() === values.addressId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...organizationEntity,
+      ...values,
+      address: addresses.find(it => it.id.toString() === values.addressId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...organizationEntity,
+          organizationType: 'Prov',
+          addressId: organizationEntity?.address?.id,
+        };
 
   return (
     <div>
@@ -71,80 +80,82 @@ export const OrganizationUpdate = (props: IOrganizationUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : organizationEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="organization-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="organization-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="organization-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="guidLabel" for="organization-guid">
-                  <Translate contentKey="hcpNphiesPortalApp.organization.guid">Guid</Translate>
-                </Label>
-                <AvField id="organization-guid" data-cy="guid" type="text" name="guid" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="forceIdLabel" for="organization-forceId">
-                  <Translate contentKey="hcpNphiesPortalApp.organization.forceId">Force Id</Translate>
-                </Label>
-                <AvField id="organization-forceId" data-cy="forceId" type="text" name="forceId" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="organizationLicenseLabel" for="organization-organizationLicense">
-                  <Translate contentKey="hcpNphiesPortalApp.organization.organizationLicense">Organization License</Translate>
-                </Label>
-                <AvField id="organization-organizationLicense" data-cy="organizationLicense" type="text" name="organizationLicense" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="baseUrlLabel" for="organization-baseUrl">
-                  <Translate contentKey="hcpNphiesPortalApp.organization.baseUrl">Base Url</Translate>
-                </Label>
-                <AvField id="organization-baseUrl" data-cy="baseUrl" type="text" name="baseUrl" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="organizationTypeLabel" for="organization-organizationType">
-                  <Translate contentKey="hcpNphiesPortalApp.organization.organizationType">Organization Type</Translate>
-                </Label>
-                <AvInput
-                  id="organization-organizationType"
-                  data-cy="organizationType"
-                  type="select"
-                  className="form-control"
-                  name="organizationType"
-                  value={(!isNew && organizationEntity.organizationType) || 'Prov'}
-                >
-                  <option value="Prov">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Prov')}</option>
-                  <option value="Dept">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Dept')}</option>
-                  <option value="Ins">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Ins')}</option>
-                  <option value="Pay">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Pay')}</option>
-                  <option value="Other">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Other')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label id="nameLabel" for="organization-name">
-                  <Translate contentKey="hcpNphiesPortalApp.organization.name">Name</Translate>
-                </Label>
-                <AvField id="organization-name" data-cy="name" type="text" name="name" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="organization-address">
-                  <Translate contentKey="hcpNphiesPortalApp.organization.address">Address</Translate>
-                </Label>
-                <AvInput id="organization-address" data-cy="address" type="select" className="form-control" name="addressId">
-                  <option value="" key="0" />
-                  {addresses
-                    ? addresses.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/organization" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.organization.guid')}
+                id="organization-guid"
+                name="guid"
+                data-cy="guid"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.organization.forceId')}
+                id="organization-forceId"
+                name="forceId"
+                data-cy="forceId"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.organization.organizationLicense')}
+                id="organization-organizationLicense"
+                name="organizationLicense"
+                data-cy="organizationLicense"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.organization.baseUrl')}
+                id="organization-baseUrl"
+                name="baseUrl"
+                data-cy="baseUrl"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.organization.organizationType')}
+                id="organization-organizationType"
+                name="organizationType"
+                data-cy="organizationType"
+                type="select"
+              >
+                <option value="Prov">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Prov')}</option>
+                <option value="Dept">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Dept')}</option>
+                <option value="Ins">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Ins')}</option>
+                <option value="Pay">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Pay')}</option>
+                <option value="Other">{translate('hcpNphiesPortalApp.OrganizationTypeEnum.Other')}</option>
+              </ValidatedField>
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.organization.name')}
+                id="organization-name"
+                name="name"
+                data-cy="name"
+                type="text"
+              />
+              <ValidatedField
+                id="organization-address"
+                name="addressId"
+                data-cy="address"
+                label={translate('hcpNphiesPortalApp.organization.address')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {addresses
+                  ? addresses.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/organization" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -157,7 +168,7 @@ export const OrganizationUpdate = (props: IOrganizationUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -165,23 +176,4 @@ export const OrganizationUpdate = (props: IOrganizationUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  addresses: storeState.address.entities,
-  organizationEntity: storeState.organization.entity,
-  loading: storeState.organization.loading,
-  updating: storeState.organization.updating,
-  updateSuccess: storeState.organization.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getAddresses,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(OrganizationUpdate);
+export default OrganizationUpdate;

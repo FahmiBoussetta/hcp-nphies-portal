@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IPractitioner } from 'app/shared/model/practitioner.model';
 import { getEntities as getPractitioners } from 'app/entities/practitioner/practitioner.reducer';
@@ -17,13 +14,20 @@ import { getEntity, updateEntity, createEntity, reset } from './care-team.reduce
 import { ICareTeam } from 'app/shared/model/care-team.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICareTeamUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CareTeamUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CareTeamUpdate = (props: ICareTeamUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { careTeamEntity, practitioners, practitionerRoles, claims, loading, updating } = props;
+  const practitioners = useAppSelector(state => state.practitioner.entities);
+  const practitionerRoles = useAppSelector(state => state.practitionerRole.entities);
+  const claims = useAppSelector(state => state.claim.entities);
+  const careTeamEntity = useAppSelector(state => state.careTeam.entity);
+  const loading = useAppSelector(state => state.careTeam.loading);
+  const updating = useAppSelector(state => state.careTeam.updating);
+  const updateSuccess = useAppSelector(state => state.careTeam.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/care-team');
@@ -31,39 +35,48 @@ export const CareTeamUpdate = (props: ICareTeamUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getPractitioners();
-    props.getPractitionerRoles();
-    props.getClaims();
+    dispatch(getPractitioners({}));
+    dispatch(getPractitionerRoles({}));
+    dispatch(getClaims({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...careTeamEntity,
-        ...values,
-        provider: practitioners.find(it => it.id.toString() === values.providerId.toString()),
-        providerRole: practitionerRoles.find(it => it.id.toString() === values.providerRoleId.toString()),
-        claim: claims.find(it => it.id.toString() === values.claimId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...careTeamEntity,
+      ...values,
+      provider: practitioners.find(it => it.id.toString() === values.providerId.toString()),
+      providerRole: practitionerRoles.find(it => it.id.toString() === values.providerRoleId.toString()),
+      claim: claims.find(it => it.id.toString() === values.claimId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...careTeamEntity,
+          role: 'Primary',
+          providerId: careTeamEntity?.provider?.id,
+          providerRoleId: careTeamEntity?.providerRole?.id,
+          claimId: careTeamEntity?.claim?.id,
+        };
 
   return (
     <div>
@@ -79,95 +92,89 @@ export const CareTeamUpdate = (props: ICareTeamUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : careTeamEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="care-team-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="care-team-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
-              ) : null}
-              <AvGroup>
-                <Label id="sequenceLabel" for="care-team-sequence">
-                  <Translate contentKey="hcpNphiesPortalApp.careTeam.sequence">Sequence</Translate>
-                </Label>
-                <AvField
-                  id="care-team-sequence"
-                  data-cy="sequence"
-                  type="string"
-                  className="form-control"
-                  name="sequence"
-                  validate={{
-                    required: { value: true, errorMessage: translate('entity.validation.required') },
-                    number: { value: true, errorMessage: translate('entity.validation.number') },
-                  }}
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="care-team-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
                 />
-              </AvGroup>
-              <AvGroup>
-                <Label id="roleLabel" for="care-team-role">
-                  <Translate contentKey="hcpNphiesPortalApp.careTeam.role">Role</Translate>
-                </Label>
-                <AvInput
-                  id="care-team-role"
-                  data-cy="role"
-                  type="select"
-                  className="form-control"
-                  name="role"
-                  value={(!isNew && careTeamEntity.role) || 'Primary'}
-                >
-                  <option value="Primary">{translate('hcpNphiesPortalApp.CareTeamRoleEnum.Primary')}</option>
-                  <option value="Assist">{translate('hcpNphiesPortalApp.CareTeamRoleEnum.Assist')}</option>
-                  <option value="Supervisor">{translate('hcpNphiesPortalApp.CareTeamRoleEnum.Supervisor')}</option>
-                  <option value="Other">{translate('hcpNphiesPortalApp.CareTeamRoleEnum.Other')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="care-team-provider">
-                  <Translate contentKey="hcpNphiesPortalApp.careTeam.provider">Provider</Translate>
-                </Label>
-                <AvInput id="care-team-provider" data-cy="provider" type="select" className="form-control" name="providerId">
-                  <option value="" key="0" />
-                  {practitioners
-                    ? practitioners.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="care-team-providerRole">
-                  <Translate contentKey="hcpNphiesPortalApp.careTeam.providerRole">Provider Role</Translate>
-                </Label>
-                <AvInput id="care-team-providerRole" data-cy="providerRole" type="select" className="form-control" name="providerRoleId">
-                  <option value="" key="0" />
-                  {practitionerRoles
-                    ? practitionerRoles.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="care-team-claim">
-                  <Translate contentKey="hcpNphiesPortalApp.careTeam.claim">Claim</Translate>
-                </Label>
-                <AvInput id="care-team-claim" data-cy="claim" type="select" className="form-control" name="claimId">
-                  <option value="" key="0" />
-                  {claims
-                    ? claims.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/care-team" replace color="info">
+              ) : null}
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.careTeam.sequence')}
+                id="care-team-sequence"
+                name="sequence"
+                data-cy="sequence"
+                type="text"
+                validate={{
+                  required: { value: true, message: translate('entity.validation.required') },
+                  validate: v => isNumber(v) || translate('entity.validation.number'),
+                }}
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.careTeam.role')}
+                id="care-team-role"
+                name="role"
+                data-cy="role"
+                type="select"
+              >
+                <option value="Primary">{translate('hcpNphiesPortalApp.CareTeamRoleEnum.Primary')}</option>
+                <option value="Assist">{translate('hcpNphiesPortalApp.CareTeamRoleEnum.Assist')}</option>
+                <option value="Supervisor">{translate('hcpNphiesPortalApp.CareTeamRoleEnum.Supervisor')}</option>
+                <option value="Other">{translate('hcpNphiesPortalApp.CareTeamRoleEnum.Other')}</option>
+              </ValidatedField>
+              <ValidatedField
+                id="care-team-provider"
+                name="providerId"
+                data-cy="provider"
+                label={translate('hcpNphiesPortalApp.careTeam.provider')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {practitioners
+                  ? practitioners.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="care-team-providerRole"
+                name="providerRoleId"
+                data-cy="providerRole"
+                label={translate('hcpNphiesPortalApp.careTeam.providerRole')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {practitionerRoles
+                  ? practitionerRoles.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="care-team-claim"
+                name="claimId"
+                data-cy="claim"
+                label={translate('hcpNphiesPortalApp.careTeam.claim')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {claims
+                  ? claims.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/care-team" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -180,7 +187,7 @@ export const CareTeamUpdate = (props: ICareTeamUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -188,27 +195,4 @@ export const CareTeamUpdate = (props: ICareTeamUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  practitioners: storeState.practitioner.entities,
-  practitionerRoles: storeState.practitionerRole.entities,
-  claims: storeState.claim.entities,
-  careTeamEntity: storeState.careTeam.entity,
-  loading: storeState.careTeam.loading,
-  updating: storeState.careTeam.updating,
-  updateSuccess: storeState.careTeam.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getPractitioners,
-  getPractitionerRoles,
-  getClaims,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CareTeamUpdate);
+export default CareTeamUpdate;

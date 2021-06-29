@@ -253,7 +253,7 @@ class QuantityResourceIT {
         Quantity partialUpdatedQuantity = new Quantity();
         partialUpdatedQuantity.setId(quantity.getId());
 
-        partialUpdatedQuantity.value(UPDATED_VALUE).unit(UPDATED_UNIT);
+        partialUpdatedQuantity.unit(UPDATED_UNIT);
 
         restQuantityMockMvc
             .perform(
@@ -267,7 +267,7 @@ class QuantityResourceIT {
         List<Quantity> quantityList = quantityRepository.findAll();
         assertThat(quantityList).hasSize(databaseSizeBeforeUpdate);
         Quantity testQuantity = quantityList.get(quantityList.size() - 1);
-        assertThat(testQuantity.getValue()).isEqualByComparingTo(UPDATED_VALUE);
+        assertThat(testQuantity.getValue()).isEqualByComparingTo(DEFAULT_VALUE);
         assertThat(testQuantity.getUnit()).isEqualTo(UPDATED_UNIT);
     }
 

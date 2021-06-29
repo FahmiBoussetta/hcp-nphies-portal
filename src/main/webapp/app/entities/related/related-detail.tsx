@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './related.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IRelatedDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const RelatedDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const RelatedDetail = (props: IRelatedDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { relatedEntity } = props;
+  const relatedEntity = useAppSelector(state => state.related.entity);
   return (
     <Row>
       <Col md="8">
@@ -63,13 +62,4 @@ export const RelatedDetail = (props: IRelatedDetailProps) => {
   );
 };
 
-const mapStateToProps = ({ related }: IRootState) => ({
-  relatedEntity: related.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(RelatedDetail);
+export default RelatedDetail;

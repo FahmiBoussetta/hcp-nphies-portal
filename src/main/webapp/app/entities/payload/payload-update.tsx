@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IAttachment } from 'app/shared/model/attachment.model';
 import { getEntities as getAttachments } from 'app/entities/attachment/attachment.reducer';
@@ -19,13 +16,21 @@ import { getEntity, updateEntity, createEntity, reset } from './payload.reducer'
 import { IPayload } from 'app/shared/model/payload.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPayloadUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const PayloadUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PayloadUpdate = (props: IPayloadUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { payloadEntity, attachments, referenceIdentifiers, communications, communicationRequests, loading, updating } = props;
+  const attachments = useAppSelector(state => state.attachment.entities);
+  const referenceIdentifiers = useAppSelector(state => state.referenceIdentifier.entities);
+  const communications = useAppSelector(state => state.communication.entities);
+  const communicationRequests = useAppSelector(state => state.communicationRequest.entities);
+  const payloadEntity = useAppSelector(state => state.payload.entity);
+  const loading = useAppSelector(state => state.payload.loading);
+  const updating = useAppSelector(state => state.payload.updating);
+  const updateSuccess = useAppSelector(state => state.payload.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/payload');
@@ -33,41 +38,50 @@ export const PayloadUpdate = (props: IPayloadUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getAttachments();
-    props.getReferenceIdentifiers();
-    props.getCommunications();
-    props.getCommunicationRequests();
+    dispatch(getAttachments({}));
+    dispatch(getReferenceIdentifiers({}));
+    dispatch(getCommunications({}));
+    dispatch(getCommunicationRequests({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...payloadEntity,
-        ...values,
-        contentAttachment: attachments.find(it => it.id.toString() === values.contentAttachmentId.toString()),
-        contentReference: referenceIdentifiers.find(it => it.id.toString() === values.contentReferenceId.toString()),
-        communication: communications.find(it => it.id.toString() === values.communicationId.toString()),
-        communicationRequest: communicationRequests.find(it => it.id.toString() === values.communicationRequestId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...payloadEntity,
+      ...values,
+      contentAttachment: attachments.find(it => it.id.toString() === values.contentAttachmentId.toString()),
+      contentReference: referenceIdentifiers.find(it => it.id.toString() === values.contentReferenceId.toString()),
+      communication: communications.find(it => it.id.toString() === values.communicationId.toString()),
+      communicationRequest: communicationRequests.find(it => it.id.toString() === values.communicationRequestId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...payloadEntity,
+          contentAttachmentId: payloadEntity?.contentAttachment?.id,
+          contentReferenceId: payloadEntity?.contentReference?.id,
+          communicationId: payloadEntity?.communication?.id,
+          communicationRequestId: payloadEntity?.communicationRequest?.id,
+        };
 
   return (
     <div>
@@ -83,100 +97,89 @@ export const PayloadUpdate = (props: IPayloadUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : payloadEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="payload-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="payload-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="payload-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="contentStringLabel" for="payload-contentString">
-                  <Translate contentKey="hcpNphiesPortalApp.payload.contentString">Content String</Translate>
-                </Label>
-                <AvField id="payload-contentString" data-cy="contentString" type="text" name="contentString" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="payload-contentAttachment">
-                  <Translate contentKey="hcpNphiesPortalApp.payload.contentAttachment">Content Attachment</Translate>
-                </Label>
-                <AvInput
-                  id="payload-contentAttachment"
-                  data-cy="contentAttachment"
-                  type="select"
-                  className="form-control"
-                  name="contentAttachmentId"
-                >
-                  <option value="" key="0" />
-                  {attachments
-                    ? attachments.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="payload-contentReference">
-                  <Translate contentKey="hcpNphiesPortalApp.payload.contentReference">Content Reference</Translate>
-                </Label>
-                <AvInput
-                  id="payload-contentReference"
-                  data-cy="contentReference"
-                  type="select"
-                  className="form-control"
-                  name="contentReferenceId"
-                >
-                  <option value="" key="0" />
-                  {referenceIdentifiers
-                    ? referenceIdentifiers.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="payload-communication">
-                  <Translate contentKey="hcpNphiesPortalApp.payload.communication">Communication</Translate>
-                </Label>
-                <AvInput id="payload-communication" data-cy="communication" type="select" className="form-control" name="communicationId">
-                  <option value="" key="0" />
-                  {communications
-                    ? communications.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="payload-communicationRequest">
-                  <Translate contentKey="hcpNphiesPortalApp.payload.communicationRequest">Communication Request</Translate>
-                </Label>
-                <AvInput
-                  id="payload-communicationRequest"
-                  data-cy="communicationRequest"
-                  type="select"
-                  className="form-control"
-                  name="communicationRequestId"
-                >
-                  <option value="" key="0" />
-                  {communicationRequests
-                    ? communicationRequests.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/payload" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.payload.contentString')}
+                id="payload-contentString"
+                name="contentString"
+                data-cy="contentString"
+                type="text"
+              />
+              <ValidatedField
+                id="payload-contentAttachment"
+                name="contentAttachmentId"
+                data-cy="contentAttachment"
+                label={translate('hcpNphiesPortalApp.payload.contentAttachment')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {attachments
+                  ? attachments.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="payload-contentReference"
+                name="contentReferenceId"
+                data-cy="contentReference"
+                label={translate('hcpNphiesPortalApp.payload.contentReference')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {referenceIdentifiers
+                  ? referenceIdentifiers.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="payload-communication"
+                name="communicationId"
+                data-cy="communication"
+                label={translate('hcpNphiesPortalApp.payload.communication')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {communications
+                  ? communications.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="payload-communicationRequest"
+                name="communicationRequestId"
+                data-cy="communicationRequest"
+                label={translate('hcpNphiesPortalApp.payload.communicationRequest')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {communicationRequests
+                  ? communicationRequests.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/payload" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -189,7 +192,7 @@ export const PayloadUpdate = (props: IPayloadUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -197,29 +200,4 @@ export const PayloadUpdate = (props: IPayloadUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  attachments: storeState.attachment.entities,
-  referenceIdentifiers: storeState.referenceIdentifier.entities,
-  communications: storeState.communication.entities,
-  communicationRequests: storeState.communicationRequest.entities,
-  payloadEntity: storeState.payload.entity,
-  loading: storeState.payload.loading,
-  updating: storeState.payload.updating,
-  updateSuccess: storeState.payload.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getAttachments,
-  getReferenceIdentifiers,
-  getCommunications,
-  getCommunicationRequests,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PayloadUpdate);
+export default PayloadUpdate;

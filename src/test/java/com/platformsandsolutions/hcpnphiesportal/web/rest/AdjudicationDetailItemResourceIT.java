@@ -279,8 +279,6 @@ class AdjudicationDetailItemResourceIT {
         AdjudicationDetailItem partialUpdatedAdjudicationDetailItem = new AdjudicationDetailItem();
         partialUpdatedAdjudicationDetailItem.setId(adjudicationDetailItem.getId());
 
-        partialUpdatedAdjudicationDetailItem.sequence(UPDATED_SEQUENCE);
-
         restAdjudicationDetailItemMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedAdjudicationDetailItem.getId())
@@ -293,7 +291,7 @@ class AdjudicationDetailItemResourceIT {
         List<AdjudicationDetailItem> adjudicationDetailItemList = adjudicationDetailItemRepository.findAll();
         assertThat(adjudicationDetailItemList).hasSize(databaseSizeBeforeUpdate);
         AdjudicationDetailItem testAdjudicationDetailItem = adjudicationDetailItemList.get(adjudicationDetailItemList.size() - 1);
-        assertThat(testAdjudicationDetailItem.getSequence()).isEqualTo(UPDATED_SEQUENCE);
+        assertThat(testAdjudicationDetailItem.getSequence()).isEqualTo(DEFAULT_SEQUENCE);
     }
 
     @Test

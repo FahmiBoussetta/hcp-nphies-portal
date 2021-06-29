@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './diagnosis.reducer';
 
-export interface IDiagnosisDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const DiagnosisDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const DiagnosisDeleteDialog = (props: IDiagnosisDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const diagnosisEntity = useAppSelector(state => state.diagnosis.entity);
+  const updateSuccess = useAppSelector(state => state.diagnosis.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/diagnosis');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.diagnosisEntity.id);
+    dispatch(deleteEntity(diagnosisEntity.id));
   };
 
-  const { diagnosisEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="diagnosisDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const DiagnosisDeleteDialog = (props: IDiagnosisDeleteDialogProps) => {
   );
 };
 
-const mapStateToProps = ({ diagnosis }: IRootState) => ({
-  diagnosisEntity: diagnosis.entity,
-  updateSuccess: diagnosis.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(DiagnosisDeleteDialog);
+export default DiagnosisDeleteDialog;

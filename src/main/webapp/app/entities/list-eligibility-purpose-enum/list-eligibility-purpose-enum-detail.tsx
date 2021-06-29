@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './list-eligibility-purpose-enum.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IListEligibilityPurposeEnumDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ListEligibilityPurposeEnumDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ListEligibilityPurposeEnumDetail = (props: IListEligibilityPurposeEnumDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { listEligibilityPurposeEnumEntity } = props;
+  const listEligibilityPurposeEnumEntity = useAppSelector(state => state.listEligibilityPurposeEnum.entity);
   return (
     <Row>
       <Col md="8">
@@ -65,13 +64,4 @@ export const ListEligibilityPurposeEnumDetail = (props: IListEligibilityPurposeE
   );
 };
 
-const mapStateToProps = ({ listEligibilityPurposeEnum }: IRootState) => ({
-  listEligibilityPurposeEnumEntity: listEligibilityPurposeEnum.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListEligibilityPurposeEnumDetail);
+export default ListEligibilityPurposeEnumDetail;

@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './quantity.reducer';
 import { IQuantity } from 'app/shared/model/quantity.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IQuantityProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Quantity = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Quantity = (props: IQuantityProps) => {
+  const quantityList = useAppSelector(state => state.quantity.entities);
+  const loading = useAppSelector(state => state.quantity.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { quantityList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="quantity-heading" data-cy="QuantityHeading">
@@ -103,16 +106,4 @@ export const Quantity = (props: IQuantityProps) => {
   );
 };
 
-const mapStateToProps = ({ quantity }: IRootState) => ({
-  quantityList: quantity.entities,
-  loading: quantity.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Quantity);
+export default Quantity;

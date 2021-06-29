@@ -50,6 +50,20 @@
         <dropDefaultValue tableName="coverage_eligibility_request" columnName="serviced_date_end" columnDataType="${datetimeType}"/>
     </changeSet>
 
+    <changeSet id="20210603073845-1-relations" author="jhipster">
+
+        <createTable tableName="rel_coverage_eligibility_request__coverages">
+            <column name="coverages_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coverage_eligibility_request_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="coverage_eligibility_request_id, coverages_id" tableName="rel_coverage_eligibility_request__coverages"/>
+    </changeSet>
+
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
 
     <!--

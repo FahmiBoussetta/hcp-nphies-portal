@@ -302,6 +302,8 @@ class PaymentNoticeResourceIT {
         PaymentNotice partialUpdatedPaymentNotice = new PaymentNotice();
         partialUpdatedPaymentNotice.setId(paymentNotice.getId());
 
+        partialUpdatedPaymentNotice.guid(UPDATED_GUID).paymentDate(UPDATED_PAYMENT_DATE).paymentStatus(UPDATED_PAYMENT_STATUS);
+
         restPaymentNoticeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedPaymentNotice.getId())
@@ -314,12 +316,12 @@ class PaymentNoticeResourceIT {
         List<PaymentNotice> paymentNoticeList = paymentNoticeRepository.findAll();
         assertThat(paymentNoticeList).hasSize(databaseSizeBeforeUpdate);
         PaymentNotice testPaymentNotice = paymentNoticeList.get(paymentNoticeList.size() - 1);
-        assertThat(testPaymentNotice.getGuid()).isEqualTo(DEFAULT_GUID);
+        assertThat(testPaymentNotice.getGuid()).isEqualTo(UPDATED_GUID);
         assertThat(testPaymentNotice.getParsed()).isEqualTo(DEFAULT_PARSED);
         assertThat(testPaymentNotice.getIdentifier()).isEqualTo(DEFAULT_IDENTIFIER);
-        assertThat(testPaymentNotice.getPaymentDate()).isEqualTo(DEFAULT_PAYMENT_DATE);
+        assertThat(testPaymentNotice.getPaymentDate()).isEqualTo(UPDATED_PAYMENT_DATE);
         assertThat(testPaymentNotice.getAmount()).isEqualByComparingTo(DEFAULT_AMOUNT);
-        assertThat(testPaymentNotice.getPaymentStatus()).isEqualTo(DEFAULT_PAYMENT_STATUS);
+        assertThat(testPaymentNotice.getPaymentStatus()).isEqualTo(UPDATED_PAYMENT_STATUS);
     }
 
     @Test

@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './class-component.reducer';
 import { IClassComponent } from 'app/shared/model/class-component.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IClassComponentProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const ClassComponent = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ClassComponent = (props: IClassComponentProps) => {
+  const classComponentList = useAppSelector(state => state.classComponent.entities);
+  const loading = useAppSelector(state => state.classComponent.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { classComponentList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="class-component-heading" data-cy="ClassComponentHeading">
@@ -121,16 +124,4 @@ export const ClassComponent = (props: IClassComponentProps) => {
   );
 };
 
-const mapStateToProps = ({ classComponent }: IRootState) => ({
-  classComponentList: classComponent.entities,
-  loading: classComponent.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ClassComponent);
+export default ClassComponent;

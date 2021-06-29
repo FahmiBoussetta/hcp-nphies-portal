@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IClaim } from 'app/shared/model/claim.model';
 import { getEntities as getClaims } from 'app/entities/claim/claim.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './claim-error-mess
 import { IClaimErrorMessages } from 'app/shared/model/claim-error-messages.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IClaimErrorMessagesUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ClaimErrorMessagesUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ClaimErrorMessagesUpdate = (props: IClaimErrorMessagesUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { claimErrorMessagesEntity, claims, loading, updating } = props;
+  const claims = useAppSelector(state => state.claim.entities);
+  const claimErrorMessagesEntity = useAppSelector(state => state.claimErrorMessages.entity);
+  const loading = useAppSelector(state => state.claimErrorMessages.loading);
+  const updating = useAppSelector(state => state.claimErrorMessages.updating);
+  const updateSuccess = useAppSelector(state => state.claimErrorMessages.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/claim-error-messages');
@@ -27,35 +29,41 @@ export const ClaimErrorMessagesUpdate = (props: IClaimErrorMessagesUpdateProps) 
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getClaims();
+    dispatch(getClaims({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...claimErrorMessagesEntity,
-        ...values,
-        claim: claims.find(it => it.id.toString() === values.claimId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...claimErrorMessagesEntity,
+      ...values,
+      claim: claims.find(it => it.id.toString() === values.claimId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...claimErrorMessagesEntity,
+          claimId: claimErrorMessagesEntity?.claim?.id,
+        };
 
   return (
     <div>
@@ -73,37 +81,41 @@ export const ClaimErrorMessagesUpdate = (props: IClaimErrorMessagesUpdateProps) 
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : claimErrorMessagesEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="claim-error-messages-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="claim-error-messages-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="claim-error-messages-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="messageLabel" for="claim-error-messages-message">
-                  <Translate contentKey="hcpNphiesPortalApp.claimErrorMessages.message">Message</Translate>
-                </Label>
-                <AvField id="claim-error-messages-message" data-cy="message" type="text" name="message" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="claim-error-messages-claim">
-                  <Translate contentKey="hcpNphiesPortalApp.claimErrorMessages.claim">Claim</Translate>
-                </Label>
-                <AvInput id="claim-error-messages-claim" data-cy="claim" type="select" className="form-control" name="claimId">
-                  <option value="" key="0" />
-                  {claims
-                    ? claims.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/claim-error-messages" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.claimErrorMessages.message')}
+                id="claim-error-messages-message"
+                name="message"
+                data-cy="message"
+                type="text"
+              />
+              <ValidatedField
+                id="claim-error-messages-claim"
+                name="claimId"
+                data-cy="claim"
+                label={translate('hcpNphiesPortalApp.claimErrorMessages.claim')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {claims
+                  ? claims.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/claim-error-messages" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -116,7 +128,7 @@ export const ClaimErrorMessagesUpdate = (props: IClaimErrorMessagesUpdateProps) 
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -124,23 +136,4 @@ export const ClaimErrorMessagesUpdate = (props: IClaimErrorMessagesUpdateProps) 
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  claims: storeState.claim.entities,
-  claimErrorMessagesEntity: storeState.claimErrorMessages.entity,
-  loading: storeState.claimErrorMessages.loading,
-  updating: storeState.claimErrorMessages.updating,
-  updateSuccess: storeState.claimErrorMessages.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getClaims,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ClaimErrorMessagesUpdate);
+export default ClaimErrorMessagesUpdate;

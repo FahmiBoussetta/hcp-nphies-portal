@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './practitioner.reducer';
 
-export interface IPractitionerDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const PractitionerDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PractitionerDeleteDialog = (props: IPractitionerDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const practitionerEntity = useAppSelector(state => state.practitioner.entity);
+  const updateSuccess = useAppSelector(state => state.practitioner.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/practitioner');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.practitionerEntity.id);
+    dispatch(deleteEntity(practitionerEntity.id));
   };
 
-  const { practitionerEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="practitionerDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const PractitionerDeleteDialog = (props: IPractitionerDeleteDialogProps) 
   );
 };
 
-const mapStateToProps = ({ practitioner }: IRootState) => ({
-  practitionerEntity: practitioner.entity,
-  updateSuccess: practitioner.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PractitionerDeleteDialog);
+export default PractitionerDeleteDialog;

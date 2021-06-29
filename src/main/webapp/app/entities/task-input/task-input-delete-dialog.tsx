@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './task-input.reducer';
 
-export interface ITaskInputDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const TaskInputDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const TaskInputDeleteDialog = (props: ITaskInputDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const taskInputEntity = useAppSelector(state => state.taskInput.entity);
+  const updateSuccess = useAppSelector(state => state.taskInput.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/task-input');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.taskInputEntity.id);
+    dispatch(deleteEntity(taskInputEntity.id));
   };
 
-  const { taskInputEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="taskInputDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const TaskInputDeleteDialog = (props: ITaskInputDeleteDialogProps) => {
   );
 };
 
-const mapStateToProps = ({ taskInput }: IRootState) => ({
-  taskInputEntity: taskInput.entity,
-  updateSuccess: taskInput.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(TaskInputDeleteDialog);
+export default TaskInputDeleteDialog;

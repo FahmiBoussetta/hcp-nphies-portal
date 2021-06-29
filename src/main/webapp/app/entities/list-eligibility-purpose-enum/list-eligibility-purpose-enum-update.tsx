@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { ICoverageEligibilityRequest } from 'app/shared/model/coverage-eligibility-request.model';
 import { getEntities as getCoverageEligibilityRequests } from 'app/entities/coverage-eligibility-request/coverage-eligibility-request.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './list-eligibility
 import { IListEligibilityPurposeEnum } from 'app/shared/model/list-eligibility-purpose-enum.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IListEligibilityPurposeEnumUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ListEligibilityPurposeEnumUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ListEligibilityPurposeEnumUpdate = (props: IListEligibilityPurposeEnumUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { listEligibilityPurposeEnumEntity, coverageEligibilityRequests, loading, updating } = props;
+  const coverageEligibilityRequests = useAppSelector(state => state.coverageEligibilityRequest.entities);
+  const listEligibilityPurposeEnumEntity = useAppSelector(state => state.listEligibilityPurposeEnum.entity);
+  const loading = useAppSelector(state => state.listEligibilityPurposeEnum.loading);
+  const updating = useAppSelector(state => state.listEligibilityPurposeEnum.updating);
+  const updateSuccess = useAppSelector(state => state.listEligibilityPurposeEnum.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/list-eligibility-purpose-enum');
@@ -27,37 +29,44 @@ export const ListEligibilityPurposeEnumUpdate = (props: IListEligibilityPurposeE
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getCoverageEligibilityRequests();
+    dispatch(getCoverageEligibilityRequests({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...listEligibilityPurposeEnumEntity,
-        ...values,
-        coverageEligibilityRequest: coverageEligibilityRequests.find(
-          it => it.id.toString() === values.coverageEligibilityRequestId.toString()
-        ),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...listEligibilityPurposeEnumEntity,
+      ...values,
+      coverageEligibilityRequest: coverageEligibilityRequests.find(
+        it => it.id.toString() === values.coverageEligibilityRequestId.toString()
+      ),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...listEligibilityPurposeEnumEntity,
+          erp: 'Benefits',
+          coverageEligibilityRequestId: listEligibilityPurposeEnumEntity?.coverageEligibilityRequest?.id,
+        };
 
   return (
     <div>
@@ -78,56 +87,52 @@ export const ListEligibilityPurposeEnumUpdate = (props: IListEligibilityPurposeE
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : listEligibilityPurposeEnumEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="list-eligibility-purpose-enum-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="list-eligibility-purpose-enum-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="list-eligibility-purpose-enum-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="erpLabel" for="list-eligibility-purpose-enum-erp">
-                  <Translate contentKey="hcpNphiesPortalApp.listEligibilityPurposeEnum.erp">Erp</Translate>
-                </Label>
-                <AvInput
-                  id="list-eligibility-purpose-enum-erp"
-                  data-cy="erp"
-                  type="select"
-                  className="form-control"
-                  name="erp"
-                  value={(!isNew && listEligibilityPurposeEnumEntity.erp) || 'Benefits'}
-                >
-                  <option value="Benefits">{translate('hcpNphiesPortalApp.EligibilityPurposeEnum.Benefits')}</option>
-                  <option value="Discovery">{translate('hcpNphiesPortalApp.EligibilityPurposeEnum.Discovery')}</option>
-                  <option value="Validation">{translate('hcpNphiesPortalApp.EligibilityPurposeEnum.Validation')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="list-eligibility-purpose-enum-coverageEligibilityRequest">
-                  <Translate contentKey="hcpNphiesPortalApp.listEligibilityPurposeEnum.coverageEligibilityRequest">
-                    Coverage Eligibility Request
-                  </Translate>
-                </Label>
-                <AvInput
-                  id="list-eligibility-purpose-enum-coverageEligibilityRequest"
-                  data-cy="coverageEligibilityRequest"
-                  type="select"
-                  className="form-control"
-                  name="coverageEligibilityRequestId"
-                >
-                  <option value="" key="0" />
-                  {coverageEligibilityRequests
-                    ? coverageEligibilityRequests.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/list-eligibility-purpose-enum" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.listEligibilityPurposeEnum.erp')}
+                id="list-eligibility-purpose-enum-erp"
+                name="erp"
+                data-cy="erp"
+                type="select"
+              >
+                <option value="Benefits">{translate('hcpNphiesPortalApp.EligibilityPurposeEnum.Benefits')}</option>
+                <option value="Discovery">{translate('hcpNphiesPortalApp.EligibilityPurposeEnum.Discovery')}</option>
+                <option value="Validation">{translate('hcpNphiesPortalApp.EligibilityPurposeEnum.Validation')}</option>
+              </ValidatedField>
+              <ValidatedField
+                id="list-eligibility-purpose-enum-coverageEligibilityRequest"
+                name="coverageEligibilityRequestId"
+                data-cy="coverageEligibilityRequest"
+                label={translate('hcpNphiesPortalApp.listEligibilityPurposeEnum.coverageEligibilityRequest')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {coverageEligibilityRequests
+                  ? coverageEligibilityRequests.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button
+                tag={Link}
+                id="cancel-save"
+                data-cy="entityCreateCancelButton"
+                to="/list-eligibility-purpose-enum"
+                replace
+                color="info"
+              >
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -140,7 +145,7 @@ export const ListEligibilityPurposeEnumUpdate = (props: IListEligibilityPurposeE
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -148,23 +153,4 @@ export const ListEligibilityPurposeEnumUpdate = (props: IListEligibilityPurposeE
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  coverageEligibilityRequests: storeState.coverageEligibilityRequest.entities,
-  listEligibilityPurposeEnumEntity: storeState.listEligibilityPurposeEnum.entity,
-  loading: storeState.listEligibilityPurposeEnum.loading,
-  updating: storeState.listEligibilityPurposeEnum.updating,
-  updateSuccess: storeState.listEligibilityPurposeEnum.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getCoverageEligibilityRequests,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListEligibilityPurposeEnumUpdate);
+export default ListEligibilityPurposeEnumUpdate;

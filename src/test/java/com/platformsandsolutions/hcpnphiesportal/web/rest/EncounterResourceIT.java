@@ -325,8 +325,9 @@ class EncounterResourceIT {
         partialUpdatedEncounter
             .guid(UPDATED_GUID)
             .forceId(UPDATED_FORCE_ID)
+            .identifier(UPDATED_IDENTIFIER)
+            .encounterClass(UPDATED_ENCOUNTER_CLASS)
             .start(UPDATED_START)
-            .serviceType(UPDATED_SERVICE_TYPE)
             .priority(UPDATED_PRIORITY);
 
         restEncounterMockMvc
@@ -343,11 +344,11 @@ class EncounterResourceIT {
         Encounter testEncounter = encounterList.get(encounterList.size() - 1);
         assertThat(testEncounter.getGuid()).isEqualTo(UPDATED_GUID);
         assertThat(testEncounter.getForceId()).isEqualTo(UPDATED_FORCE_ID);
-        assertThat(testEncounter.getIdentifier()).isEqualTo(DEFAULT_IDENTIFIER);
-        assertThat(testEncounter.getEncounterClass()).isEqualTo(DEFAULT_ENCOUNTER_CLASS);
+        assertThat(testEncounter.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
+        assertThat(testEncounter.getEncounterClass()).isEqualTo(UPDATED_ENCOUNTER_CLASS);
         assertThat(testEncounter.getStart()).isEqualTo(UPDATED_START);
         assertThat(testEncounter.getEnd()).isEqualTo(DEFAULT_END);
-        assertThat(testEncounter.getServiceType()).isEqualTo(UPDATED_SERVICE_TYPE);
+        assertThat(testEncounter.getServiceType()).isEqualTo(DEFAULT_SERVICE_TYPE);
         assertThat(testEncounter.getPriority()).isEqualTo(UPDATED_PRIORITY);
     }
 

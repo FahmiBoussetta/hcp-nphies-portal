@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './list-role-code-enum.reducer';
 import { IListRoleCodeEnum } from 'app/shared/model/list-role-code-enum.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IListRoleCodeEnumProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const ListRoleCodeEnum = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ListRoleCodeEnum = (props: IListRoleCodeEnumProps) => {
+  const listRoleCodeEnumList = useAppSelector(state => state.listRoleCodeEnum.entities);
+  const loading = useAppSelector(state => state.listRoleCodeEnum.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { listRoleCodeEnumList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="list-role-code-enum-heading" data-cy="ListRoleCodeEnumHeading">
@@ -123,16 +126,4 @@ export const ListRoleCodeEnum = (props: IListRoleCodeEnumProps) => {
   );
 };
 
-const mapStateToProps = ({ listRoleCodeEnum }: IRootState) => ({
-  listRoleCodeEnumList: listRoleCodeEnum.entities,
-  loading: listRoleCodeEnum.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListRoleCodeEnum);
+export default ListRoleCodeEnum;

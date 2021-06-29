@@ -1,156 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IClaimErrorMessages, defaultValue } from 'app/shared/model/claim-error-messages.model';
 
-export const ACTION_TYPES = {
-  FETCH_CLAIMERRORMESSAGES_LIST: 'claimErrorMessages/FETCH_CLAIMERRORMESSAGES_LIST',
-  FETCH_CLAIMERRORMESSAGES: 'claimErrorMessages/FETCH_CLAIMERRORMESSAGES',
-  CREATE_CLAIMERRORMESSAGES: 'claimErrorMessages/CREATE_CLAIMERRORMESSAGES',
-  UPDATE_CLAIMERRORMESSAGES: 'claimErrorMessages/UPDATE_CLAIMERRORMESSAGES',
-  PARTIAL_UPDATE_CLAIMERRORMESSAGES: 'claimErrorMessages/PARTIAL_UPDATE_CLAIMERRORMESSAGES',
-  DELETE_CLAIMERRORMESSAGES: 'claimErrorMessages/DELETE_CLAIMERRORMESSAGES',
-  RESET: 'claimErrorMessages/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<IClaimErrorMessages> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<IClaimErrorMessages>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type ClaimErrorMessagesState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: ClaimErrorMessagesState = initialState, action): ClaimErrorMessagesState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_CLAIMERRORMESSAGES_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_CLAIMERRORMESSAGES):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_CLAIMERRORMESSAGES):
-    case REQUEST(ACTION_TYPES.UPDATE_CLAIMERRORMESSAGES):
-    case REQUEST(ACTION_TYPES.DELETE_CLAIMERRORMESSAGES):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_CLAIMERRORMESSAGES):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_CLAIMERRORMESSAGES_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_CLAIMERRORMESSAGES):
-    case FAILURE(ACTION_TYPES.CREATE_CLAIMERRORMESSAGES):
-    case FAILURE(ACTION_TYPES.UPDATE_CLAIMERRORMESSAGES):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_CLAIMERRORMESSAGES):
-    case FAILURE(ACTION_TYPES.DELETE_CLAIMERRORMESSAGES):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_CLAIMERRORMESSAGES_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_CLAIMERRORMESSAGES):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_CLAIMERRORMESSAGES):
-    case SUCCESS(ACTION_TYPES.UPDATE_CLAIMERRORMESSAGES):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_CLAIMERRORMESSAGES):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_CLAIMERRORMESSAGES):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/claim-error-messages';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<IClaimErrorMessages> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_CLAIMERRORMESSAGES_LIST,
-  payload: axios.get<IClaimErrorMessages>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('claimErrorMessages/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<IClaimErrorMessages[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<IClaimErrorMessages> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_CLAIMERRORMESSAGES,
-    payload: axios.get<IClaimErrorMessages>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'claimErrorMessages/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<IClaimErrorMessages>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<IClaimErrorMessages> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_CLAIMERRORMESSAGES,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'claimErrorMessages/create_entity',
+  async (entity: IClaimErrorMessages, thunkAPI) => {
+    const result = await axios.post<IClaimErrorMessages>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<IClaimErrorMessages> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_CLAIMERRORMESSAGES,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'claimErrorMessages/update_entity',
+  async (entity: IClaimErrorMessages, thunkAPI) => {
+    const result = await axios.put<IClaimErrorMessages>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<IClaimErrorMessages> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_CLAIMERRORMESSAGES,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'claimErrorMessages/partial_update_entity',
+  async (entity: IClaimErrorMessages, thunkAPI) => {
+    const result = await axios.patch<IClaimErrorMessages>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<IClaimErrorMessages> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_CLAIMERRORMESSAGES,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'claimErrorMessages/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<IClaimErrorMessages>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
+// slice
+
+export const ClaimErrorMessagesSlice = createEntitySlice({
+  name: 'claimErrorMessages',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
+  },
 });
+
+export const { reset } = ClaimErrorMessagesSlice.actions;
+
+// Reducer
+export default ClaimErrorMessagesSlice.reducer;

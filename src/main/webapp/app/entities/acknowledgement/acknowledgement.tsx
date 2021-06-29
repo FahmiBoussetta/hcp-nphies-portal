@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './acknowledgement.reducer';
 import { IAcknowledgement } from 'app/shared/model/acknowledgement.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAcknowledgementProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Acknowledgement = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Acknowledgement = (props: IAcknowledgementProps) => {
+  const acknowledgementList = useAppSelector(state => state.acknowledgement.entities);
+  const loading = useAppSelector(state => state.acknowledgement.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { acknowledgementList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="acknowledgement-heading" data-cy="AcknowledgementHeading">
@@ -119,16 +122,4 @@ export const Acknowledgement = (props: IAcknowledgementProps) => {
   );
 };
 
-const mapStateToProps = ({ acknowledgement }: IRootState) => ({
-  acknowledgementList: acknowledgement.entities,
-  loading: acknowledgement.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Acknowledgement);
+export default Acknowledgement;

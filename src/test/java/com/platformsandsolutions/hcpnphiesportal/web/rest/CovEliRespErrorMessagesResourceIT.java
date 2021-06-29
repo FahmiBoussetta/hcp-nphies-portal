@@ -258,6 +258,8 @@ class CovEliRespErrorMessagesResourceIT {
         CovEliRespErrorMessages partialUpdatedCovEliRespErrorMessages = new CovEliRespErrorMessages();
         partialUpdatedCovEliRespErrorMessages.setId(covEliRespErrorMessages.getId());
 
+        partialUpdatedCovEliRespErrorMessages.message(UPDATED_MESSAGE);
+
         restCovEliRespErrorMessagesMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedCovEliRespErrorMessages.getId())
@@ -270,7 +272,7 @@ class CovEliRespErrorMessagesResourceIT {
         List<CovEliRespErrorMessages> covEliRespErrorMessagesList = covEliRespErrorMessagesRepository.findAll();
         assertThat(covEliRespErrorMessagesList).hasSize(databaseSizeBeforeUpdate);
         CovEliRespErrorMessages testCovEliRespErrorMessages = covEliRespErrorMessagesList.get(covEliRespErrorMessagesList.size() - 1);
-        assertThat(testCovEliRespErrorMessages.getMessage()).isEqualTo(DEFAULT_MESSAGE);
+        assertThat(testCovEliRespErrorMessages.getMessage()).isEqualTo(UPDATED_MESSAGE);
     }
 
     @Test

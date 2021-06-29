@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate, openFile, byteSize } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './attachment.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAttachmentDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AttachmentDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AttachmentDetail = (props: IAttachmentDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { attachmentEntity } = props;
+  const attachmentEntity = useAppSelector(state => state.attachment.entity);
   return (
     <Row>
       <Col md="8">
@@ -123,13 +122,4 @@ export const AttachmentDetail = (props: IAttachmentDetailProps) => {
   );
 };
 
-const mapStateToProps = ({ attachment }: IRootState) => ({
-  attachmentEntity: attachment.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AttachmentDetail);
+export default AttachmentDetail;

@@ -422,9 +422,13 @@ class DetailItemResourceIT {
 
         partialUpdatedDetailItem
             .tax(UPDATED_TAX)
+            .transportationSRCA(UPDATED_TRANSPORTATION_SRCA)
+            .laboratory(UPDATED_LABORATORY)
             .medicalDevice(UPDATED_MEDICAL_DEVICE)
+            .oralHealthIP(UPDATED_ORAL_HEALTH_IP)
             .oralHealthOP(UPDATED_ORAL_HEALTH_OP)
-            .services(UPDATED_SERVICES);
+            .procedure(UPDATED_PROCEDURE)
+            .quantity(UPDATED_QUANTITY);
 
         restDetailItemMockMvc
             .perform(
@@ -440,16 +444,16 @@ class DetailItemResourceIT {
         DetailItem testDetailItem = detailItemList.get(detailItemList.size() - 1);
         assertThat(testDetailItem.getSequence()).isEqualTo(DEFAULT_SEQUENCE);
         assertThat(testDetailItem.getTax()).isEqualByComparingTo(UPDATED_TAX);
-        assertThat(testDetailItem.getTransportationSRCA()).isEqualTo(DEFAULT_TRANSPORTATION_SRCA);
+        assertThat(testDetailItem.getTransportationSRCA()).isEqualTo(UPDATED_TRANSPORTATION_SRCA);
         assertThat(testDetailItem.getImaging()).isEqualTo(DEFAULT_IMAGING);
-        assertThat(testDetailItem.getLaboratory()).isEqualTo(DEFAULT_LABORATORY);
+        assertThat(testDetailItem.getLaboratory()).isEqualTo(UPDATED_LABORATORY);
         assertThat(testDetailItem.getMedicalDevice()).isEqualTo(UPDATED_MEDICAL_DEVICE);
-        assertThat(testDetailItem.getOralHealthIP()).isEqualTo(DEFAULT_ORAL_HEALTH_IP);
+        assertThat(testDetailItem.getOralHealthIP()).isEqualTo(UPDATED_ORAL_HEALTH_IP);
         assertThat(testDetailItem.getOralHealthOP()).isEqualTo(UPDATED_ORAL_HEALTH_OP);
-        assertThat(testDetailItem.getProcedure()).isEqualTo(DEFAULT_PROCEDURE);
-        assertThat(testDetailItem.getServices()).isEqualTo(UPDATED_SERVICES);
+        assertThat(testDetailItem.getProcedure()).isEqualTo(UPDATED_PROCEDURE);
+        assertThat(testDetailItem.getServices()).isEqualTo(DEFAULT_SERVICES);
         assertThat(testDetailItem.getMedicationCode()).isEqualTo(DEFAULT_MEDICATION_CODE);
-        assertThat(testDetailItem.getQuantity()).isEqualTo(DEFAULT_QUANTITY);
+        assertThat(testDetailItem.getQuantity()).isEqualTo(UPDATED_QUANTITY);
         assertThat(testDetailItem.getUnitPrice()).isEqualTo(DEFAULT_UNIT_PRICE);
     }
 

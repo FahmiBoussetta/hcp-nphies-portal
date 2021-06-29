@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './payee.reducer';
 
-export interface IPayeeDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const PayeeDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PayeeDeleteDialog = (props: IPayeeDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const payeeEntity = useAppSelector(state => state.payee.entity);
+  const updateSuccess = useAppSelector(state => state.payee.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/payee');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.payeeEntity.id);
+    dispatch(deleteEntity(payeeEntity.id));
   };
 
-  const { payeeEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="payeeDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const PayeeDeleteDialog = (props: IPayeeDeleteDialogProps) => {
   );
 };
 
-const mapStateToProps = ({ payee }: IRootState) => ({
-  payeeEntity: payee.entity,
-  updateSuccess: payee.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PayeeDeleteDialog);
+export default PayeeDeleteDialog;

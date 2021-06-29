@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './coverage.reducer';
 
-export interface ICoverageDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CoverageDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CoverageDeleteDialog = (props: ICoverageDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const coverageEntity = useAppSelector(state => state.coverage.entity);
+  const updateSuccess = useAppSelector(state => state.coverage.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/coverage');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.coverageEntity.id);
+    dispatch(deleteEntity(coverageEntity.id));
   };
 
-  const { coverageEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="coverageDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const CoverageDeleteDialog = (props: ICoverageDeleteDialogProps) => {
   );
 };
 
-const mapStateToProps = ({ coverage }: IRootState) => ({
-  coverageEntity: coverage.entity,
-  updateSuccess: coverage.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CoverageDeleteDialog);
+export default CoverageDeleteDialog;

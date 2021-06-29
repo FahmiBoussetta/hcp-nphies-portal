@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './practitioner-role.reducer';
 import { IPractitionerRole } from 'app/shared/model/practitioner-role.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPractitionerRoleProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const PractitionerRole = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PractitionerRole = (props: IPractitionerRoleProps) => {
+  const practitionerRoleList = useAppSelector(state => state.practitionerRole.entities);
+  const loading = useAppSelector(state => state.practitionerRole.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { practitionerRoleList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="practitioner-role-heading" data-cy="PractitionerRoleHeading">
@@ -145,16 +148,4 @@ export const PractitionerRole = (props: IPractitionerRoleProps) => {
   );
 };
 
-const mapStateToProps = ({ practitionerRole }: IRootState) => ({
-  practitionerRoleList: practitionerRole.entities,
-  loading: practitionerRole.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PractitionerRole);
+export default PractitionerRole;

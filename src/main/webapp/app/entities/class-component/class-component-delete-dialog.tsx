@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './class-component.reducer';
 
-export interface IClassComponentDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ClassComponentDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ClassComponentDeleteDialog = (props: IClassComponentDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const classComponentEntity = useAppSelector(state => state.classComponent.entity);
+  const updateSuccess = useAppSelector(state => state.classComponent.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/class-component');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.classComponentEntity.id);
+    dispatch(deleteEntity(classComponentEntity.id));
   };
 
-  const { classComponentEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="classComponentDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const ClassComponentDeleteDialog = (props: IClassComponentDeleteDialogPro
   );
 };
 
-const mapStateToProps = ({ classComponent }: IRootState) => ({
-  classComponentEntity: classComponent.entity,
-  updateSuccess: classComponent.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ClassComponentDeleteDialog);
+export default ClassComponentDeleteDialog;

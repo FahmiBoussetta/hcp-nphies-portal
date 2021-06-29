@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IAddress } from 'app/shared/model/address.model';
 import { getEntities as getAddresses } from 'app/entities/address/address.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './accident.reducer
 import { IAccident } from 'app/shared/model/accident.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAccidentUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AccidentUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AccidentUpdate = (props: IAccidentUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { accidentEntity, addresses, loading, updating } = props;
+  const addresses = useAppSelector(state => state.address.entities);
+  const accidentEntity = useAppSelector(state => state.accident.entity);
+  const loading = useAppSelector(state => state.accident.loading);
+  const updating = useAppSelector(state => state.accident.updating);
+  const updateSuccess = useAppSelector(state => state.accident.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/accident');
@@ -27,37 +29,47 @@ export const AccidentUpdate = (props: IAccidentUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getAddresses();
+    dispatch(getAddresses({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
+  const saveEntity = values => {
     values.date = convertDateTimeToServer(values.date);
 
-    if (errors.length === 0) {
-      const entity = {
-        ...accidentEntity,
-        ...values,
-        location: addresses.find(it => it.id.toString() === values.locationId.toString()),
-      };
+    const entity = {
+      ...accidentEntity,
+      ...values,
+      location: addresses.find(it => it.id.toString() === values.locationId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {
+          date: displayDefaultDateTime(),
+        }
+      : {
+          ...accidentEntity,
+          date: convertDateTimeFromServer(accidentEntity.date),
+          type: 'MVA',
+          locationId: accidentEntity?.location?.id,
+        };
 
   return (
     <div>
@@ -73,66 +85,57 @@ export const AccidentUpdate = (props: IAccidentUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : accidentEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="accident-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="accident-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
-              ) : null}
-              <AvGroup>
-                <Label id="dateLabel" for="accident-date">
-                  <Translate contentKey="hcpNphiesPortalApp.accident.date">Date</Translate>
-                </Label>
-                <AvInput
-                  id="accident-date"
-                  data-cy="date"
-                  type="datetime-local"
-                  className="form-control"
-                  name="date"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.accidentEntity.date)}
-                  validate={{
-                    required: { value: true, errorMessage: translate('entity.validation.required') },
-                  }}
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="accident-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
                 />
-              </AvGroup>
-              <AvGroup>
-                <Label id="typeLabel" for="accident-type">
-                  <Translate contentKey="hcpNphiesPortalApp.accident.type">Type</Translate>
-                </Label>
-                <AvInput
-                  id="accident-type"
-                  data-cy="type"
-                  type="select"
-                  className="form-control"
-                  name="type"
-                  value={(!isNew && accidentEntity.type) || 'MVA'}
-                >
-                  <option value="MVA">{translate('hcpNphiesPortalApp.AccidentTypeEnum.MVA')}</option>
-                  <option value="SCHOOL">{translate('hcpNphiesPortalApp.AccidentTypeEnum.SCHOOL')}</option>
-                  <option value="SPT">{translate('hcpNphiesPortalApp.AccidentTypeEnum.SPT')}</option>
-                  <option value="WPA">{translate('hcpNphiesPortalApp.AccidentTypeEnum.WPA')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="accident-location">
-                  <Translate contentKey="hcpNphiesPortalApp.accident.location">Location</Translate>
-                </Label>
-                <AvInput id="accident-location" data-cy="location" type="select" className="form-control" name="locationId">
-                  <option value="" key="0" />
-                  {addresses
-                    ? addresses.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/accident" replace color="info">
+              ) : null}
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.accident.date')}
+                id="accident-date"
+                name="date"
+                data-cy="date"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+                validate={{
+                  required: { value: true, message: translate('entity.validation.required') },
+                }}
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.accident.type')}
+                id="accident-type"
+                name="type"
+                data-cy="type"
+                type="select"
+              >
+                <option value="MVA">{translate('hcpNphiesPortalApp.AccidentTypeEnum.MVA')}</option>
+                <option value="SCHOOL">{translate('hcpNphiesPortalApp.AccidentTypeEnum.SCHOOL')}</option>
+                <option value="SPT">{translate('hcpNphiesPortalApp.AccidentTypeEnum.SPT')}</option>
+                <option value="WPA">{translate('hcpNphiesPortalApp.AccidentTypeEnum.WPA')}</option>
+              </ValidatedField>
+              <ValidatedField
+                id="accident-location"
+                name="locationId"
+                data-cy="location"
+                label={translate('hcpNphiesPortalApp.accident.location')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {addresses
+                  ? addresses.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/accident" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -145,7 +148,7 @@ export const AccidentUpdate = (props: IAccidentUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -153,23 +156,4 @@ export const AccidentUpdate = (props: IAccidentUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  addresses: storeState.address.entities,
-  accidentEntity: storeState.accident.entity,
-  loading: storeState.accident.loading,
-  updating: storeState.accident.updating,
-  updateSuccess: storeState.accident.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getAddresses,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AccidentUpdate);
+export default AccidentUpdate;

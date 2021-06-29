@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './task.reducer';
 
-export interface ITaskDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const TaskDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const TaskDeleteDialog = (props: ITaskDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const taskEntity = useAppSelector(state => state.task.entity);
+  const updateSuccess = useAppSelector(state => state.task.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/task');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.taskEntity.id);
+    dispatch(deleteEntity(taskEntity.id));
   };
 
-  const { taskEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="taskDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const TaskDeleteDialog = (props: ITaskDeleteDialogProps) => {
   );
 };
 
-const mapStateToProps = ({ task }: IRootState) => ({
-  taskEntity: task.entity,
-  updateSuccess: task.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(TaskDeleteDialog);
+export default TaskDeleteDialog;

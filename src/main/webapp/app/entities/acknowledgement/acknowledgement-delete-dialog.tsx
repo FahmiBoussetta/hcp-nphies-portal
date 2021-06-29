@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './acknowledgement.reducer';
 
-export interface IAcknowledgementDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AcknowledgementDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AcknowledgementDeleteDialog = (props: IAcknowledgementDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const acknowledgementEntity = useAppSelector(state => state.acknowledgement.entity);
+  const updateSuccess = useAppSelector(state => state.acknowledgement.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/acknowledgement');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.acknowledgementEntity.id);
+    dispatch(deleteEntity(acknowledgementEntity.id));
   };
 
-  const { acknowledgementEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="acknowledgementDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const AcknowledgementDeleteDialog = (props: IAcknowledgementDeleteDialogP
   );
 };
 
-const mapStateToProps = ({ acknowledgement }: IRootState) => ({
-  acknowledgementEntity: acknowledgement.entity,
-  updateSuccess: acknowledgement.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AcknowledgementDeleteDialog);
+export default AcknowledgementDeleteDialog;

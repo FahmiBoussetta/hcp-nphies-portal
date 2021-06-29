@@ -1,156 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IQuantity, defaultValue } from 'app/shared/model/quantity.model';
 
-export const ACTION_TYPES = {
-  FETCH_QUANTITY_LIST: 'quantity/FETCH_QUANTITY_LIST',
-  FETCH_QUANTITY: 'quantity/FETCH_QUANTITY',
-  CREATE_QUANTITY: 'quantity/CREATE_QUANTITY',
-  UPDATE_QUANTITY: 'quantity/UPDATE_QUANTITY',
-  PARTIAL_UPDATE_QUANTITY: 'quantity/PARTIAL_UPDATE_QUANTITY',
-  DELETE_QUANTITY: 'quantity/DELETE_QUANTITY',
-  RESET: 'quantity/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<IQuantity> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<IQuantity>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type QuantityState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: QuantityState = initialState, action): QuantityState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_QUANTITY_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_QUANTITY):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_QUANTITY):
-    case REQUEST(ACTION_TYPES.UPDATE_QUANTITY):
-    case REQUEST(ACTION_TYPES.DELETE_QUANTITY):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_QUANTITY):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_QUANTITY_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_QUANTITY):
-    case FAILURE(ACTION_TYPES.CREATE_QUANTITY):
-    case FAILURE(ACTION_TYPES.UPDATE_QUANTITY):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_QUANTITY):
-    case FAILURE(ACTION_TYPES.DELETE_QUANTITY):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_QUANTITY_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_QUANTITY):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_QUANTITY):
-    case SUCCESS(ACTION_TYPES.UPDATE_QUANTITY):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_QUANTITY):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_QUANTITY):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/quantities';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<IQuantity> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_QUANTITY_LIST,
-  payload: axios.get<IQuantity>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('quantity/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<IQuantity[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<IQuantity> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_QUANTITY,
-    payload: axios.get<IQuantity>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'quantity/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<IQuantity>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<IQuantity> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_QUANTITY,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'quantity/create_entity',
+  async (entity: IQuantity, thunkAPI) => {
+    const result = await axios.post<IQuantity>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<IQuantity> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_QUANTITY,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'quantity/update_entity',
+  async (entity: IQuantity, thunkAPI) => {
+    const result = await axios.put<IQuantity>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<IQuantity> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_QUANTITY,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'quantity/partial_update_entity',
+  async (entity: IQuantity, thunkAPI) => {
+    const result = await axios.patch<IQuantity>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<IQuantity> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_QUANTITY,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'quantity/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<IQuantity>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
+// slice
+
+export const QuantitySlice = createEntitySlice({
+  name: 'quantity',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
+  },
 });
+
+export const { reset } = QuantitySlice.actions;
+
+// Reducer
+export default QuantitySlice.reducer;
