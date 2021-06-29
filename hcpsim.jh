@@ -976,6 +976,10 @@ relationship OneToOne {
   TaskOutput{response} to ReferenceIdentifier
 }
 
+relationship ManyToMany {
+  CoverageEligibilityRequest{coverages} to Coverage{coverageEligibilityRequests}
+}
+
 relationship ManyToOne {
   AckErrorMessages{acknowledgement} to Acknowledgement{errors}
   ClaimErrorMessages{claim} to Claim{errors}
@@ -1019,7 +1023,6 @@ relationship OneToMany {
   CostToBeneficiaryComponent{exceptions} to ExemptionComponent{costToBeneficiary}
   CoverageEligibilityRequest{errors} to CovEliErrorMessages{coverageEligibilityRequest}
   CoverageEligibilityRequest{purposes} to ListEligibilityPurposeEnum{coverageEligibilityRequest}
-  CoverageEligibilityRequest{coverages} to Coverage{coverageEligibilityRequest}
   CoverageEligibilityResponse{errors} to CovEliRespErrorMessages{coverageEligibilityResponse}
   CoverageEligibilityResponse{insurance} to ResponseInsurance{coverageEligibilityResponse}
   ResponseInsurance{item} to ResponseInsuranceItem{responseInsurance}
