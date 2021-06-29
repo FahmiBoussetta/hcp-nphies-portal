@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IAdjudicationItem } from 'app/shared/model/adjudication-item.model';
 import { getEntities as getAdjudicationItems } from 'app/entities/adjudication-item/adjudication-item.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './adjudication-not
 import { IAdjudicationNotes } from 'app/shared/model/adjudication-notes.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAdjudicationNotesUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AdjudicationNotesUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AdjudicationNotesUpdate = (props: IAdjudicationNotesUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { adjudicationNotesEntity, adjudicationItems, loading, updating } = props;
+  const adjudicationItems = useAppSelector(state => state.adjudicationItem.entities);
+  const adjudicationNotesEntity = useAppSelector(state => state.adjudicationNotes.entity);
+  const loading = useAppSelector(state => state.adjudicationNotes.loading);
+  const updating = useAppSelector(state => state.adjudicationNotes.updating);
+  const updateSuccess = useAppSelector(state => state.adjudicationNotes.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/adjudication-notes');
@@ -27,35 +29,41 @@ export const AdjudicationNotesUpdate = (props: IAdjudicationNotesUpdateProps) =>
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getAdjudicationItems();
+    dispatch(getAdjudicationItems({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...adjudicationNotesEntity,
-        ...values,
-        adjudicationItem: adjudicationItems.find(it => it.id.toString() === values.adjudicationItemId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...adjudicationNotesEntity,
+      ...values,
+      adjudicationItem: adjudicationItems.find(it => it.id.toString() === values.adjudicationItemId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...adjudicationNotesEntity,
+          adjudicationItemId: adjudicationNotesEntity?.adjudicationItem?.id,
+        };
 
   return (
     <div>
@@ -73,43 +81,41 @@ export const AdjudicationNotesUpdate = (props: IAdjudicationNotesUpdateProps) =>
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : adjudicationNotesEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="adjudication-notes-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="adjudication-notes-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="adjudication-notes-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="noteLabel" for="adjudication-notes-note">
-                  <Translate contentKey="hcpNphiesPortalApp.adjudicationNotes.note">Note</Translate>
-                </Label>
-                <AvField id="adjudication-notes-note" data-cy="note" type="text" name="note" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="adjudication-notes-adjudicationItem">
-                  <Translate contentKey="hcpNphiesPortalApp.adjudicationNotes.adjudicationItem">Adjudication Item</Translate>
-                </Label>
-                <AvInput
-                  id="adjudication-notes-adjudicationItem"
-                  data-cy="adjudicationItem"
-                  type="select"
-                  className="form-control"
-                  name="adjudicationItemId"
-                >
-                  <option value="" key="0" />
-                  {adjudicationItems
-                    ? adjudicationItems.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/adjudication-notes" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.adjudicationNotes.note')}
+                id="adjudication-notes-note"
+                name="note"
+                data-cy="note"
+                type="text"
+              />
+              <ValidatedField
+                id="adjudication-notes-adjudicationItem"
+                name="adjudicationItemId"
+                data-cy="adjudicationItem"
+                label={translate('hcpNphiesPortalApp.adjudicationNotes.adjudicationItem')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {adjudicationItems
+                  ? adjudicationItems.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/adjudication-notes" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -122,7 +128,7 @@ export const AdjudicationNotesUpdate = (props: IAdjudicationNotesUpdateProps) =>
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -130,23 +136,4 @@ export const AdjudicationNotesUpdate = (props: IAdjudicationNotesUpdateProps) =>
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  adjudicationItems: storeState.adjudicationItem.entities,
-  adjudicationNotesEntity: storeState.adjudicationNotes.entity,
-  loading: storeState.adjudicationNotes.loading,
-  updating: storeState.adjudicationNotes.updating,
-  updateSuccess: storeState.adjudicationNotes.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getAdjudicationItems,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdjudicationNotesUpdate);
+export default AdjudicationNotesUpdate;

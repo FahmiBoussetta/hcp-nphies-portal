@@ -288,6 +288,8 @@ class AccidentResourceIT {
         Accident partialUpdatedAccident = new Accident();
         partialUpdatedAccident.setId(accident.getId());
 
+        partialUpdatedAccident.date(UPDATED_DATE).type(UPDATED_TYPE);
+
         restAccidentMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedAccident.getId())
@@ -300,8 +302,8 @@ class AccidentResourceIT {
         List<Accident> accidentList = accidentRepository.findAll();
         assertThat(accidentList).hasSize(databaseSizeBeforeUpdate);
         Accident testAccident = accidentList.get(accidentList.size() - 1);
-        assertThat(testAccident.getDate()).isEqualTo(DEFAULT_DATE);
-        assertThat(testAccident.getType()).isEqualTo(DEFAULT_TYPE);
+        assertThat(testAccident.getDate()).isEqualTo(UPDATED_DATE);
+        assertThat(testAccident.getType()).isEqualTo(UPDATED_TYPE);
     }
 
     @Test

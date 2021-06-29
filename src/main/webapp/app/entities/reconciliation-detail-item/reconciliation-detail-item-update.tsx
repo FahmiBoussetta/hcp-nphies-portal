@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IClaim } from 'app/shared/model/claim.model';
 import { getEntities as getClaims } from 'app/entities/claim/claim.reducer';
@@ -19,13 +16,21 @@ import { getEntity, updateEntity, createEntity, reset } from './reconciliation-d
 import { IReconciliationDetailItem } from 'app/shared/model/reconciliation-detail-item.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IReconciliationDetailItemUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ReconciliationDetailItemUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ReconciliationDetailItemUpdate = (props: IReconciliationDetailItemUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { reconciliationDetailItemEntity, claims, organizations, claimResponses, paymentReconciliations, loading, updating } = props;
+  const claims = useAppSelector(state => state.claim.entities);
+  const organizations = useAppSelector(state => state.organization.entities);
+  const claimResponses = useAppSelector(state => state.claimResponse.entities);
+  const paymentReconciliations = useAppSelector(state => state.paymentReconciliation.entities);
+  const reconciliationDetailItemEntity = useAppSelector(state => state.reconciliationDetailItem.entity);
+  const loading = useAppSelector(state => state.reconciliationDetailItem.loading);
+  const updating = useAppSelector(state => state.reconciliationDetailItem.updating);
+  const updateSuccess = useAppSelector(state => state.reconciliationDetailItem.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/reconciliation-detail-item');
@@ -33,44 +38,57 @@ export const ReconciliationDetailItemUpdate = (props: IReconciliationDetailItemU
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getClaims();
-    props.getOrganizations();
-    props.getClaimResponses();
-    props.getPaymentReconciliations();
+    dispatch(getClaims({}));
+    dispatch(getOrganizations({}));
+    dispatch(getClaimResponses({}));
+    dispatch(getPaymentReconciliations({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
+  const saveEntity = values => {
     values.date = convertDateTimeToServer(values.date);
 
-    if (errors.length === 0) {
-      const entity = {
-        ...reconciliationDetailItemEntity,
-        ...values,
-        request: claims.find(it => it.id.toString() === values.requestId.toString()),
-        submitter: organizations.find(it => it.id.toString() === values.submitterId.toString()),
-        payee: organizations.find(it => it.id.toString() === values.payeeId.toString()),
-        response: claimResponses.find(it => it.id.toString() === values.responseId.toString()),
-        paymentReconciliation: paymentReconciliations.find(it => it.id.toString() === values.paymentReconciliationId.toString()),
-      };
+    const entity = {
+      ...reconciliationDetailItemEntity,
+      ...values,
+      request: claims.find(it => it.id.toString() === values.requestId.toString()),
+      submitter: organizations.find(it => it.id.toString() === values.submitterId.toString()),
+      payee: organizations.find(it => it.id.toString() === values.payeeId.toString()),
+      response: claimResponses.find(it => it.id.toString() === values.responseId.toString()),
+      paymentReconciliation: paymentReconciliations.find(it => it.id.toString() === values.paymentReconciliationId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {
+          date: displayDefaultDateTime(),
+        }
+      : {
+          ...reconciliationDetailItemEntity,
+          date: convertDateTimeFromServer(reconciliationDetailItemEntity.date),
+          requestId: reconciliationDetailItemEntity?.request?.id,
+          submitterId: reconciliationDetailItemEntity?.submitter?.id,
+          responseId: reconciliationDetailItemEntity?.response?.id,
+          payeeId: reconciliationDetailItemEntity?.payee?.id,
+          paymentReconciliationId: reconciliationDetailItemEntity?.paymentReconciliation?.id,
+        };
 
   return (
     <div>
@@ -88,149 +106,134 @@ export const ReconciliationDetailItemUpdate = (props: IReconciliationDetailItemU
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : reconciliationDetailItemEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="reconciliation-detail-item-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="reconciliation-detail-item-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
-              ) : null}
-              <AvGroup>
-                <Label id="identifierLabel" for="reconciliation-detail-item-identifier">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.identifier">Identifier</Translate>
-                </Label>
-                <AvField id="reconciliation-detail-item-identifier" data-cy="identifier" type="text" name="identifier" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="predecessorLabel" for="reconciliation-detail-item-predecessor">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.predecessor">Predecessor</Translate>
-                </Label>
-                <AvField id="reconciliation-detail-item-predecessor" data-cy="predecessor" type="text" name="predecessor" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="typeLabel" for="reconciliation-detail-item-type">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.type">Type</Translate>
-                </Label>
-                <AvField id="reconciliation-detail-item-type" data-cy="type" type="text" name="type" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="dateLabel" for="reconciliation-detail-item-date">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.date">Date</Translate>
-                </Label>
-                <AvInput
-                  id="reconciliation-detail-item-date"
-                  data-cy="date"
-                  type="datetime-local"
-                  className="form-control"
-                  name="date"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.reconciliationDetailItemEntity.date)}
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="reconciliation-detail-item-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
                 />
-              </AvGroup>
-              <AvGroup>
-                <Label id="amountLabel" for="reconciliation-detail-item-amount">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.amount">Amount</Translate>
-                </Label>
-                <AvField id="reconciliation-detail-item-amount" data-cy="amount" type="text" name="amount" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="reconciliation-detail-item-request">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.request">Request</Translate>
-                </Label>
-                <AvInput id="reconciliation-detail-item-request" data-cy="request" type="select" className="form-control" name="requestId">
-                  <option value="" key="0" />
-                  {claims
-                    ? claims.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="reconciliation-detail-item-submitter">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.submitter">Submitter</Translate>
-                </Label>
-                <AvInput
-                  id="reconciliation-detail-item-submitter"
-                  data-cy="submitter"
-                  type="select"
-                  className="form-control"
-                  name="submitterId"
-                >
-                  <option value="" key="0" />
-                  {organizations
-                    ? organizations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="reconciliation-detail-item-response">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.response">Response</Translate>
-                </Label>
-                <AvInput
-                  id="reconciliation-detail-item-response"
-                  data-cy="response"
-                  type="select"
-                  className="form-control"
-                  name="responseId"
-                >
-                  <option value="" key="0" />
-                  {claimResponses
-                    ? claimResponses.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="reconciliation-detail-item-payee">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.payee">Payee</Translate>
-                </Label>
-                <AvInput id="reconciliation-detail-item-payee" data-cy="payee" type="select" className="form-control" name="payeeId">
-                  <option value="" key="0" />
-                  {organizations
-                    ? organizations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="reconciliation-detail-item-paymentReconciliation">
-                  <Translate contentKey="hcpNphiesPortalApp.reconciliationDetailItem.paymentReconciliation">
-                    Payment Reconciliation
-                  </Translate>
-                </Label>
-                <AvInput
-                  id="reconciliation-detail-item-paymentReconciliation"
-                  data-cy="paymentReconciliation"
-                  type="select"
-                  className="form-control"
-                  name="paymentReconciliationId"
-                >
-                  <option value="" key="0" />
-                  {paymentReconciliations
-                    ? paymentReconciliations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/reconciliation-detail-item" replace color="info">
+              ) : null}
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.identifier')}
+                id="reconciliation-detail-item-identifier"
+                name="identifier"
+                data-cy="identifier"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.predecessor')}
+                id="reconciliation-detail-item-predecessor"
+                name="predecessor"
+                data-cy="predecessor"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.type')}
+                id="reconciliation-detail-item-type"
+                name="type"
+                data-cy="type"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.date')}
+                id="reconciliation-detail-item-date"
+                name="date"
+                data-cy="date"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.amount')}
+                id="reconciliation-detail-item-amount"
+                name="amount"
+                data-cy="amount"
+                type="text"
+              />
+              <ValidatedField
+                id="reconciliation-detail-item-request"
+                name="requestId"
+                data-cy="request"
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.request')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {claims
+                  ? claims.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="reconciliation-detail-item-submitter"
+                name="submitterId"
+                data-cy="submitter"
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.submitter')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {organizations
+                  ? organizations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="reconciliation-detail-item-response"
+                name="responseId"
+                data-cy="response"
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.response')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {claimResponses
+                  ? claimResponses.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="reconciliation-detail-item-payee"
+                name="payeeId"
+                data-cy="payee"
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.payee')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {organizations
+                  ? organizations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="reconciliation-detail-item-paymentReconciliation"
+                name="paymentReconciliationId"
+                data-cy="paymentReconciliation"
+                label={translate('hcpNphiesPortalApp.reconciliationDetailItem.paymentReconciliation')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {paymentReconciliations
+                  ? paymentReconciliations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/reconciliation-detail-item" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -243,7 +246,7 @@ export const ReconciliationDetailItemUpdate = (props: IReconciliationDetailItemU
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -251,29 +254,4 @@ export const ReconciliationDetailItemUpdate = (props: IReconciliationDetailItemU
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  claims: storeState.claim.entities,
-  organizations: storeState.organization.entities,
-  claimResponses: storeState.claimResponse.entities,
-  paymentReconciliations: storeState.paymentReconciliation.entities,
-  reconciliationDetailItemEntity: storeState.reconciliationDetailItem.entity,
-  loading: storeState.reconciliationDetailItem.loading,
-  updating: storeState.reconciliationDetailItem.updating,
-  updateSuccess: storeState.reconciliationDetailItem.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getClaims,
-  getOrganizations,
-  getClaimResponses,
-  getPaymentReconciliations,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ReconciliationDetailItemUpdate);
+export default ReconciliationDetailItemUpdate;

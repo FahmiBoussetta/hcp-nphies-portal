@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IPatient } from 'app/shared/model/patient.model';
 import { getEntities as getPatients } from 'app/entities/patient/patient.reducer';
@@ -15,13 +12,19 @@ import { getEntity, updateEntity, createEntity, reset } from './human-name.reduc
 import { IHumanName } from 'app/shared/model/human-name.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IHumanNameUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const HumanNameUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const HumanNameUpdate = (props: IHumanNameUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { humanNameEntity, patients, practitioners, loading, updating } = props;
+  const patients = useAppSelector(state => state.patient.entities);
+  const practitioners = useAppSelector(state => state.practitioner.entities);
+  const humanNameEntity = useAppSelector(state => state.humanName.entity);
+  const loading = useAppSelector(state => state.humanName.loading);
+  const updating = useAppSelector(state => state.humanName.updating);
+  const updateSuccess = useAppSelector(state => state.humanName.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/human-name');
@@ -29,37 +32,44 @@ export const HumanNameUpdate = (props: IHumanNameUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getPatients();
-    props.getPractitioners();
+    dispatch(getPatients({}));
+    dispatch(getPractitioners({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...humanNameEntity,
-        ...values,
-        patient: patients.find(it => it.id.toString() === values.patientId.toString()),
-        practitioner: practitioners.find(it => it.id.toString() === values.practitionerId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...humanNameEntity,
+      ...values,
+      patient: patients.find(it => it.id.toString() === values.patientId.toString()),
+      practitioner: practitioners.find(it => it.id.toString() === values.practitionerId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...humanNameEntity,
+          patientId: humanNameEntity?.patient?.id,
+          practitionerId: humanNameEntity?.practitioner?.id,
+        };
 
   return (
     <div>
@@ -75,60 +85,60 @@ export const HumanNameUpdate = (props: IHumanNameUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : humanNameEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="human-name-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="human-name-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
-              ) : null}
-              <AvGroup>
-                <Label id="familyLabel" for="human-name-family">
-                  <Translate contentKey="hcpNphiesPortalApp.humanName.family">Family</Translate>
-                </Label>
-                <AvField
-                  id="human-name-family"
-                  data-cy="family"
-                  type="text"
-                  name="family"
-                  validate={{
-                    required: { value: true, errorMessage: translate('entity.validation.required') },
-                  }}
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="human-name-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
                 />
-              </AvGroup>
-              <AvGroup>
-                <Label for="human-name-patient">
-                  <Translate contentKey="hcpNphiesPortalApp.humanName.patient">Patient</Translate>
-                </Label>
-                <AvInput id="human-name-patient" data-cy="patient" type="select" className="form-control" name="patientId">
-                  <option value="" key="0" />
-                  {patients
-                    ? patients.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="human-name-practitioner">
-                  <Translate contentKey="hcpNphiesPortalApp.humanName.practitioner">Practitioner</Translate>
-                </Label>
-                <AvInput id="human-name-practitioner" data-cy="practitioner" type="select" className="form-control" name="practitionerId">
-                  <option value="" key="0" />
-                  {practitioners
-                    ? practitioners.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/human-name" replace color="info">
+              ) : null}
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.humanName.family')}
+                id="human-name-family"
+                name="family"
+                data-cy="family"
+                type="text"
+                validate={{
+                  required: { value: true, message: translate('entity.validation.required') },
+                }}
+              />
+              <ValidatedField
+                id="human-name-patient"
+                name="patientId"
+                data-cy="patient"
+                label={translate('hcpNphiesPortalApp.humanName.patient')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {patients
+                  ? patients.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="human-name-practitioner"
+                name="practitionerId"
+                data-cy="practitioner"
+                label={translate('hcpNphiesPortalApp.humanName.practitioner')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {practitioners
+                  ? practitioners.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/human-name" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -141,7 +151,7 @@ export const HumanNameUpdate = (props: IHumanNameUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -149,25 +159,4 @@ export const HumanNameUpdate = (props: IHumanNameUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  patients: storeState.patient.entities,
-  practitioners: storeState.practitioner.entities,
-  humanNameEntity: storeState.humanName.entity,
-  loading: storeState.humanName.loading,
-  updating: storeState.humanName.updating,
-  updateSuccess: storeState.humanName.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getPatients,
-  getPractitioners,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(HumanNameUpdate);
+export default HumanNameUpdate;

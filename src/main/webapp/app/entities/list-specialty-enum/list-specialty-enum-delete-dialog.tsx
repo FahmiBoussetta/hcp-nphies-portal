@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './list-specialty-enum.reducer';
 
-export interface IListSpecialtyEnumDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ListSpecialtyEnumDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ListSpecialtyEnumDeleteDialog = (props: IListSpecialtyEnumDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const listSpecialtyEnumEntity = useAppSelector(state => state.listSpecialtyEnum.entity);
+  const updateSuccess = useAppSelector(state => state.listSpecialtyEnum.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/list-specialty-enum');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.listSpecialtyEnumEntity.id);
+    dispatch(deleteEntity(listSpecialtyEnumEntity.id));
   };
 
-  const { listSpecialtyEnumEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="listSpecialtyEnumDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const ListSpecialtyEnumDeleteDialog = (props: IListSpecialtyEnumDeleteDia
   );
 };
 
-const mapStateToProps = ({ listSpecialtyEnum }: IRootState) => ({
-  listSpecialtyEnumEntity: listSpecialtyEnum.entity,
-  updateSuccess: listSpecialtyEnum.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListSpecialtyEnumDeleteDialog);
+export default ListSpecialtyEnumDeleteDialog;

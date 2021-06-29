@@ -1,156 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IInsurance, defaultValue } from 'app/shared/model/insurance.model';
 
-export const ACTION_TYPES = {
-  FETCH_INSURANCE_LIST: 'insurance/FETCH_INSURANCE_LIST',
-  FETCH_INSURANCE: 'insurance/FETCH_INSURANCE',
-  CREATE_INSURANCE: 'insurance/CREATE_INSURANCE',
-  UPDATE_INSURANCE: 'insurance/UPDATE_INSURANCE',
-  PARTIAL_UPDATE_INSURANCE: 'insurance/PARTIAL_UPDATE_INSURANCE',
-  DELETE_INSURANCE: 'insurance/DELETE_INSURANCE',
-  RESET: 'insurance/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<IInsurance> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<IInsurance>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type InsuranceState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: InsuranceState = initialState, action): InsuranceState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_INSURANCE_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_INSURANCE):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_INSURANCE):
-    case REQUEST(ACTION_TYPES.UPDATE_INSURANCE):
-    case REQUEST(ACTION_TYPES.DELETE_INSURANCE):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_INSURANCE):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_INSURANCE_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_INSURANCE):
-    case FAILURE(ACTION_TYPES.CREATE_INSURANCE):
-    case FAILURE(ACTION_TYPES.UPDATE_INSURANCE):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_INSURANCE):
-    case FAILURE(ACTION_TYPES.DELETE_INSURANCE):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_INSURANCE_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_INSURANCE):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_INSURANCE):
-    case SUCCESS(ACTION_TYPES.UPDATE_INSURANCE):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_INSURANCE):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_INSURANCE):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/insurances';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<IInsurance> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_INSURANCE_LIST,
-  payload: axios.get<IInsurance>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('insurance/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<IInsurance[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<IInsurance> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_INSURANCE,
-    payload: axios.get<IInsurance>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'insurance/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<IInsurance>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<IInsurance> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_INSURANCE,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'insurance/create_entity',
+  async (entity: IInsurance, thunkAPI) => {
+    const result = await axios.post<IInsurance>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<IInsurance> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_INSURANCE,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'insurance/update_entity',
+  async (entity: IInsurance, thunkAPI) => {
+    const result = await axios.put<IInsurance>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<IInsurance> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_INSURANCE,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'insurance/partial_update_entity',
+  async (entity: IInsurance, thunkAPI) => {
+    const result = await axios.patch<IInsurance>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<IInsurance> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_INSURANCE,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'insurance/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<IInsurance>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
+// slice
+
+export const InsuranceSlice = createEntitySlice({
+  name: 'insurance',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
+  },
 });
+
+export const { reset } = InsuranceSlice.actions;
+
+// Reducer
+export default InsuranceSlice.reducer;

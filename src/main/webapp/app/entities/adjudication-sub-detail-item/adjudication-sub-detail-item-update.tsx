@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IAdjudicationDetailItem } from 'app/shared/model/adjudication-detail-item.model';
 import { getEntities as getAdjudicationDetailItems } from 'app/entities/adjudication-detail-item/adjudication-detail-item.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './adjudication-sub
 import { IAdjudicationSubDetailItem } from 'app/shared/model/adjudication-sub-detail-item.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAdjudicationSubDetailItemUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AdjudicationSubDetailItemUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AdjudicationSubDetailItemUpdate = (props: IAdjudicationSubDetailItemUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { adjudicationSubDetailItemEntity, adjudicationDetailItems, loading, updating } = props;
+  const adjudicationDetailItems = useAppSelector(state => state.adjudicationDetailItem.entities);
+  const adjudicationSubDetailItemEntity = useAppSelector(state => state.adjudicationSubDetailItem.entity);
+  const loading = useAppSelector(state => state.adjudicationSubDetailItem.loading);
+  const updating = useAppSelector(state => state.adjudicationSubDetailItem.updating);
+  const updateSuccess = useAppSelector(state => state.adjudicationSubDetailItem.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/adjudication-sub-detail-item');
@@ -27,35 +29,41 @@ export const AdjudicationSubDetailItemUpdate = (props: IAdjudicationSubDetailIte
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getAdjudicationDetailItems();
+    dispatch(getAdjudicationDetailItems({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...adjudicationSubDetailItemEntity,
-        ...values,
-        adjudicationDetailItem: adjudicationDetailItems.find(it => it.id.toString() === values.adjudicationDetailItemId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...adjudicationSubDetailItemEntity,
+      ...values,
+      adjudicationDetailItem: adjudicationDetailItems.find(it => it.id.toString() === values.adjudicationDetailItemId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...adjudicationSubDetailItemEntity,
+          adjudicationDetailItemId: adjudicationSubDetailItemEntity?.adjudicationDetailItem?.id,
+        };
 
   return (
     <div>
@@ -76,55 +84,52 @@ export const AdjudicationSubDetailItemUpdate = (props: IAdjudicationSubDetailIte
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : adjudicationSubDetailItemEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="adjudication-sub-detail-item-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="adjudication-sub-detail-item-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
-              ) : null}
-              <AvGroup>
-                <Label id="sequenceLabel" for="adjudication-sub-detail-item-sequence">
-                  <Translate contentKey="hcpNphiesPortalApp.adjudicationSubDetailItem.sequence">Sequence</Translate>
-                </Label>
-                <AvField
-                  id="adjudication-sub-detail-item-sequence"
-                  data-cy="sequence"
-                  type="string"
-                  className="form-control"
-                  name="sequence"
-                  validate={{
-                    required: { value: true, errorMessage: translate('entity.validation.required') },
-                    number: { value: true, errorMessage: translate('entity.validation.number') },
-                  }}
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="adjudication-sub-detail-item-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
                 />
-              </AvGroup>
-              <AvGroup>
-                <Label for="adjudication-sub-detail-item-adjudicationDetailItem">
-                  <Translate contentKey="hcpNphiesPortalApp.adjudicationSubDetailItem.adjudicationDetailItem">
-                    Adjudication Detail Item
-                  </Translate>
-                </Label>
-                <AvInput
-                  id="adjudication-sub-detail-item-adjudicationDetailItem"
-                  data-cy="adjudicationDetailItem"
-                  type="select"
-                  className="form-control"
-                  name="adjudicationDetailItemId"
-                >
-                  <option value="" key="0" />
-                  {adjudicationDetailItems
-                    ? adjudicationDetailItems.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/adjudication-sub-detail-item" replace color="info">
+              ) : null}
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.adjudicationSubDetailItem.sequence')}
+                id="adjudication-sub-detail-item-sequence"
+                name="sequence"
+                data-cy="sequence"
+                type="text"
+                validate={{
+                  required: { value: true, message: translate('entity.validation.required') },
+                  validate: v => isNumber(v) || translate('entity.validation.number'),
+                }}
+              />
+              <ValidatedField
+                id="adjudication-sub-detail-item-adjudicationDetailItem"
+                name="adjudicationDetailItemId"
+                data-cy="adjudicationDetailItem"
+                label={translate('hcpNphiesPortalApp.adjudicationSubDetailItem.adjudicationDetailItem')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {adjudicationDetailItems
+                  ? adjudicationDetailItems.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button
+                tag={Link}
+                id="cancel-save"
+                data-cy="entityCreateCancelButton"
+                to="/adjudication-sub-detail-item"
+                replace
+                color="info"
+              >
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -137,7 +142,7 @@ export const AdjudicationSubDetailItemUpdate = (props: IAdjudicationSubDetailIte
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -145,23 +150,4 @@ export const AdjudicationSubDetailItemUpdate = (props: IAdjudicationSubDetailIte
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  adjudicationDetailItems: storeState.adjudicationDetailItem.entities,
-  adjudicationSubDetailItemEntity: storeState.adjudicationSubDetailItem.entity,
-  loading: storeState.adjudicationSubDetailItem.loading,
-  updating: storeState.adjudicationSubDetailItem.updating,
-  updateSuccess: storeState.adjudicationSubDetailItem.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getAdjudicationDetailItems,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdjudicationSubDetailItemUpdate);
+export default AdjudicationSubDetailItemUpdate;

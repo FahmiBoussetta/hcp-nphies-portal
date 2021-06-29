@@ -262,8 +262,6 @@ class PayeeResourceIT {
         Payee partialUpdatedPayee = new Payee();
         partialUpdatedPayee.setId(payee.getId());
 
-        partialUpdatedPayee.type(UPDATED_TYPE);
-
         restPayeeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedPayee.getId())
@@ -276,7 +274,7 @@ class PayeeResourceIT {
         List<Payee> payeeList = payeeRepository.findAll();
         assertThat(payeeList).hasSize(databaseSizeBeforeUpdate);
         Payee testPayee = payeeList.get(payeeList.size() - 1);
-        assertThat(testPayee.getType()).isEqualTo(UPDATED_TYPE);
+        assertThat(testPayee.getType()).isEqualTo(DEFAULT_TYPE);
     }
 
     @Test

@@ -353,7 +353,11 @@ class CoverageResourceIT {
         Coverage partialUpdatedCoverage = new Coverage();
         partialUpdatedCoverage.setId(coverage.getId());
 
-        partialUpdatedCoverage.subscriberId(UPDATED_SUBSCRIBER_ID).network(UPDATED_NETWORK).subrogation(UPDATED_SUBROGATION);
+        partialUpdatedCoverage
+            .forceId(UPDATED_FORCE_ID)
+            .coverageType(UPDATED_COVERAGE_TYPE)
+            .dependent(UPDATED_DEPENDENT)
+            .subrogation(UPDATED_SUBROGATION);
 
         restCoverageMockMvc
             .perform(
@@ -368,12 +372,12 @@ class CoverageResourceIT {
         assertThat(coverageList).hasSize(databaseSizeBeforeUpdate);
         Coverage testCoverage = coverageList.get(coverageList.size() - 1);
         assertThat(testCoverage.getGuid()).isEqualTo(DEFAULT_GUID);
-        assertThat(testCoverage.getForceId()).isEqualTo(DEFAULT_FORCE_ID);
-        assertThat(testCoverage.getCoverageType()).isEqualTo(DEFAULT_COVERAGE_TYPE);
-        assertThat(testCoverage.getSubscriberId()).isEqualTo(UPDATED_SUBSCRIBER_ID);
-        assertThat(testCoverage.getDependent()).isEqualTo(DEFAULT_DEPENDENT);
+        assertThat(testCoverage.getForceId()).isEqualTo(UPDATED_FORCE_ID);
+        assertThat(testCoverage.getCoverageType()).isEqualTo(UPDATED_COVERAGE_TYPE);
+        assertThat(testCoverage.getSubscriberId()).isEqualTo(DEFAULT_SUBSCRIBER_ID);
+        assertThat(testCoverage.getDependent()).isEqualTo(UPDATED_DEPENDENT);
         assertThat(testCoverage.getRelationShip()).isEqualTo(DEFAULT_RELATION_SHIP);
-        assertThat(testCoverage.getNetwork()).isEqualTo(UPDATED_NETWORK);
+        assertThat(testCoverage.getNetwork()).isEqualTo(DEFAULT_NETWORK);
         assertThat(testCoverage.getSubrogation()).isEqualTo(UPDATED_SUBROGATION);
     }
 

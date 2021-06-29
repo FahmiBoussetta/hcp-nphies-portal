@@ -559,16 +559,17 @@ class ItemResourceIT {
         partialUpdatedItem.setId(item.getId());
 
         partialUpdatedItem
-            .sequence(UPDATED_SEQUENCE)
-            .isPackage(UPDATED_IS_PACKAGE)
-            .patientShare(UPDATED_PATIENT_SHARE)
+            .payerShare(UPDATED_PAYER_SHARE)
+            .imaging(UPDATED_IMAGING)
+            .laboratory(UPDATED_LABORATORY)
             .medicalDevice(UPDATED_MEDICAL_DEVICE)
-            .procedure(UPDATED_PROCEDURE)
+            .oralHealthIP(UPDATED_ORAL_HEALTH_IP)
+            .oralHealthOP(UPDATED_ORAL_HEALTH_OP)
             .services(UPDATED_SERVICES)
+            .medicationCode(UPDATED_MEDICATION_CODE)
             .servicedDate(UPDATED_SERVICED_DATE)
             .servicedDateEnd(UPDATED_SERVICED_DATE_END)
-            .unitPrice(UPDATED_UNIT_PRICE)
-            .factor(UPDATED_FACTOR);
+            .bodySite(UPDATED_BODY_SITE);
 
         restItemMockMvc
             .perform(
@@ -582,28 +583,28 @@ class ItemResourceIT {
         List<Item> itemList = itemRepository.findAll();
         assertThat(itemList).hasSize(databaseSizeBeforeUpdate);
         Item testItem = itemList.get(itemList.size() - 1);
-        assertThat(testItem.getSequence()).isEqualTo(UPDATED_SEQUENCE);
-        assertThat(testItem.getIsPackage()).isEqualTo(UPDATED_IS_PACKAGE);
+        assertThat(testItem.getSequence()).isEqualTo(DEFAULT_SEQUENCE);
+        assertThat(testItem.getIsPackage()).isEqualTo(DEFAULT_IS_PACKAGE);
         assertThat(testItem.getTax()).isEqualByComparingTo(DEFAULT_TAX);
-        assertThat(testItem.getPayerShare()).isEqualByComparingTo(DEFAULT_PAYER_SHARE);
-        assertThat(testItem.getPatientShare()).isEqualByComparingTo(UPDATED_PATIENT_SHARE);
+        assertThat(testItem.getPayerShare()).isEqualByComparingTo(UPDATED_PAYER_SHARE);
+        assertThat(testItem.getPatientShare()).isEqualByComparingTo(DEFAULT_PATIENT_SHARE);
         assertThat(testItem.getCareTeamSequence()).isEqualTo(DEFAULT_CARE_TEAM_SEQUENCE);
         assertThat(testItem.getTransportationSRCA()).isEqualTo(DEFAULT_TRANSPORTATION_SRCA);
-        assertThat(testItem.getImaging()).isEqualTo(DEFAULT_IMAGING);
-        assertThat(testItem.getLaboratory()).isEqualTo(DEFAULT_LABORATORY);
+        assertThat(testItem.getImaging()).isEqualTo(UPDATED_IMAGING);
+        assertThat(testItem.getLaboratory()).isEqualTo(UPDATED_LABORATORY);
         assertThat(testItem.getMedicalDevice()).isEqualTo(UPDATED_MEDICAL_DEVICE);
-        assertThat(testItem.getOralHealthIP()).isEqualTo(DEFAULT_ORAL_HEALTH_IP);
-        assertThat(testItem.getOralHealthOP()).isEqualTo(DEFAULT_ORAL_HEALTH_OP);
-        assertThat(testItem.getProcedure()).isEqualTo(UPDATED_PROCEDURE);
+        assertThat(testItem.getOralHealthIP()).isEqualTo(UPDATED_ORAL_HEALTH_IP);
+        assertThat(testItem.getOralHealthOP()).isEqualTo(UPDATED_ORAL_HEALTH_OP);
+        assertThat(testItem.getProcedure()).isEqualTo(DEFAULT_PROCEDURE);
         assertThat(testItem.getServices()).isEqualTo(UPDATED_SERVICES);
-        assertThat(testItem.getMedicationCode()).isEqualTo(DEFAULT_MEDICATION_CODE);
+        assertThat(testItem.getMedicationCode()).isEqualTo(UPDATED_MEDICATION_CODE);
         assertThat(testItem.getServicedDate()).isEqualTo(UPDATED_SERVICED_DATE);
         assertThat(testItem.getServicedDateStart()).isEqualTo(DEFAULT_SERVICED_DATE_START);
         assertThat(testItem.getServicedDateEnd()).isEqualTo(UPDATED_SERVICED_DATE_END);
         assertThat(testItem.getQuantity()).isEqualTo(DEFAULT_QUANTITY);
-        assertThat(testItem.getUnitPrice()).isEqualTo(UPDATED_UNIT_PRICE);
-        assertThat(testItem.getFactor()).isEqualByComparingTo(UPDATED_FACTOR);
-        assertThat(testItem.getBodySite()).isEqualTo(DEFAULT_BODY_SITE);
+        assertThat(testItem.getUnitPrice()).isEqualTo(DEFAULT_UNIT_PRICE);
+        assertThat(testItem.getFactor()).isEqualByComparingTo(DEFAULT_FACTOR);
+        assertThat(testItem.getBodySite()).isEqualTo(UPDATED_BODY_SITE);
         assertThat(testItem.getSubSite()).isEqualTo(DEFAULT_SUB_SITE);
     }
 

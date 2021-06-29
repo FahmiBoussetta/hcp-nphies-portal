@@ -31,5 +31,17 @@
                                  constraintName="fk_coverage_eligibility_request__facility_id"
                                  referencedColumnNames="id"
                                  referencedTableName="location"/>
+
+        <addForeignKeyConstraint baseColumnNames="coverage_eligibility_request_id"
+                                 baseTableName="rel_coverage_eligibility_request__coverages"
+                                 constraintName="fk_rel_coverage_eligibility_req__coverage_eligibility_requ_1b_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="coverage_eligibility_request"/>
+
+        <addForeignKeyConstraint baseColumnNames="coverages_id"
+                                 baseTableName="rel_coverage_eligibility_request__coverages"
+                                 constraintName="fk_rel_coverage_eligibility_request__coverages__coverages_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="coverage"/>
     </changeSet>
 </databaseChangeLog>

@@ -260,7 +260,7 @@ class NoteResourceIT {
         Note partialUpdatedNote = new Note();
         partialUpdatedNote.setId(note.getId());
 
-        partialUpdatedNote.time(UPDATED_TIME);
+        partialUpdatedNote.text(UPDATED_TEXT);
 
         restNoteMockMvc
             .perform(
@@ -274,9 +274,9 @@ class NoteResourceIT {
         List<Note> noteList = noteRepository.findAll();
         assertThat(noteList).hasSize(databaseSizeBeforeUpdate);
         Note testNote = noteList.get(noteList.size() - 1);
-        assertThat(testNote.getText()).isEqualTo(DEFAULT_TEXT);
+        assertThat(testNote.getText()).isEqualTo(UPDATED_TEXT);
         assertThat(testNote.getAuthor()).isEqualTo(DEFAULT_AUTHOR);
-        assertThat(testNote.getTime()).isEqualTo(UPDATED_TIME);
+        assertThat(testNote.getTime()).isEqualTo(DEFAULT_TIME);
     }
 
     @Test

@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './adjudication-sub-detail-item.reducer';
 
-export interface IAdjudicationSubDetailItemDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AdjudicationSubDetailItemDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AdjudicationSubDetailItemDeleteDialog = (props: IAdjudicationSubDetailItemDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const adjudicationSubDetailItemEntity = useAppSelector(state => state.adjudicationSubDetailItem.entity);
+  const updateSuccess = useAppSelector(state => state.adjudicationSubDetailItem.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/adjudication-sub-detail-item');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.adjudicationSubDetailItemEntity.id);
+    dispatch(deleteEntity(adjudicationSubDetailItemEntity.id));
   };
 
-  const { adjudicationSubDetailItemEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="adjudicationSubDetailItemDeleteDialogHeading">
@@ -64,14 +65,4 @@ export const AdjudicationSubDetailItemDeleteDialog = (props: IAdjudicationSubDet
   );
 };
 
-const mapStateToProps = ({ adjudicationSubDetailItem }: IRootState) => ({
-  adjudicationSubDetailItemEntity: adjudicationSubDetailItem.entity,
-  updateSuccess: adjudicationSubDetailItem.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdjudicationSubDetailItemDeleteDialog);
+export default AdjudicationSubDetailItemDeleteDialog;

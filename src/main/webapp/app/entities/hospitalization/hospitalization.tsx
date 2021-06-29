@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './hospitalization.reducer';
 import { IHospitalization } from 'app/shared/model/hospitalization.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IHospitalizationProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Hospitalization = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Hospitalization = (props: IHospitalizationProps) => {
+  const hospitalizationList = useAppSelector(state => state.hospitalization.entities);
+  const loading = useAppSelector(state => state.hospitalization.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { hospitalizationList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="hospitalization-heading" data-cy="HospitalizationHeading">
@@ -135,16 +138,4 @@ export const Hospitalization = (props: IHospitalizationProps) => {
   );
 };
 
-const mapStateToProps = ({ hospitalization }: IRootState) => ({
-  hospitalizationList: hospitalization.entities,
-  loading: hospitalization.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Hospitalization);
+export default Hospitalization;

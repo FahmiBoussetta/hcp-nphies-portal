@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './adjudication-item.reducer';
 import { IAdjudicationItem } from 'app/shared/model/adjudication-item.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAdjudicationItemProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const AdjudicationItem = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AdjudicationItem = (props: IAdjudicationItemProps) => {
+  const adjudicationItemList = useAppSelector(state => state.adjudicationItem.entities);
+  const loading = useAppSelector(state => state.adjudicationItem.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { adjudicationItemList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="adjudication-item-heading" data-cy="AdjudicationItemHeading">
@@ -125,16 +128,4 @@ export const AdjudicationItem = (props: IAdjudicationItemProps) => {
   );
 };
 
-const mapStateToProps = ({ adjudicationItem }: IRootState) => ({
-  adjudicationItemList: adjudicationItem.entities,
-  loading: adjudicationItem.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdjudicationItem);
+export default AdjudicationItem;

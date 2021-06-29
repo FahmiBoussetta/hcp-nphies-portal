@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './pay-not-error-messages.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPayNotErrorMessagesDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const PayNotErrorMessagesDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PayNotErrorMessagesDetail = (props: IPayNotErrorMessagesDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { payNotErrorMessagesEntity } = props;
+  const payNotErrorMessagesEntity = useAppSelector(state => state.payNotErrorMessages.entity);
   return (
     <Row>
       <Col md="8">
@@ -59,13 +58,4 @@ export const PayNotErrorMessagesDetail = (props: IPayNotErrorMessagesDetailProps
   );
 };
 
-const mapStateToProps = ({ payNotErrorMessages }: IRootState) => ({
-  payNotErrorMessagesEntity: payNotErrorMessages.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PayNotErrorMessagesDetail);
+export default PayNotErrorMessagesDetail;

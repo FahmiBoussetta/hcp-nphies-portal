@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './insurance-benefit.reducer';
 
-export interface IInsuranceBenefitDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const InsuranceBenefitDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const InsuranceBenefitDeleteDialog = (props: IInsuranceBenefitDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const insuranceBenefitEntity = useAppSelector(state => state.insuranceBenefit.entity);
+  const updateSuccess = useAppSelector(state => state.insuranceBenefit.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/insurance-benefit');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.insuranceBenefitEntity.id);
+    dispatch(deleteEntity(insuranceBenefitEntity.id));
   };
 
-  const { insuranceBenefitEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="insuranceBenefitDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const InsuranceBenefitDeleteDialog = (props: IInsuranceBenefitDeleteDialo
   );
 };
 
-const mapStateToProps = ({ insuranceBenefit }: IRootState) => ({
-  insuranceBenefitEntity: insuranceBenefit.entity,
-  updateSuccess: insuranceBenefit.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(InsuranceBenefitDeleteDialog);
+export default InsuranceBenefitDeleteDialog;

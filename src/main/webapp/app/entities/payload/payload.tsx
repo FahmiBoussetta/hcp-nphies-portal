@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './payload.reducer';
 import { IPayload } from 'app/shared/model/payload.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPayloadProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Payload = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Payload = (props: IPayloadProps) => {
+  const payloadList = useAppSelector(state => state.payload.entities);
+  const loading = useAppSelector(state => state.payload.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { payloadList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="payload-heading" data-cy="PayloadHeading">
@@ -135,16 +138,4 @@ export const Payload = (props: IPayloadProps) => {
   );
 };
 
-const mapStateToProps = ({ payload }: IRootState) => ({
-  payloadList: payload.entities,
-  loading: payload.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Payload);
+export default Payload;

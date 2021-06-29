@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './total.reducer';
 
-export interface ITotalDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const TotalDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const TotalDeleteDialog = (props: ITotalDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const totalEntity = useAppSelector(state => state.total.entity);
+  const updateSuccess = useAppSelector(state => state.total.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/total');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.totalEntity.id);
+    dispatch(deleteEntity(totalEntity.id));
   };
 
-  const { totalEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="totalDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const TotalDeleteDialog = (props: ITotalDeleteDialogProps) => {
   );
 };
 
-const mapStateToProps = ({ total }: IRootState) => ({
-  totalEntity: total.entity,
-  updateSuccess: total.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(TotalDeleteDialog);
+export default TotalDeleteDialog;

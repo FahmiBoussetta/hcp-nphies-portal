@@ -358,7 +358,11 @@ class SupportingInfoResourceIT {
         SupportingInfo partialUpdatedSupportingInfo = new SupportingInfo();
         partialUpdatedSupportingInfo.setId(supportingInfo.getId());
 
-        partialUpdatedSupportingInfo.codeFdiOral(UPDATED_CODE_FDI_ORAL).reasonMissingTooth(UPDATED_REASON_MISSING_TOOTH);
+        partialUpdatedSupportingInfo
+            .codeLOINC(UPDATED_CODE_LOINC)
+            .codeFdiOral(UPDATED_CODE_FDI_ORAL)
+            .timingEnd(UPDATED_TIMING_END)
+            .valueBoolean(UPDATED_VALUE_BOOLEAN);
 
         restSupportingInfoMockMvc
             .perform(
@@ -373,16 +377,16 @@ class SupportingInfoResourceIT {
         assertThat(supportingInfoList).hasSize(databaseSizeBeforeUpdate);
         SupportingInfo testSupportingInfo = supportingInfoList.get(supportingInfoList.size() - 1);
         assertThat(testSupportingInfo.getSequence()).isEqualTo(DEFAULT_SEQUENCE);
-        assertThat(testSupportingInfo.getCodeLOINC()).isEqualTo(DEFAULT_CODE_LOINC);
+        assertThat(testSupportingInfo.getCodeLOINC()).isEqualTo(UPDATED_CODE_LOINC);
         assertThat(testSupportingInfo.getCategory()).isEqualTo(DEFAULT_CATEGORY);
         assertThat(testSupportingInfo.getCodeVisit()).isEqualTo(DEFAULT_CODE_VISIT);
         assertThat(testSupportingInfo.getCodeFdiOral()).isEqualTo(UPDATED_CODE_FDI_ORAL);
         assertThat(testSupportingInfo.getTiming()).isEqualTo(DEFAULT_TIMING);
-        assertThat(testSupportingInfo.getTimingEnd()).isEqualTo(DEFAULT_TIMING_END);
-        assertThat(testSupportingInfo.getValueBoolean()).isEqualTo(DEFAULT_VALUE_BOOLEAN);
+        assertThat(testSupportingInfo.getTimingEnd()).isEqualTo(UPDATED_TIMING_END);
+        assertThat(testSupportingInfo.getValueBoolean()).isEqualTo(UPDATED_VALUE_BOOLEAN);
         assertThat(testSupportingInfo.getValueString()).isEqualTo(DEFAULT_VALUE_STRING);
         assertThat(testSupportingInfo.getReason()).isEqualTo(DEFAULT_REASON);
-        assertThat(testSupportingInfo.getReasonMissingTooth()).isEqualTo(UPDATED_REASON_MISSING_TOOTH);
+        assertThat(testSupportingInfo.getReasonMissingTooth()).isEqualTo(DEFAULT_REASON_MISSING_TOOTH);
     }
 
     @Test

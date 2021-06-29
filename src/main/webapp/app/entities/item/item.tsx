@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './item.reducer';
 import { IItem } from 'app/shared/model/item.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IItemProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Item = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Item = (props: IItemProps) => {
+  const itemList = useAppSelector(state => state.item.entities);
+  const loading = useAppSelector(state => state.item.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { itemList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="item-heading" data-cy="ItemHeading">
@@ -197,16 +200,4 @@ export const Item = (props: IItemProps) => {
   );
 };
 
-const mapStateToProps = ({ item }: IRootState) => ({
-  itemList: item.entities,
-  loading: item.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Item);
+export default Item;

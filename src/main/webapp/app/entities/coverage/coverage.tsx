@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './coverage.reducer';
 import { ICoverage } from 'app/shared/model/coverage.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICoverageProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Coverage = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Coverage = (props: ICoverageProps) => {
+  const coverageList = useAppSelector(state => state.coverage.entities);
+  const loading = useAppSelector(state => state.coverage.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { coverageList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="coverage-heading" data-cy="CoverageHeading">
@@ -79,9 +82,6 @@ export const Coverage = (props: ICoverageProps) => {
                 <th>
                   <Translate contentKey="hcpNphiesPortalApp.coverage.payor">Payor</Translate>
                 </th>
-                <th>
-                  <Translate contentKey="hcpNphiesPortalApp.coverage.coverageEligibilityRequest">Coverage Eligibility Request</Translate>
-                </th>
                 <th />
               </tr>
             </thead>
@@ -114,15 +114,6 @@ export const Coverage = (props: ICoverageProps) => {
                   </td>
                   <td>{coverage.beneficiary ? <Link to={`patient/${coverage.beneficiary.id}`}>{coverage.beneficiary.id}</Link> : ''}</td>
                   <td>{coverage.payor ? <Link to={`organization/${coverage.payor.id}`}>{coverage.payor.id}</Link> : ''}</td>
-                  <td>
-                    {coverage.coverageEligibilityRequest ? (
-                      <Link to={`coverage-eligibility-request/${coverage.coverageEligibilityRequest.id}`}>
-                        {coverage.coverageEligibilityRequest.id}
-                      </Link>
-                    ) : (
-                      ''
-                    )}
-                  </td>
                   <td className="text-right">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`${match.url}/${coverage.id}`} color="info" size="sm" data-cy="entityDetailsButton">
@@ -161,16 +152,4 @@ export const Coverage = (props: ICoverageProps) => {
   );
 };
 
-const mapStateToProps = ({ coverage }: IRootState) => ({
-  coverageList: coverage.entities,
-  loading: coverage.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Coverage);
+export default Coverage;

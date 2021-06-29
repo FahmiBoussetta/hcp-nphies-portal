@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './payment-notice.reducer';
 import { IPaymentNotice } from 'app/shared/model/payment-notice.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPaymentNoticeProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const PaymentNotice = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PaymentNotice = (props: IPaymentNoticeProps) => {
+  const paymentNoticeList = useAppSelector(state => state.paymentNotice.entities);
+  const loading = useAppSelector(state => state.paymentNotice.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { paymentNoticeList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="payment-notice-heading" data-cy="PaymentNoticeHeading">
@@ -141,16 +144,4 @@ export const PaymentNotice = (props: IPaymentNoticeProps) => {
   );
 };
 
-const mapStateToProps = ({ paymentNotice }: IRootState) => ({
-  paymentNoticeList: paymentNotice.entities,
-  loading: paymentNotice.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PaymentNotice);
+export default PaymentNotice;

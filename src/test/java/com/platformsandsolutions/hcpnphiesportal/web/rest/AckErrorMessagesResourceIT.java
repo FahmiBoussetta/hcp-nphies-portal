@@ -250,6 +250,8 @@ class AckErrorMessagesResourceIT {
         AckErrorMessages partialUpdatedAckErrorMessages = new AckErrorMessages();
         partialUpdatedAckErrorMessages.setId(ackErrorMessages.getId());
 
+        partialUpdatedAckErrorMessages.message(UPDATED_MESSAGE);
+
         restAckErrorMessagesMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedAckErrorMessages.getId())
@@ -262,7 +264,7 @@ class AckErrorMessagesResourceIT {
         List<AckErrorMessages> ackErrorMessagesList = ackErrorMessagesRepository.findAll();
         assertThat(ackErrorMessagesList).hasSize(databaseSizeBeforeUpdate);
         AckErrorMessages testAckErrorMessages = ackErrorMessagesList.get(ackErrorMessagesList.size() - 1);
-        assertThat(testAckErrorMessages.getMessage()).isEqualTo(DEFAULT_MESSAGE);
+        assertThat(testAckErrorMessages.getMessage()).isEqualTo(UPDATED_MESSAGE);
     }
 
     @Test

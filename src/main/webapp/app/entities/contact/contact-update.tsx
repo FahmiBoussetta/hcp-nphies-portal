@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IHumanName } from 'app/shared/model/human-name.model';
 import { getEntities as getHumanNames } from 'app/entities/human-name/human-name.reducer';
@@ -15,13 +12,19 @@ import { getEntity, updateEntity, createEntity, reset } from './contact.reducer'
 import { IContact } from 'app/shared/model/contact.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IContactUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ContactUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ContactUpdate = (props: IContactUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { contactEntity, humanNames, organizations, loading, updating } = props;
+  const humanNames = useAppSelector(state => state.humanName.entities);
+  const organizations = useAppSelector(state => state.organization.entities);
+  const contactEntity = useAppSelector(state => state.contact.entity);
+  const loading = useAppSelector(state => state.contact.loading);
+  const updating = useAppSelector(state => state.contact.updating);
+  const updateSuccess = useAppSelector(state => state.contact.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/contact');
@@ -29,37 +32,44 @@ export const ContactUpdate = (props: IContactUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getHumanNames();
-    props.getOrganizations();
+    dispatch(getHumanNames({}));
+    dispatch(getOrganizations({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...contactEntity,
-        ...values,
-        name: humanNames.find(it => it.id.toString() === values.nameId.toString()),
-        organization: organizations.find(it => it.id.toString() === values.organizationId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...contactEntity,
+      ...values,
+      name: humanNames.find(it => it.id.toString() === values.nameId.toString()),
+      organization: organizations.find(it => it.id.toString() === values.organizationId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...contactEntity,
+          nameId: contactEntity?.name?.id,
+          organizationId: contactEntity?.organization?.id,
+        };
 
   return (
     <div>
@@ -75,70 +85,72 @@ export const ContactUpdate = (props: IContactUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : contactEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="contact-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="contact-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="contact-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="phoneLabel" for="contact-phone">
-                  <Translate contentKey="hcpNphiesPortalApp.contact.phone">Phone</Translate>
-                </Label>
-                <AvField id="contact-phone" data-cy="phone" type="text" name="phone" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="emailLabel" for="contact-email">
-                  <Translate contentKey="hcpNphiesPortalApp.contact.email">Email</Translate>
-                </Label>
-                <AvField id="contact-email" data-cy="email" type="text" name="email" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="mobileLabel" for="contact-mobile">
-                  <Translate contentKey="hcpNphiesPortalApp.contact.mobile">Mobile</Translate>
-                </Label>
-                <AvField id="contact-mobile" data-cy="mobile" type="text" name="mobile" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="urlLabel" for="contact-url">
-                  <Translate contentKey="hcpNphiesPortalApp.contact.url">Url</Translate>
-                </Label>
-                <AvField id="contact-url" data-cy="url" type="text" name="url" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="contact-name">
-                  <Translate contentKey="hcpNphiesPortalApp.contact.name">Name</Translate>
-                </Label>
-                <AvInput id="contact-name" data-cy="name" type="select" className="form-control" name="nameId">
-                  <option value="" key="0" />
-                  {humanNames
-                    ? humanNames.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="contact-organization">
-                  <Translate contentKey="hcpNphiesPortalApp.contact.organization">Organization</Translate>
-                </Label>
-                <AvInput id="contact-organization" data-cy="organization" type="select" className="form-control" name="organizationId">
-                  <option value="" key="0" />
-                  {organizations
-                    ? organizations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/contact" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.contact.phone')}
+                id="contact-phone"
+                name="phone"
+                data-cy="phone"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.contact.email')}
+                id="contact-email"
+                name="email"
+                data-cy="email"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.contact.mobile')}
+                id="contact-mobile"
+                name="mobile"
+                data-cy="mobile"
+                type="text"
+              />
+              <ValidatedField label={translate('hcpNphiesPortalApp.contact.url')} id="contact-url" name="url" data-cy="url" type="text" />
+              <ValidatedField
+                id="contact-name"
+                name="nameId"
+                data-cy="name"
+                label={translate('hcpNphiesPortalApp.contact.name')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {humanNames
+                  ? humanNames.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="contact-organization"
+                name="organizationId"
+                data-cy="organization"
+                label={translate('hcpNphiesPortalApp.contact.organization')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {organizations
+                  ? organizations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/contact" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -151,7 +163,7 @@ export const ContactUpdate = (props: IContactUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -159,25 +171,4 @@ export const ContactUpdate = (props: IContactUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  humanNames: storeState.humanName.entities,
-  organizations: storeState.organization.entities,
-  contactEntity: storeState.contact.entity,
-  loading: storeState.contact.loading,
-  updating: storeState.contact.updating,
-  updateSuccess: storeState.contact.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getHumanNames,
-  getOrganizations,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactUpdate);
+export default ContactUpdate;

@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './human-name.reducer';
 import { IHumanName } from 'app/shared/model/human-name.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IHumanNameProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const HumanName = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const HumanName = (props: IHumanNameProps) => {
+  const humanNameList = useAppSelector(state => state.humanName.entities);
+  const loading = useAppSelector(state => state.humanName.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { humanNameList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="human-name-heading" data-cy="HumanNameHeading">
@@ -113,16 +116,4 @@ export const HumanName = (props: IHumanNameProps) => {
   );
 };
 
-const mapStateToProps = ({ humanName }: IRootState) => ({
-  humanNameList: humanName.entities,
-  loading: humanName.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(HumanName);
+export default HumanName;

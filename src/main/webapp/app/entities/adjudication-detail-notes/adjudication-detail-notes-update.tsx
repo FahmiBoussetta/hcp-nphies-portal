@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IAdjudicationDetailItem } from 'app/shared/model/adjudication-detail-item.model';
 import { getEntities as getAdjudicationDetailItems } from 'app/entities/adjudication-detail-item/adjudication-detail-item.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './adjudication-det
 import { IAdjudicationDetailNotes } from 'app/shared/model/adjudication-detail-notes.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAdjudicationDetailNotesUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AdjudicationDetailNotesUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AdjudicationDetailNotesUpdate = (props: IAdjudicationDetailNotesUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { adjudicationDetailNotesEntity, adjudicationDetailItems, loading, updating } = props;
+  const adjudicationDetailItems = useAppSelector(state => state.adjudicationDetailItem.entities);
+  const adjudicationDetailNotesEntity = useAppSelector(state => state.adjudicationDetailNotes.entity);
+  const loading = useAppSelector(state => state.adjudicationDetailNotes.loading);
+  const updating = useAppSelector(state => state.adjudicationDetailNotes.updating);
+  const updateSuccess = useAppSelector(state => state.adjudicationDetailNotes.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/adjudication-detail-notes');
@@ -27,35 +29,41 @@ export const AdjudicationDetailNotesUpdate = (props: IAdjudicationDetailNotesUpd
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getAdjudicationDetailItems();
+    dispatch(getAdjudicationDetailItems({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...adjudicationDetailNotesEntity,
-        ...values,
-        adjudicationDetailItem: adjudicationDetailItems.find(it => it.id.toString() === values.adjudicationDetailItemId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...adjudicationDetailNotesEntity,
+      ...values,
+      adjudicationDetailItem: adjudicationDetailItems.find(it => it.id.toString() === values.adjudicationDetailItemId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...adjudicationDetailNotesEntity,
+          adjudicationDetailItemId: adjudicationDetailNotesEntity?.adjudicationDetailItem?.id,
+        };
 
   return (
     <div>
@@ -73,45 +81,41 @@ export const AdjudicationDetailNotesUpdate = (props: IAdjudicationDetailNotesUpd
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : adjudicationDetailNotesEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="adjudication-detail-notes-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="adjudication-detail-notes-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="adjudication-detail-notes-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="noteLabel" for="adjudication-detail-notes-note">
-                  <Translate contentKey="hcpNphiesPortalApp.adjudicationDetailNotes.note">Note</Translate>
-                </Label>
-                <AvField id="adjudication-detail-notes-note" data-cy="note" type="text" name="note" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="adjudication-detail-notes-adjudicationDetailItem">
-                  <Translate contentKey="hcpNphiesPortalApp.adjudicationDetailNotes.adjudicationDetailItem">
-                    Adjudication Detail Item
-                  </Translate>
-                </Label>
-                <AvInput
-                  id="adjudication-detail-notes-adjudicationDetailItem"
-                  data-cy="adjudicationDetailItem"
-                  type="select"
-                  className="form-control"
-                  name="adjudicationDetailItemId"
-                >
-                  <option value="" key="0" />
-                  {adjudicationDetailItems
-                    ? adjudicationDetailItems.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/adjudication-detail-notes" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.adjudicationDetailNotes.note')}
+                id="adjudication-detail-notes-note"
+                name="note"
+                data-cy="note"
+                type="text"
+              />
+              <ValidatedField
+                id="adjudication-detail-notes-adjudicationDetailItem"
+                name="adjudicationDetailItemId"
+                data-cy="adjudicationDetailItem"
+                label={translate('hcpNphiesPortalApp.adjudicationDetailNotes.adjudicationDetailItem')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {adjudicationDetailItems
+                  ? adjudicationDetailItems.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/adjudication-detail-notes" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -124,7 +128,7 @@ export const AdjudicationDetailNotesUpdate = (props: IAdjudicationDetailNotesUpd
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -132,23 +136,4 @@ export const AdjudicationDetailNotesUpdate = (props: IAdjudicationDetailNotesUpd
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  adjudicationDetailItems: storeState.adjudicationDetailItem.entities,
-  adjudicationDetailNotesEntity: storeState.adjudicationDetailNotes.entity,
-  loading: storeState.adjudicationDetailNotes.loading,
-  updating: storeState.adjudicationDetailNotes.updating,
-  updateSuccess: storeState.adjudicationDetailNotes.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getAdjudicationDetailItems,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdjudicationDetailNotesUpdate);
+export default AdjudicationDetailNotesUpdate;

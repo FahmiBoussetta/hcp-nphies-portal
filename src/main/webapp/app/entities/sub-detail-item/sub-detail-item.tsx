@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './sub-detail-item.reducer';
 import { ISubDetailItem } from 'app/shared/model/sub-detail-item.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ISubDetailItemProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const SubDetailItem = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const SubDetailItem = (props: ISubDetailItemProps) => {
+  const subDetailItemList = useAppSelector(state => state.subDetailItem.entities);
+  const loading = useAppSelector(state => state.subDetailItem.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { subDetailItemList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="sub-detail-item-heading" data-cy="SubDetailItemHeading">
@@ -163,16 +166,4 @@ export const SubDetailItem = (props: ISubDetailItemProps) => {
   );
 };
 
-const mapStateToProps = ({ subDetailItem }: IRootState) => ({
-  subDetailItemList: subDetailItem.entities,
-  loading: subDetailItem.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(SubDetailItem);
+export default SubDetailItem;

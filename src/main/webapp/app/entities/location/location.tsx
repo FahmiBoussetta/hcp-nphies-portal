@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './location.reducer';
 import { ILocation } from 'app/shared/model/location.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ILocationProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Location = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Location = (props: ILocationProps) => {
+  const locationList = useAppSelector(state => state.location.entities);
+  const loading = useAppSelector(state => state.location.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { locationList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="location-heading" data-cy="LocationHeading">
@@ -119,16 +122,4 @@ export const Location = (props: ILocationProps) => {
   );
 };
 
-const mapStateToProps = ({ location }: IRootState) => ({
-  locationList: location.entities,
-  loading: location.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Location);
+export default Location;

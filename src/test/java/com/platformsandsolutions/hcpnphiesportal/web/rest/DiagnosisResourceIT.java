@@ -326,6 +326,8 @@ class DiagnosisResourceIT {
         Diagnosis partialUpdatedDiagnosis = new Diagnosis();
         partialUpdatedDiagnosis.setId(diagnosis.getId());
 
+        partialUpdatedDiagnosis.sequence(UPDATED_SEQUENCE).type(UPDATED_TYPE).onAdmission(UPDATED_ON_ADMISSION);
+
         restDiagnosisMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedDiagnosis.getId())
@@ -338,10 +340,10 @@ class DiagnosisResourceIT {
         List<Diagnosis> diagnosisList = diagnosisRepository.findAll();
         assertThat(diagnosisList).hasSize(databaseSizeBeforeUpdate);
         Diagnosis testDiagnosis = diagnosisList.get(diagnosisList.size() - 1);
-        assertThat(testDiagnosis.getSequence()).isEqualTo(DEFAULT_SEQUENCE);
+        assertThat(testDiagnosis.getSequence()).isEqualTo(UPDATED_SEQUENCE);
         assertThat(testDiagnosis.getDiagnosis()).isEqualTo(DEFAULT_DIAGNOSIS);
-        assertThat(testDiagnosis.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testDiagnosis.getOnAdmission()).isEqualTo(DEFAULT_ON_ADMISSION);
+        assertThat(testDiagnosis.getType()).isEqualTo(UPDATED_TYPE);
+        assertThat(testDiagnosis.getOnAdmission()).isEqualTo(UPDATED_ON_ADMISSION);
     }
 
     @Test

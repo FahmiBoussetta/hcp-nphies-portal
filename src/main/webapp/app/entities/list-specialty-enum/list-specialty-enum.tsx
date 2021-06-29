@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './list-specialty-enum.reducer';
 import { IListSpecialtyEnum } from 'app/shared/model/list-specialty-enum.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IListSpecialtyEnumProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const ListSpecialtyEnum = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ListSpecialtyEnum = (props: IListSpecialtyEnumProps) => {
+  const listSpecialtyEnumList = useAppSelector(state => state.listSpecialtyEnum.entities);
+  const loading = useAppSelector(state => state.listSpecialtyEnum.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { listSpecialtyEnumList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="list-specialty-enum-heading" data-cy="ListSpecialtyEnumHeading">
@@ -123,16 +126,4 @@ export const ListSpecialtyEnum = (props: IListSpecialtyEnumProps) => {
   );
 };
 
-const mapStateToProps = ({ listSpecialtyEnum }: IRootState) => ({
-  listSpecialtyEnumList: listSpecialtyEnum.entities,
-  loading: listSpecialtyEnum.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListSpecialtyEnum);
+export default ListSpecialtyEnum;

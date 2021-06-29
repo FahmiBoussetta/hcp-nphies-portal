@@ -338,10 +338,10 @@ class CoverageEligibilityResponseResourceIT {
         partialUpdatedCoverageEligibilityResponse.setId(coverageEligibilityResponse.getId());
 
         partialUpdatedCoverageEligibilityResponse
+            .value(UPDATED_VALUE)
             .system(UPDATED_SYSTEM)
-            .outcome(UPDATED_OUTCOME)
             .serviced(UPDATED_SERVICED)
-            .servicedEnd(UPDATED_SERVICED_END);
+            .disposition(UPDATED_DISPOSITION);
 
         restCoverageEligibilityResponseMockMvc
             .perform(
@@ -357,13 +357,13 @@ class CoverageEligibilityResponseResourceIT {
         CoverageEligibilityResponse testCoverageEligibilityResponse = coverageEligibilityResponseList.get(
             coverageEligibilityResponseList.size() - 1
         );
-        assertThat(testCoverageEligibilityResponse.getValue()).isEqualTo(DEFAULT_VALUE);
+        assertThat(testCoverageEligibilityResponse.getValue()).isEqualTo(UPDATED_VALUE);
         assertThat(testCoverageEligibilityResponse.getSystem()).isEqualTo(UPDATED_SYSTEM);
         assertThat(testCoverageEligibilityResponse.getParsed()).isEqualTo(DEFAULT_PARSED);
-        assertThat(testCoverageEligibilityResponse.getOutcome()).isEqualTo(UPDATED_OUTCOME);
+        assertThat(testCoverageEligibilityResponse.getOutcome()).isEqualTo(DEFAULT_OUTCOME);
         assertThat(testCoverageEligibilityResponse.getServiced()).isEqualTo(UPDATED_SERVICED);
-        assertThat(testCoverageEligibilityResponse.getServicedEnd()).isEqualTo(UPDATED_SERVICED_END);
-        assertThat(testCoverageEligibilityResponse.getDisposition()).isEqualTo(DEFAULT_DISPOSITION);
+        assertThat(testCoverageEligibilityResponse.getServicedEnd()).isEqualTo(DEFAULT_SERVICED_END);
+        assertThat(testCoverageEligibilityResponse.getDisposition()).isEqualTo(UPDATED_DISPOSITION);
         assertThat(testCoverageEligibilityResponse.getNotInforceReason()).isEqualTo(DEFAULT_NOT_INFORCE_REASON);
     }
 

@@ -285,7 +285,7 @@ class CommunicationRequestResourceIT {
         CommunicationRequest partialUpdatedCommunicationRequest = new CommunicationRequest();
         partialUpdatedCommunicationRequest.setId(communicationRequest.getId());
 
-        partialUpdatedCommunicationRequest.system(UPDATED_SYSTEM).parsed(UPDATED_PARSED);
+        partialUpdatedCommunicationRequest.value(UPDATED_VALUE).system(UPDATED_SYSTEM);
 
         restCommunicationRequestMockMvc
             .perform(
@@ -299,9 +299,9 @@ class CommunicationRequestResourceIT {
         List<CommunicationRequest> communicationRequestList = communicationRequestRepository.findAll();
         assertThat(communicationRequestList).hasSize(databaseSizeBeforeUpdate);
         CommunicationRequest testCommunicationRequest = communicationRequestList.get(communicationRequestList.size() - 1);
-        assertThat(testCommunicationRequest.getValue()).isEqualTo(DEFAULT_VALUE);
+        assertThat(testCommunicationRequest.getValue()).isEqualTo(UPDATED_VALUE);
         assertThat(testCommunicationRequest.getSystem()).isEqualTo(UPDATED_SYSTEM);
-        assertThat(testCommunicationRequest.getParsed()).isEqualTo(UPDATED_PARSED);
+        assertThat(testCommunicationRequest.getParsed()).isEqualTo(DEFAULT_PARSED);
         assertThat(testCommunicationRequest.getLimitDate()).isEqualTo(DEFAULT_LIMIT_DATE);
     }
 

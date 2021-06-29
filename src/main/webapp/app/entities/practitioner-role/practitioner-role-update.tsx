@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IPractitioner } from 'app/shared/model/practitioner.model';
 import { getEntities as getPractitioners } from 'app/entities/practitioner/practitioner.reducer';
@@ -15,13 +12,19 @@ import { getEntity, updateEntity, createEntity, reset } from './practitioner-rol
 import { IPractitionerRole } from 'app/shared/model/practitioner-role.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPractitionerRoleUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const PractitionerRoleUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PractitionerRoleUpdate = (props: IPractitionerRoleUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { practitionerRoleEntity, practitioners, organizations, loading, updating } = props;
+  const practitioners = useAppSelector(state => state.practitioner.entities);
+  const organizations = useAppSelector(state => state.organization.entities);
+  const practitionerRoleEntity = useAppSelector(state => state.practitionerRole.entity);
+  const loading = useAppSelector(state => state.practitionerRole.loading);
+  const updating = useAppSelector(state => state.practitionerRole.updating);
+  const updateSuccess = useAppSelector(state => state.practitionerRole.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/practitioner-role');
@@ -29,40 +32,52 @@ export const PractitionerRoleUpdate = (props: IPractitionerRoleUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getPractitioners();
-    props.getOrganizations();
+    dispatch(getPractitioners({}));
+    dispatch(getOrganizations({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
+  const saveEntity = values => {
     values.start = convertDateTimeToServer(values.start);
     values.end = convertDateTimeToServer(values.end);
 
-    if (errors.length === 0) {
-      const entity = {
-        ...practitionerRoleEntity,
-        ...values,
-        practitioner: practitioners.find(it => it.id.toString() === values.practitionerId.toString()),
-        organization: organizations.find(it => it.id.toString() === values.organizationId.toString()),
-      };
+    const entity = {
+      ...practitionerRoleEntity,
+      ...values,
+      practitioner: practitioners.find(it => it.id.toString() === values.practitionerId.toString()),
+      organization: organizations.find(it => it.id.toString() === values.organizationId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {
+          start: displayDefaultDateTime(),
+          end: displayDefaultDateTime(),
+        }
+      : {
+          ...practitionerRoleEntity,
+          start: convertDateTimeFromServer(practitionerRoleEntity.start),
+          end: convertDateTimeFromServer(practitionerRoleEntity.end),
+          practitionerId: practitionerRoleEntity?.practitioner?.id,
+          organizationId: practitionerRoleEntity?.organization?.id,
+        };
 
   return (
     <div>
@@ -78,98 +93,80 @@ export const PractitionerRoleUpdate = (props: IPractitionerRoleUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : practitionerRoleEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="practitioner-role-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="practitioner-role-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="practitioner-role-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="guidLabel" for="practitioner-role-guid">
-                  <Translate contentKey="hcpNphiesPortalApp.practitionerRole.guid">Guid</Translate>
-                </Label>
-                <AvField id="practitioner-role-guid" data-cy="guid" type="text" name="guid" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="forceIdLabel" for="practitioner-role-forceId">
-                  <Translate contentKey="hcpNphiesPortalApp.practitionerRole.forceId">Force Id</Translate>
-                </Label>
-                <AvField id="practitioner-role-forceId" data-cy="forceId" type="text" name="forceId" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="startLabel" for="practitioner-role-start">
-                  <Translate contentKey="hcpNphiesPortalApp.practitionerRole.start">Start</Translate>
-                </Label>
-                <AvInput
-                  id="practitioner-role-start"
-                  data-cy="start"
-                  type="datetime-local"
-                  className="form-control"
-                  name="start"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.practitionerRoleEntity.start)}
-                />
-              </AvGroup>
-              <AvGroup>
-                <Label id="endLabel" for="practitioner-role-end">
-                  <Translate contentKey="hcpNphiesPortalApp.practitionerRole.end">End</Translate>
-                </Label>
-                <AvInput
-                  id="practitioner-role-end"
-                  data-cy="end"
-                  type="datetime-local"
-                  className="form-control"
-                  name="end"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.practitionerRoleEntity.end)}
-                />
-              </AvGroup>
-              <AvGroup>
-                <Label for="practitioner-role-practitioner">
-                  <Translate contentKey="hcpNphiesPortalApp.practitionerRole.practitioner">Practitioner</Translate>
-                </Label>
-                <AvInput
-                  id="practitioner-role-practitioner"
-                  data-cy="practitioner"
-                  type="select"
-                  className="form-control"
-                  name="practitionerId"
-                >
-                  <option value="" key="0" />
-                  {practitioners
-                    ? practitioners.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="practitioner-role-organization">
-                  <Translate contentKey="hcpNphiesPortalApp.practitionerRole.organization">Organization</Translate>
-                </Label>
-                <AvInput
-                  id="practitioner-role-organization"
-                  data-cy="organization"
-                  type="select"
-                  className="form-control"
-                  name="organizationId"
-                >
-                  <option value="" key="0" />
-                  {organizations
-                    ? organizations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/practitioner-role" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.practitionerRole.guid')}
+                id="practitioner-role-guid"
+                name="guid"
+                data-cy="guid"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.practitionerRole.forceId')}
+                id="practitioner-role-forceId"
+                name="forceId"
+                data-cy="forceId"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.practitionerRole.start')}
+                id="practitioner-role-start"
+                name="start"
+                data-cy="start"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.practitionerRole.end')}
+                id="practitioner-role-end"
+                name="end"
+                data-cy="end"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                id="practitioner-role-practitioner"
+                name="practitionerId"
+                data-cy="practitioner"
+                label={translate('hcpNphiesPortalApp.practitionerRole.practitioner')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {practitioners
+                  ? practitioners.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="practitioner-role-organization"
+                name="organizationId"
+                data-cy="organization"
+                label={translate('hcpNphiesPortalApp.practitionerRole.organization')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {organizations
+                  ? organizations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/practitioner-role" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -182,7 +179,7 @@ export const PractitionerRoleUpdate = (props: IPractitionerRoleUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -190,25 +187,4 @@ export const PractitionerRoleUpdate = (props: IPractitionerRoleUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  practitioners: storeState.practitioner.entities,
-  organizations: storeState.organization.entities,
-  practitionerRoleEntity: storeState.practitionerRole.entity,
-  loading: storeState.practitionerRole.loading,
-  updating: storeState.practitionerRole.updating,
-  updateSuccess: storeState.practitionerRole.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getPractitioners,
-  getOrganizations,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PractitionerRoleUpdate);
+export default PractitionerRoleUpdate;

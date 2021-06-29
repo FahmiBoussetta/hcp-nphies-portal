@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IClaimResponse } from 'app/shared/model/claim-response.model';
 import { getEntities as getClaimResponses } from 'app/entities/claim-response/claim-response.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './total.reducer';
 import { ITotal } from 'app/shared/model/total.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ITotalUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const TotalUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const TotalUpdate = (props: ITotalUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { totalEntity, claimResponses, loading, updating } = props;
+  const claimResponses = useAppSelector(state => state.claimResponse.entities);
+  const totalEntity = useAppSelector(state => state.total.entity);
+  const loading = useAppSelector(state => state.total.loading);
+  const updating = useAppSelector(state => state.total.updating);
+  const updateSuccess = useAppSelector(state => state.total.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/total');
@@ -27,35 +29,41 @@ export const TotalUpdate = (props: ITotalUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getClaimResponses();
+    dispatch(getClaimResponses({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...totalEntity,
-        ...values,
-        claimResponse: claimResponses.find(it => it.id.toString() === values.claimResponseId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...totalEntity,
+      ...values,
+      claimResponse: claimResponses.find(it => it.id.toString() === values.claimResponseId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...totalEntity,
+          claimResponseId: totalEntity?.claimResponse?.id,
+        };
 
   return (
     <div>
@@ -71,43 +79,48 @@ export const TotalUpdate = (props: ITotalUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : totalEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="total-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="total-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="total-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="categoryLabel" for="total-category">
-                  <Translate contentKey="hcpNphiesPortalApp.total.category">Category</Translate>
-                </Label>
-                <AvField id="total-category" data-cy="category" type="text" name="category" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="amountLabel" for="total-amount">
-                  <Translate contentKey="hcpNphiesPortalApp.total.amount">Amount</Translate>
-                </Label>
-                <AvField id="total-amount" data-cy="amount" type="string" className="form-control" name="amount" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="total-claimResponse">
-                  <Translate contentKey="hcpNphiesPortalApp.total.claimResponse">Claim Response</Translate>
-                </Label>
-                <AvInput id="total-claimResponse" data-cy="claimResponse" type="select" className="form-control" name="claimResponseId">
-                  <option value="" key="0" />
-                  {claimResponses
-                    ? claimResponses.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/total" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.total.category')}
+                id="total-category"
+                name="category"
+                data-cy="category"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.total.amount')}
+                id="total-amount"
+                name="amount"
+                data-cy="amount"
+                type="text"
+              />
+              <ValidatedField
+                id="total-claimResponse"
+                name="claimResponseId"
+                data-cy="claimResponse"
+                label={translate('hcpNphiesPortalApp.total.claimResponse')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {claimResponses
+                  ? claimResponses.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/total" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -120,7 +133,7 @@ export const TotalUpdate = (props: ITotalUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -128,23 +141,4 @@ export const TotalUpdate = (props: ITotalUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  claimResponses: storeState.claimResponse.entities,
-  totalEntity: storeState.total.entity,
-  loading: storeState.total.loading,
-  updating: storeState.total.updating,
-  updateSuccess: storeState.total.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getClaimResponses,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(TotalUpdate);
+export default TotalUpdate;

@@ -286,7 +286,7 @@ class ExemptionComponentResourceIT {
         ExemptionComponent partialUpdatedExemptionComponent = new ExemptionComponent();
         partialUpdatedExemptionComponent.setId(exemptionComponent.getId());
 
-        partialUpdatedExemptionComponent.type(UPDATED_TYPE).end(UPDATED_END);
+        partialUpdatedExemptionComponent.start(UPDATED_START).end(UPDATED_END);
 
         restExemptionComponentMockMvc
             .perform(
@@ -300,8 +300,8 @@ class ExemptionComponentResourceIT {
         List<ExemptionComponent> exemptionComponentList = exemptionComponentRepository.findAll();
         assertThat(exemptionComponentList).hasSize(databaseSizeBeforeUpdate);
         ExemptionComponent testExemptionComponent = exemptionComponentList.get(exemptionComponentList.size() - 1);
-        assertThat(testExemptionComponent.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testExemptionComponent.getStart()).isEqualTo(DEFAULT_START);
+        assertThat(testExemptionComponent.getType()).isEqualTo(DEFAULT_TYPE);
+        assertThat(testExemptionComponent.getStart()).isEqualTo(UPDATED_START);
         assertThat(testExemptionComponent.getEnd()).isEqualTo(UPDATED_END);
     }
 

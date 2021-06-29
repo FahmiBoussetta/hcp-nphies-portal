@@ -25,11 +25,5 @@
                                  constraintName="fk_coverage__payor_id"
                                  referencedColumnNames="id"
                                  referencedTableName="organization"/>
-
-        <addForeignKeyConstraint baseColumnNames="coverage_eligibility_request_id"
-                                 baseTableName="coverage"
-                                 constraintName="fk_coverage__coverage_eligibility_request_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="coverage_eligibility_request"/>
     </changeSet>
 </databaseChangeLog>

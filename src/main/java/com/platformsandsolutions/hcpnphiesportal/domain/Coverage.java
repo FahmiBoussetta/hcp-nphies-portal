@@ -78,9 +78,10 @@ public class Coverage implements Serializable {
     @JsonIgnoreProperties(value = { "exceptions", "coverage" }, allowSetters = true)
     private Set<CostToBeneficiaryComponent> costToBeneficiaryComponents = new HashSet<>();
 
-    @ManyToOne
+    @ManyToMany(mappedBy = "coverages")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "patient", "provider", "insurer", "facility", "errors", "purposes", "coverages" }, allowSetters = true)
-    private CoverageEligibilityRequest coverageEligibilityRequest;
+    private Set<CoverageEligibilityRequest> coverageEligibilityRequests = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public Long getId() {
@@ -301,17 +302,35 @@ public class Coverage implements Serializable {
         this.costToBeneficiaryComponents = costToBeneficiaryComponents;
     }
 
-    public CoverageEligibilityRequest getCoverageEligibilityRequest() {
-        return this.coverageEligibilityRequest;
+    public Set<CoverageEligibilityRequest> getCoverageEligibilityRequests() {
+        return this.coverageEligibilityRequests;
     }
 
-    public Coverage coverageEligibilityRequest(CoverageEligibilityRequest coverageEligibilityRequest) {
-        this.setCoverageEligibilityRequest(coverageEligibilityRequest);
+    public Coverage coverageEligibilityRequests(Set<CoverageEligibilityRequest> coverageEligibilityRequests) {
+        this.setCoverageEligibilityRequests(coverageEligibilityRequests);
         return this;
     }
 
-    public void setCoverageEligibilityRequest(CoverageEligibilityRequest coverageEligibilityRequest) {
-        this.coverageEligibilityRequest = coverageEligibilityRequest;
+    public Coverage addCoverageEligibilityRequests(CoverageEligibilityRequest coverageEligibilityRequest) {
+        this.coverageEligibilityRequests.add(coverageEligibilityRequest);
+        coverageEligibilityRequest.getCoverages().add(this);
+        return this;
+    }
+
+    public Coverage removeCoverageEligibilityRequests(CoverageEligibilityRequest coverageEligibilityRequest) {
+        this.coverageEligibilityRequests.remove(coverageEligibilityRequest);
+        coverageEligibilityRequest.getCoverages().remove(this);
+        return this;
+    }
+
+    public void setCoverageEligibilityRequests(Set<CoverageEligibilityRequest> coverageEligibilityRequests) {
+        if (this.coverageEligibilityRequests != null) {
+            this.coverageEligibilityRequests.forEach(i -> i.removeCoverages(this));
+        }
+        if (coverageEligibilityRequests != null) {
+            coverageEligibilityRequests.forEach(i -> i.addCoverages(this));
+        }
+        this.coverageEligibilityRequests = coverageEligibilityRequests;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

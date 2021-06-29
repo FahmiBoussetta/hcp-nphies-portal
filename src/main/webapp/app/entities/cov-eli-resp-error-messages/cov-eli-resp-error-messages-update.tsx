@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { ICoverageEligibilityResponse } from 'app/shared/model/coverage-eligibility-response.model';
 import { getEntities as getCoverageEligibilityResponses } from 'app/entities/coverage-eligibility-response/coverage-eligibility-response.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './cov-eli-resp-err
 import { ICovEliRespErrorMessages } from 'app/shared/model/cov-eli-resp-error-messages.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICovEliRespErrorMessagesUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CovEliRespErrorMessagesUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CovEliRespErrorMessagesUpdate = (props: ICovEliRespErrorMessagesUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { covEliRespErrorMessagesEntity, coverageEligibilityResponses, loading, updating } = props;
+  const coverageEligibilityResponses = useAppSelector(state => state.coverageEligibilityResponse.entities);
+  const covEliRespErrorMessagesEntity = useAppSelector(state => state.covEliRespErrorMessages.entity);
+  const loading = useAppSelector(state => state.covEliRespErrorMessages.loading);
+  const updating = useAppSelector(state => state.covEliRespErrorMessages.updating);
+  const updateSuccess = useAppSelector(state => state.covEliRespErrorMessages.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/cov-eli-resp-error-messages');
@@ -27,37 +29,43 @@ export const CovEliRespErrorMessagesUpdate = (props: ICovEliRespErrorMessagesUpd
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getCoverageEligibilityResponses();
+    dispatch(getCoverageEligibilityResponses({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...covEliRespErrorMessagesEntity,
-        ...values,
-        coverageEligibilityResponse: coverageEligibilityResponses.find(
-          it => it.id.toString() === values.coverageEligibilityResponseId.toString()
-        ),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...covEliRespErrorMessagesEntity,
+      ...values,
+      coverageEligibilityResponse: coverageEligibilityResponses.find(
+        it => it.id.toString() === values.coverageEligibilityResponseId.toString()
+      ),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...covEliRespErrorMessagesEntity,
+          coverageEligibilityResponseId: covEliRespErrorMessagesEntity?.coverageEligibilityResponse?.id,
+        };
 
   return (
     <div>
@@ -75,45 +83,41 @@ export const CovEliRespErrorMessagesUpdate = (props: ICovEliRespErrorMessagesUpd
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : covEliRespErrorMessagesEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="cov-eli-resp-error-messages-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="cov-eli-resp-error-messages-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="cov-eli-resp-error-messages-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="messageLabel" for="cov-eli-resp-error-messages-message">
-                  <Translate contentKey="hcpNphiesPortalApp.covEliRespErrorMessages.message">Message</Translate>
-                </Label>
-                <AvField id="cov-eli-resp-error-messages-message" data-cy="message" type="text" name="message" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="cov-eli-resp-error-messages-coverageEligibilityResponse">
-                  <Translate contentKey="hcpNphiesPortalApp.covEliRespErrorMessages.coverageEligibilityResponse">
-                    Coverage Eligibility Response
-                  </Translate>
-                </Label>
-                <AvInput
-                  id="cov-eli-resp-error-messages-coverageEligibilityResponse"
-                  data-cy="coverageEligibilityResponse"
-                  type="select"
-                  className="form-control"
-                  name="coverageEligibilityResponseId"
-                >
-                  <option value="" key="0" />
-                  {coverageEligibilityResponses
-                    ? coverageEligibilityResponses.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/cov-eli-resp-error-messages" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.covEliRespErrorMessages.message')}
+                id="cov-eli-resp-error-messages-message"
+                name="message"
+                data-cy="message"
+                type="text"
+              />
+              <ValidatedField
+                id="cov-eli-resp-error-messages-coverageEligibilityResponse"
+                name="coverageEligibilityResponseId"
+                data-cy="coverageEligibilityResponse"
+                label={translate('hcpNphiesPortalApp.covEliRespErrorMessages.coverageEligibilityResponse')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {coverageEligibilityResponses
+                  ? coverageEligibilityResponses.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/cov-eli-resp-error-messages" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -126,7 +130,7 @@ export const CovEliRespErrorMessagesUpdate = (props: ICovEliRespErrorMessagesUpd
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -134,23 +138,4 @@ export const CovEliRespErrorMessagesUpdate = (props: ICovEliRespErrorMessagesUpd
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  coverageEligibilityResponses: storeState.coverageEligibilityResponse.entities,
-  covEliRespErrorMessagesEntity: storeState.covEliRespErrorMessages.entity,
-  loading: storeState.covEliRespErrorMessages.loading,
-  updating: storeState.covEliRespErrorMessages.updating,
-  updateSuccess: storeState.covEliRespErrorMessages.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getCoverageEligibilityResponses,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CovEliRespErrorMessagesUpdate);
+export default CovEliRespErrorMessagesUpdate;

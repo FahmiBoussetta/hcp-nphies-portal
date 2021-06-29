@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './reconciliation-detail-item.reducer';
 import { IReconciliationDetailItem } from 'app/shared/model/reconciliation-detail-item.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IReconciliationDetailItemProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const ReconciliationDetailItem = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ReconciliationDetailItem = (props: IReconciliationDetailItemProps) => {
+  const reconciliationDetailItemList = useAppSelector(state => state.reconciliationDetailItem.entities);
+  const loading = useAppSelector(state => state.reconciliationDetailItem.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { reconciliationDetailItemList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="reconciliation-detail-item-heading" data-cy="ReconciliationDetailItemHeading">
@@ -195,16 +198,4 @@ export const ReconciliationDetailItem = (props: IReconciliationDetailItemProps) 
   );
 };
 
-const mapStateToProps = ({ reconciliationDetailItem }: IRootState) => ({
-  reconciliationDetailItemList: reconciliationDetailItem.entities,
-  loading: reconciliationDetailItem.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ReconciliationDetailItem);
+export default ReconciliationDetailItem;

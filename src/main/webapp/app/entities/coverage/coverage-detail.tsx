@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './coverage.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICoverageDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CoverageDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CoverageDetail = (props: ICoverageDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { coverageEntity } = props;
+  const coverageEntity = useAppSelector(state => state.coverage.entity);
   return (
     <Row>
       <Col md="8">
@@ -90,10 +89,6 @@ export const CoverageDetail = (props: ICoverageDetailProps) => {
             <Translate contentKey="hcpNphiesPortalApp.coverage.payor">Payor</Translate>
           </dt>
           <dd>{coverageEntity.payor ? coverageEntity.payor.id : ''}</dd>
-          <dt>
-            <Translate contentKey="hcpNphiesPortalApp.coverage.coverageEligibilityRequest">Coverage Eligibility Request</Translate>
-          </dt>
-          <dd>{coverageEntity.coverageEligibilityRequest ? coverageEntity.coverageEligibilityRequest.id : ''}</dd>
         </dl>
         <Button tag={Link} to="/coverage" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}
@@ -113,13 +108,4 @@ export const CoverageDetail = (props: ICoverageDetailProps) => {
   );
 };
 
-const mapStateToProps = ({ coverage }: IRootState) => ({
-  coverageEntity: coverage.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CoverageDetail);
+export default CoverageDetail;

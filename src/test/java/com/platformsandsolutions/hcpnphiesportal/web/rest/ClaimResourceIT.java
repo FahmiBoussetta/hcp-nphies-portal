@@ -436,14 +436,13 @@ class ClaimResourceIT {
         partialUpdatedClaim.setId(claim.getId());
 
         partialUpdatedClaim
-            .guid(UPDATED_GUID)
             .isQueued(UPDATED_IS_QUEUED)
             .parsed(UPDATED_PARSED)
-            .identifier(UPDATED_IDENTIFIER)
             .subType(UPDATED_SUB_TYPE)
-            .eligibilityOffline(UPDATED_ELIGIBILITY_OFFLINE)
+            .authorizationOfflineDate(UPDATED_AUTHORIZATION_OFFLINE_DATE)
+            .billableStart(UPDATED_BILLABLE_START)
             .billableEnd(UPDATED_BILLABLE_END)
-            .priority(UPDATED_PRIORITY);
+            .fundsReserve(UPDATED_FUNDS_RESERVE);
 
         restClaimMockMvc
             .perform(
@@ -457,20 +456,20 @@ class ClaimResourceIT {
         List<Claim> claimList = claimRepository.findAll();
         assertThat(claimList).hasSize(databaseSizeBeforeUpdate);
         Claim testClaim = claimList.get(claimList.size() - 1);
-        assertThat(testClaim.getGuid()).isEqualTo(UPDATED_GUID);
+        assertThat(testClaim.getGuid()).isEqualTo(DEFAULT_GUID);
         assertThat(testClaim.getIsQueued()).isEqualTo(UPDATED_IS_QUEUED);
         assertThat(testClaim.getParsed()).isEqualTo(UPDATED_PARSED);
-        assertThat(testClaim.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
+        assertThat(testClaim.getIdentifier()).isEqualTo(DEFAULT_IDENTIFIER);
         assertThat(testClaim.getUse()).isEqualTo(DEFAULT_USE);
         assertThat(testClaim.getType()).isEqualTo(DEFAULT_TYPE);
         assertThat(testClaim.getSubType()).isEqualTo(UPDATED_SUB_TYPE);
-        assertThat(testClaim.getEligibilityOffline()).isEqualTo(UPDATED_ELIGIBILITY_OFFLINE);
+        assertThat(testClaim.getEligibilityOffline()).isEqualTo(DEFAULT_ELIGIBILITY_OFFLINE);
         assertThat(testClaim.getEligibilityOfflineDate()).isEqualTo(DEFAULT_ELIGIBILITY_OFFLINE_DATE);
-        assertThat(testClaim.getAuthorizationOfflineDate()).isEqualTo(DEFAULT_AUTHORIZATION_OFFLINE_DATE);
-        assertThat(testClaim.getBillableStart()).isEqualTo(DEFAULT_BILLABLE_START);
+        assertThat(testClaim.getAuthorizationOfflineDate()).isEqualTo(UPDATED_AUTHORIZATION_OFFLINE_DATE);
+        assertThat(testClaim.getBillableStart()).isEqualTo(UPDATED_BILLABLE_START);
         assertThat(testClaim.getBillableEnd()).isEqualTo(UPDATED_BILLABLE_END);
-        assertThat(testClaim.getPriority()).isEqualTo(UPDATED_PRIORITY);
-        assertThat(testClaim.getFundsReserve()).isEqualTo(DEFAULT_FUNDS_RESERVE);
+        assertThat(testClaim.getPriority()).isEqualTo(DEFAULT_PRIORITY);
+        assertThat(testClaim.getFundsReserve()).isEqualTo(UPDATED_FUNDS_RESERVE);
     }
 
     @Test

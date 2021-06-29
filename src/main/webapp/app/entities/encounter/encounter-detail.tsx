@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './encounter.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IEncounterDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const EncounterDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const EncounterDetail = (props: IEncounterDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { encounterEntity } = props;
+  const encounterEntity = useAppSelector(state => state.encounter.entity);
   return (
     <Row>
       <Col md="8">
@@ -109,13 +108,4 @@ export const EncounterDetail = (props: IEncounterDetailProps) => {
   );
 };
 
-const mapStateToProps = ({ encounter }: IRootState) => ({
-  encounterEntity: encounter.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(EncounterDetail);
+export default EncounterDetail;

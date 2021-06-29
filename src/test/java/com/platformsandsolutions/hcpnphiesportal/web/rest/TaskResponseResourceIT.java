@@ -273,7 +273,7 @@ class TaskResponseResourceIT {
         TaskResponse partialUpdatedTaskResponse = new TaskResponse();
         partialUpdatedTaskResponse.setId(taskResponse.getId());
 
-        partialUpdatedTaskResponse.system(UPDATED_SYSTEM).parsed(UPDATED_PARSED);
+        partialUpdatedTaskResponse.value(UPDATED_VALUE).system(UPDATED_SYSTEM);
 
         restTaskResponseMockMvc
             .perform(
@@ -287,9 +287,9 @@ class TaskResponseResourceIT {
         List<TaskResponse> taskResponseList = taskResponseRepository.findAll();
         assertThat(taskResponseList).hasSize(databaseSizeBeforeUpdate);
         TaskResponse testTaskResponse = taskResponseList.get(taskResponseList.size() - 1);
-        assertThat(testTaskResponse.getValue()).isEqualTo(DEFAULT_VALUE);
+        assertThat(testTaskResponse.getValue()).isEqualTo(UPDATED_VALUE);
         assertThat(testTaskResponse.getSystem()).isEqualTo(UPDATED_SYSTEM);
-        assertThat(testTaskResponse.getParsed()).isEqualTo(UPDATED_PARSED);
+        assertThat(testTaskResponse.getParsed()).isEqualTo(DEFAULT_PARSED);
         assertThat(testTaskResponse.getStatus()).isEqualTo(DEFAULT_STATUS);
     }
 

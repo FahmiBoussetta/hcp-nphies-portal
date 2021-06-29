@@ -76,11 +76,16 @@ public class CoverageEligibilityRequest implements Serializable {
     @JsonIgnoreProperties(value = { "coverageEligibilityRequest" }, allowSetters = true)
     private Set<ListEligibilityPurposeEnum> purposes = new HashSet<>();
 
-    @OneToMany(mappedBy = "coverageEligibilityRequest")
+    @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JoinTable(
+        name = "rel_coverage_eligibility_request__coverages",
+        joinColumns = @JoinColumn(name = "coverage_eligibility_request_id"),
+        inverseJoinColumns = @JoinColumn(name = "coverages_id")
+    )
     @JsonIgnoreProperties(
         value = {
-            "subscriberPatient", "beneficiary", "payor", "classComponents", "costToBeneficiaryComponents", "coverageEligibilityRequest",
+            "subscriberPatient", "beneficiary", "payor", "classComponents", "costToBeneficiaryComponents", "coverageEligibilityRequests",
         },
         allowSetters = true
     )
@@ -303,23 +308,17 @@ public class CoverageEligibilityRequest implements Serializable {
 
     public CoverageEligibilityRequest addCoverages(Coverage coverage) {
         this.coverages.add(coverage);
-        coverage.setCoverageEligibilityRequest(this);
+        coverage.getCoverageEligibilityRequests().add(this);
         return this;
     }
 
     public CoverageEligibilityRequest removeCoverages(Coverage coverage) {
         this.coverages.remove(coverage);
-        coverage.setCoverageEligibilityRequest(null);
+        coverage.getCoverageEligibilityRequests().remove(this);
         return this;
     }
 
     public void setCoverages(Set<Coverage> coverages) {
-        if (this.coverages != null) {
-            this.coverages.forEach(i -> i.setCoverageEligibilityRequest(null));
-        }
-        if (coverages != null) {
-            coverages.forEach(i -> i.setCoverageEligibilityRequest(this));
-        }
         this.coverages = coverages;
     }
 

@@ -1,156 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IAccident, defaultValue } from 'app/shared/model/accident.model';
 
-export const ACTION_TYPES = {
-  FETCH_ACCIDENT_LIST: 'accident/FETCH_ACCIDENT_LIST',
-  FETCH_ACCIDENT: 'accident/FETCH_ACCIDENT',
-  CREATE_ACCIDENT: 'accident/CREATE_ACCIDENT',
-  UPDATE_ACCIDENT: 'accident/UPDATE_ACCIDENT',
-  PARTIAL_UPDATE_ACCIDENT: 'accident/PARTIAL_UPDATE_ACCIDENT',
-  DELETE_ACCIDENT: 'accident/DELETE_ACCIDENT',
-  RESET: 'accident/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<IAccident> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<IAccident>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type AccidentState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: AccidentState = initialState, action): AccidentState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_ACCIDENT_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_ACCIDENT):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_ACCIDENT):
-    case REQUEST(ACTION_TYPES.UPDATE_ACCIDENT):
-    case REQUEST(ACTION_TYPES.DELETE_ACCIDENT):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_ACCIDENT):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_ACCIDENT_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_ACCIDENT):
-    case FAILURE(ACTION_TYPES.CREATE_ACCIDENT):
-    case FAILURE(ACTION_TYPES.UPDATE_ACCIDENT):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_ACCIDENT):
-    case FAILURE(ACTION_TYPES.DELETE_ACCIDENT):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_ACCIDENT_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_ACCIDENT):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_ACCIDENT):
-    case SUCCESS(ACTION_TYPES.UPDATE_ACCIDENT):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_ACCIDENT):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_ACCIDENT):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/accidents';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<IAccident> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_ACCIDENT_LIST,
-  payload: axios.get<IAccident>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('accident/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<IAccident[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<IAccident> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_ACCIDENT,
-    payload: axios.get<IAccident>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'accident/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<IAccident>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<IAccident> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_ACCIDENT,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'accident/create_entity',
+  async (entity: IAccident, thunkAPI) => {
+    const result = await axios.post<IAccident>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<IAccident> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_ACCIDENT,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'accident/update_entity',
+  async (entity: IAccident, thunkAPI) => {
+    const result = await axios.put<IAccident>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<IAccident> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_ACCIDENT,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'accident/partial_update_entity',
+  async (entity: IAccident, thunkAPI) => {
+    const result = await axios.patch<IAccident>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<IAccident> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_ACCIDENT,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'accident/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<IAccident>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
+// slice
+
+export const AccidentSlice = createEntitySlice({
+  name: 'accident',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
+  },
 });
+
+export const { reset } = AccidentSlice.actions;
+
+// Reducer
+export default AccidentSlice.reducer;

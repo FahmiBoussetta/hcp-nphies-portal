@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './claim-response.reducer';
 
-export interface IClaimResponseDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ClaimResponseDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ClaimResponseDeleteDialog = (props: IClaimResponseDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const claimResponseEntity = useAppSelector(state => state.claimResponse.entity);
+  const updateSuccess = useAppSelector(state => state.claimResponse.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/claim-response');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.claimResponseEntity.id);
+    dispatch(deleteEntity(claimResponseEntity.id));
   };
 
-  const { claimResponseEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="claimResponseDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const ClaimResponseDeleteDialog = (props: IClaimResponseDeleteDialogProps
   );
 };
 
-const mapStateToProps = ({ claimResponse }: IRootState) => ({
-  claimResponseEntity: claimResponse.entity,
-  updateSuccess: claimResponse.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ClaimResponseDeleteDialog);
+export default ClaimResponseDeleteDialog;

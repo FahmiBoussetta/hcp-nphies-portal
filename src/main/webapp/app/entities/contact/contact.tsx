@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './contact.reducer';
 import { IContact } from 'app/shared/model/contact.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IContactProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Contact = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Contact = (props: IContactProps) => {
+  const contactList = useAppSelector(state => state.contact.entities);
+  const loading = useAppSelector(state => state.contact.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { contactList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="contact-heading" data-cy="ContactHeading">
@@ -121,16 +124,4 @@ export const Contact = (props: IContactProps) => {
   );
 };
 
-const mapStateToProps = ({ contact }: IRootState) => ({
-  contactList: contact.entities,
-  loading: contact.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Contact);
+export default Contact;

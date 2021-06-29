@@ -44,7 +44,7 @@ public class CostToBeneficiaryComponent implements Serializable {
     @ManyToOne
     @JsonIgnoreProperties(
         value = {
-            "subscriberPatient", "beneficiary", "payor", "classComponents", "costToBeneficiaryComponents", "coverageEligibilityRequest",
+            "subscriberPatient", "beneficiary", "payor", "classComponents", "costToBeneficiaryComponents", "coverageEligibilityRequests",
         },
         allowSetters = true
     )

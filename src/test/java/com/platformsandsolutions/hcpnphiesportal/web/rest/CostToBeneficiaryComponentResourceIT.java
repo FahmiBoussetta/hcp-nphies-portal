@@ -306,7 +306,7 @@ class CostToBeneficiaryComponentResourceIT {
         CostToBeneficiaryComponent partialUpdatedCostToBeneficiaryComponent = new CostToBeneficiaryComponent();
         partialUpdatedCostToBeneficiaryComponent.setId(costToBeneficiaryComponent.getId());
 
-        partialUpdatedCostToBeneficiaryComponent.type(UPDATED_TYPE).isMoney(UPDATED_IS_MONEY);
+        partialUpdatedCostToBeneficiaryComponent.isMoney(UPDATED_IS_MONEY);
 
         restCostToBeneficiaryComponentMockMvc
             .perform(
@@ -322,7 +322,7 @@ class CostToBeneficiaryComponentResourceIT {
         CostToBeneficiaryComponent testCostToBeneficiaryComponent = costToBeneficiaryComponentList.get(
             costToBeneficiaryComponentList.size() - 1
         );
-        assertThat(testCostToBeneficiaryComponent.getType()).isEqualTo(UPDATED_TYPE);
+        assertThat(testCostToBeneficiaryComponent.getType()).isEqualTo(DEFAULT_TYPE);
         assertThat(testCostToBeneficiaryComponent.getIsMoney()).isEqualTo(UPDATED_IS_MONEY);
         assertThat(testCostToBeneficiaryComponent.getValue()).isEqualByComparingTo(DEFAULT_VALUE);
     }

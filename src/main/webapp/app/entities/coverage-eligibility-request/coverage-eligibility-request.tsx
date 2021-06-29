@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './coverage-eligibility-request.reducer';
 import { ICoverageEligibilityRequest } from 'app/shared/model/coverage-eligibility-request.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICoverageEligibilityRequestProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const CoverageEligibilityRequest = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CoverageEligibilityRequest = (props: ICoverageEligibilityRequestProps) => {
+  const coverageEligibilityRequestList = useAppSelector(state => state.coverageEligibilityRequest.entities);
+  const loading = useAppSelector(state => state.coverageEligibilityRequest.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { coverageEligibilityRequestList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="coverage-eligibility-request-heading" data-cy="CoverageEligibilityRequestHeading">
@@ -78,6 +81,9 @@ export const CoverageEligibilityRequest = (props: ICoverageEligibilityRequestPro
                 <th>
                   <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.facility">Facility</Translate>
                 </th>
+                <th>
+                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.coverages">Coverages</Translate>
+                </th>
                 <th />
               </tr>
             </thead>
@@ -132,6 +138,16 @@ export const CoverageEligibilityRequest = (props: ICoverageEligibilityRequestPro
                     ) : (
                       ''
                     )}
+                  </td>
+                  <td>
+                    {coverageEligibilityRequest.coverages
+                      ? coverageEligibilityRequest.coverages.map((val, j) => (
+                          <span key={j}>
+                            <Link to={`coverage/${val.id}`}>{val.id}</Link>
+                            {j === coverageEligibilityRequest.coverages.length - 1 ? '' : ', '}
+                          </span>
+                        ))
+                      : null}
                   </td>
                   <td className="text-right">
                     <div className="btn-group flex-btn-group-container">
@@ -191,16 +207,4 @@ export const CoverageEligibilityRequest = (props: ICoverageEligibilityRequestPro
   );
 };
 
-const mapStateToProps = ({ coverageEligibilityRequest }: IRootState) => ({
-  coverageEligibilityRequestList: coverageEligibilityRequest.entities,
-  loading: coverageEligibilityRequest.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CoverageEligibilityRequest);
+export default CoverageEligibilityRequest;

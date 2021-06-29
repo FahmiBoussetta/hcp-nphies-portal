@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './sub-detail-item.reducer';
 
-export interface ISubDetailItemDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const SubDetailItemDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const SubDetailItemDeleteDialog = (props: ISubDetailItemDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const subDetailItemEntity = useAppSelector(state => state.subDetailItem.entity);
+  const updateSuccess = useAppSelector(state => state.subDetailItem.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/sub-detail-item');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.subDetailItemEntity.id);
+    dispatch(deleteEntity(subDetailItemEntity.id));
   };
 
-  const { subDetailItemEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="subDetailItemDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const SubDetailItemDeleteDialog = (props: ISubDetailItemDeleteDialogProps
   );
 };
 
-const mapStateToProps = ({ subDetailItem }: IRootState) => ({
-  subDetailItemEntity: subDetailItem.entity,
-  updateSuccess: subDetailItem.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(SubDetailItemDeleteDialog);
+export default SubDetailItemDeleteDialog;

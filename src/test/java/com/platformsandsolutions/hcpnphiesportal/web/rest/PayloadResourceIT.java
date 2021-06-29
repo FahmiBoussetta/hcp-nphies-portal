@@ -244,6 +244,8 @@ class PayloadResourceIT {
         Payload partialUpdatedPayload = new Payload();
         partialUpdatedPayload.setId(payload.getId());
 
+        partialUpdatedPayload.contentString(UPDATED_CONTENT_STRING);
+
         restPayloadMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedPayload.getId())
@@ -256,7 +258,7 @@ class PayloadResourceIT {
         List<Payload> payloadList = payloadRepository.findAll();
         assertThat(payloadList).hasSize(databaseSizeBeforeUpdate);
         Payload testPayload = payloadList.get(payloadList.size() - 1);
-        assertThat(testPayload.getContentString()).isEqualTo(DEFAULT_CONTENT_STRING);
+        assertThat(testPayload.getContentString()).isEqualTo(UPDATED_CONTENT_STRING);
     }
 
     @Test

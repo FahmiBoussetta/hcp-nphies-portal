@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './patient.reducer';
 import { IPatient } from 'app/shared/model/patient.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPatientProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Patient = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Patient = (props: IPatientProps) => {
+  const patientList = useAppSelector(state => state.patient.entities);
+  const loading = useAppSelector(state => state.patient.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { patientList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="patient-heading" data-cy="PatientHeading">
@@ -153,16 +156,4 @@ export const Patient = (props: IPatientProps) => {
   );
 };
 
-const mapStateToProps = ({ patient }: IRootState) => ({
-  patientList: patient.entities,
-  loading: patient.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Patient);
+export default Patient;

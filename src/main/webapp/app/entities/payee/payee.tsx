@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './payee.reducer';
 import { IPayee } from 'app/shared/model/payee.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPayeeProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Payee = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Payee = (props: IPayeeProps) => {
+  const payeeList = useAppSelector(state => state.payee.entities);
+  const loading = useAppSelector(state => state.payee.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { payeeList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="payee-heading" data-cy="PayeeHeading">
@@ -115,16 +118,4 @@ export const Payee = (props: IPayeeProps) => {
   );
 };
 
-const mapStateToProps = ({ payee }: IRootState) => ({
-  payeeList: payee.entities,
-  loading: payee.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Payee);
+export default Payee;

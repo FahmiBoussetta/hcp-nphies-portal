@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IContact } from 'app/shared/model/contact.model';
 import { getEntities as getContacts } from 'app/entities/contact/contact.reducer';
@@ -15,13 +12,19 @@ import { getEntity, updateEntity, createEntity, reset } from './patient.reducer'
 import { IPatient } from 'app/shared/model/patient.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPatientUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const PatientUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PatientUpdate = (props: IPatientUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { patientEntity, contacts, addresses, loading, updating } = props;
+  const contacts = useAppSelector(state => state.contact.entities);
+  const addresses = useAppSelector(state => state.address.entities);
+  const patientEntity = useAppSelector(state => state.patient.entity);
+  const loading = useAppSelector(state => state.patient.loading);
+  const updating = useAppSelector(state => state.patient.updating);
+  const updateSuccess = useAppSelector(state => state.patient.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/patient');
@@ -29,40 +32,55 @@ export const PatientUpdate = (props: IPatientUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getContacts();
-    props.getAddresses();
+    dispatch(getContacts({}));
+    dispatch(getAddresses({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
+  const saveEntity = values => {
     values.birthDate = convertDateTimeToServer(values.birthDate);
     values.deceasedDate = convertDateTimeToServer(values.deceasedDate);
 
-    if (errors.length === 0) {
-      const entity = {
-        ...patientEntity,
-        ...values,
-        contacts: contacts.find(it => it.id.toString() === values.contactsId.toString()),
-        address: addresses.find(it => it.id.toString() === values.addressId.toString()),
-      };
+    const entity = {
+      ...patientEntity,
+      ...values,
+      contacts: contacts.find(it => it.id.toString() === values.contactsId.toString()),
+      address: addresses.find(it => it.id.toString() === values.addressId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {
+          birthDate: displayDefaultDateTime(),
+          deceasedDate: displayDefaultDateTime(),
+        }
+      : {
+          ...patientEntity,
+          religion: 'N0',
+          gender: 'Male',
+          birthDate: convertDateTimeFromServer(patientEntity.birthDate),
+          deceasedDate: convertDateTimeFromServer(patientEntity.deceasedDate),
+          maritalStatus: 'L',
+          contactsId: patientEntity?.contacts?.id,
+          addressId: patientEntity?.address?.id,
+        };
 
   return (
     <div>
@@ -78,177 +96,157 @@ export const PatientUpdate = (props: IPatientUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : patientEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="patient-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="patient-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="patient-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="guidLabel" for="patient-guid">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.guid">Guid</Translate>
-                </Label>
-                <AvField id="patient-guid" data-cy="guid" type="text" name="guid" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="forceIdLabel" for="patient-forceId">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.forceId">Force Id</Translate>
-                </Label>
-                <AvField id="patient-forceId" data-cy="forceId" type="text" name="forceId" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="residentNumberLabel" for="patient-residentNumber">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.residentNumber">Resident Number</Translate>
-                </Label>
-                <AvField id="patient-residentNumber" data-cy="residentNumber" type="text" name="residentNumber" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="passportNumberLabel" for="patient-passportNumber">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.passportNumber">Passport Number</Translate>
-                </Label>
-                <AvField id="patient-passportNumber" data-cy="passportNumber" type="text" name="passportNumber" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="nationalHealthIdLabel" for="patient-nationalHealthId">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.nationalHealthId">National Health Id</Translate>
-                </Label>
-                <AvField id="patient-nationalHealthId" data-cy="nationalHealthId" type="text" name="nationalHealthId" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="iqamaLabel" for="patient-iqama">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.iqama">Iqama</Translate>
-                </Label>
-                <AvField id="patient-iqama" data-cy="iqama" type="text" name="iqama" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="religionLabel" for="patient-religion">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.religion">Religion</Translate>
-                </Label>
-                <AvInput
-                  id="patient-religion"
-                  data-cy="religion"
-                  type="select"
-                  className="form-control"
-                  name="religion"
-                  value={(!isNew && patientEntity.religion) || 'N0'}
-                >
-                  <option value="N0">{translate('hcpNphiesPortalApp.ReligionEnum.N0')}</option>
-                  <option value="N1">{translate('hcpNphiesPortalApp.ReligionEnum.N1')}</option>
-                  <option value="N2">{translate('hcpNphiesPortalApp.ReligionEnum.N2')}</option>
-                  <option value="N3">{translate('hcpNphiesPortalApp.ReligionEnum.N3')}</option>
-                  <option value="N4">{translate('hcpNphiesPortalApp.ReligionEnum.N4')}</option>
-                  <option value="N5">{translate('hcpNphiesPortalApp.ReligionEnum.N5')}</option>
-                  <option value="N7">{translate('hcpNphiesPortalApp.ReligionEnum.N7')}</option>
-                  <option value="N8">{translate('hcpNphiesPortalApp.ReligionEnum.N8')}</option>
-                  <option value="N9">{translate('hcpNphiesPortalApp.ReligionEnum.N9')}</option>
-                  <option value="N98">{translate('hcpNphiesPortalApp.ReligionEnum.N98')}</option>
-                  <option value="N99">{translate('hcpNphiesPortalApp.ReligionEnum.N99')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label id="genderLabel" for="patient-gender">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.gender">Gender</Translate>
-                </Label>
-                <AvInput
-                  id="patient-gender"
-                  data-cy="gender"
-                  type="select"
-                  className="form-control"
-                  name="gender"
-                  value={(!isNew && patientEntity.gender) || 'Male'}
-                >
-                  <option value="Male">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.Male')}</option>
-                  <option value="Female">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.Female')}</option>
-                  <option value="Unknown">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.Unknown')}</option>
-                  <option value="U">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.U')}</option>
-                  <option value="N">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.N')}</option>
-                  <option value="A">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.A')}</option>
-                  <option value="B">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.B')}</option>
-                  <option value="C">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.C')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label id="birthDateLabel" for="patient-birthDate">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.birthDate">Birth Date</Translate>
-                </Label>
-                <AvInput
-                  id="patient-birthDate"
-                  data-cy="birthDate"
-                  type="datetime-local"
-                  className="form-control"
-                  name="birthDate"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.patientEntity.birthDate)}
-                />
-              </AvGroup>
-              <AvGroup>
-                <Label id="deceasedDateLabel" for="patient-deceasedDate">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.deceasedDate">Deceased Date</Translate>
-                </Label>
-                <AvInput
-                  id="patient-deceasedDate"
-                  data-cy="deceasedDate"
-                  type="datetime-local"
-                  className="form-control"
-                  name="deceasedDate"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.patientEntity.deceasedDate)}
-                />
-              </AvGroup>
-              <AvGroup>
-                <Label id="maritalStatusLabel" for="patient-maritalStatus">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.maritalStatus">Marital Status</Translate>
-                </Label>
-                <AvInput
-                  id="patient-maritalStatus"
-                  data-cy="maritalStatus"
-                  type="select"
-                  className="form-control"
-                  name="maritalStatus"
-                  value={(!isNew && patientEntity.maritalStatus) || 'L'}
-                >
-                  <option value="L">{translate('hcpNphiesPortalApp.MaritalStatusEnum.L')}</option>
-                  <option value="D">{translate('hcpNphiesPortalApp.MaritalStatusEnum.D')}</option>
-                  <option value="M">{translate('hcpNphiesPortalApp.MaritalStatusEnum.M')}</option>
-                  <option value="U">{translate('hcpNphiesPortalApp.MaritalStatusEnum.U')}</option>
-                  <option value="W">{translate('hcpNphiesPortalApp.MaritalStatusEnum.W')}</option>
-                  <option value="UNK">{translate('hcpNphiesPortalApp.MaritalStatusEnum.UNK')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="patient-contacts">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.contacts">Contacts</Translate>
-                </Label>
-                <AvInput id="patient-contacts" data-cy="contacts" type="select" className="form-control" name="contactsId">
-                  <option value="" key="0" />
-                  {contacts
-                    ? contacts.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="patient-address">
-                  <Translate contentKey="hcpNphiesPortalApp.patient.address">Address</Translate>
-                </Label>
-                <AvInput id="patient-address" data-cy="address" type="select" className="form-control" name="addressId">
-                  <option value="" key="0" />
-                  {addresses
-                    ? addresses.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/patient" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.guid')}
+                id="patient-guid"
+                name="guid"
+                data-cy="guid"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.forceId')}
+                id="patient-forceId"
+                name="forceId"
+                data-cy="forceId"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.residentNumber')}
+                id="patient-residentNumber"
+                name="residentNumber"
+                data-cy="residentNumber"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.passportNumber')}
+                id="patient-passportNumber"
+                name="passportNumber"
+                data-cy="passportNumber"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.nationalHealthId')}
+                id="patient-nationalHealthId"
+                name="nationalHealthId"
+                data-cy="nationalHealthId"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.iqama')}
+                id="patient-iqama"
+                name="iqama"
+                data-cy="iqama"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.religion')}
+                id="patient-religion"
+                name="religion"
+                data-cy="religion"
+                type="select"
+              >
+                <option value="N0">{translate('hcpNphiesPortalApp.ReligionEnum.N0')}</option>
+                <option value="N1">{translate('hcpNphiesPortalApp.ReligionEnum.N1')}</option>
+                <option value="N2">{translate('hcpNphiesPortalApp.ReligionEnum.N2')}</option>
+                <option value="N3">{translate('hcpNphiesPortalApp.ReligionEnum.N3')}</option>
+                <option value="N4">{translate('hcpNphiesPortalApp.ReligionEnum.N4')}</option>
+                <option value="N5">{translate('hcpNphiesPortalApp.ReligionEnum.N5')}</option>
+                <option value="N7">{translate('hcpNphiesPortalApp.ReligionEnum.N7')}</option>
+                <option value="N8">{translate('hcpNphiesPortalApp.ReligionEnum.N8')}</option>
+                <option value="N9">{translate('hcpNphiesPortalApp.ReligionEnum.N9')}</option>
+                <option value="N98">{translate('hcpNphiesPortalApp.ReligionEnum.N98')}</option>
+                <option value="N99">{translate('hcpNphiesPortalApp.ReligionEnum.N99')}</option>
+              </ValidatedField>
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.gender')}
+                id="patient-gender"
+                name="gender"
+                data-cy="gender"
+                type="select"
+              >
+                <option value="Male">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.Male')}</option>
+                <option value="Female">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.Female')}</option>
+                <option value="Unknown">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.Unknown')}</option>
+                <option value="U">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.U')}</option>
+                <option value="N">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.N')}</option>
+                <option value="A">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.A')}</option>
+                <option value="B">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.B')}</option>
+                <option value="C">{translate('hcpNphiesPortalApp.AdministrativeGenderEnum.C')}</option>
+              </ValidatedField>
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.birthDate')}
+                id="patient-birthDate"
+                name="birthDate"
+                data-cy="birthDate"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.deceasedDate')}
+                id="patient-deceasedDate"
+                name="deceasedDate"
+                data-cy="deceasedDate"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.patient.maritalStatus')}
+                id="patient-maritalStatus"
+                name="maritalStatus"
+                data-cy="maritalStatus"
+                type="select"
+              >
+                <option value="L">{translate('hcpNphiesPortalApp.MaritalStatusEnum.L')}</option>
+                <option value="D">{translate('hcpNphiesPortalApp.MaritalStatusEnum.D')}</option>
+                <option value="M">{translate('hcpNphiesPortalApp.MaritalStatusEnum.M')}</option>
+                <option value="U">{translate('hcpNphiesPortalApp.MaritalStatusEnum.U')}</option>
+                <option value="W">{translate('hcpNphiesPortalApp.MaritalStatusEnum.W')}</option>
+                <option value="UNK">{translate('hcpNphiesPortalApp.MaritalStatusEnum.UNK')}</option>
+              </ValidatedField>
+              <ValidatedField
+                id="patient-contacts"
+                name="contactsId"
+                data-cy="contacts"
+                label={translate('hcpNphiesPortalApp.patient.contacts')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {contacts
+                  ? contacts.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="patient-address"
+                name="addressId"
+                data-cy="address"
+                label={translate('hcpNphiesPortalApp.patient.address')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {addresses
+                  ? addresses.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/patient" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -261,7 +259,7 @@ export const PatientUpdate = (props: IPatientUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -269,25 +267,4 @@ export const PatientUpdate = (props: IPatientUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  contacts: storeState.contact.entities,
-  addresses: storeState.address.entities,
-  patientEntity: storeState.patient.entity,
-  loading: storeState.patient.loading,
-  updating: storeState.patient.updating,
-  updateSuccess: storeState.patient.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getContacts,
-  getAddresses,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PatientUpdate);
+export default PatientUpdate;

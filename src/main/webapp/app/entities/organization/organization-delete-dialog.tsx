@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './organization.reducer';
 
-export interface IOrganizationDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const OrganizationDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const OrganizationDeleteDialog = (props: IOrganizationDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const organizationEntity = useAppSelector(state => state.organization.entity);
+  const updateSuccess = useAppSelector(state => state.organization.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/organization');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.organizationEntity.id);
+    dispatch(deleteEntity(organizationEntity.id));
   };
 
-  const { organizationEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="organizationDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const OrganizationDeleteDialog = (props: IOrganizationDeleteDialogProps) 
   );
 };
 
-const mapStateToProps = ({ organization }: IRootState) => ({
-  organizationEntity: organization.entity,
-  updateSuccess: organization.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(OrganizationDeleteDialog);
+export default OrganizationDeleteDialog;

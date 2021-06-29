@@ -2,6 +2,7 @@ package com.platformsandsolutions.hcpnphiesportal.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -11,14 +12,20 @@ import com.platformsandsolutions.hcpnphiesportal.domain.enumeration.PriorityEnum
 import com.platformsandsolutions.hcpnphiesportal.repository.CoverageEligibilityRequestRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link CoverageEligibilityRequestResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class CoverageEligibilityRequestResourceIT {
@@ -58,6 +66,9 @@ class CoverageEligibilityRequestResourceIT {
 
     @Autowired
     private CoverageEligibilityRequestRepository coverageEligibilityRequestRepository;
+
+    @Mock
+    private CoverageEligibilityRequestRepository coverageEligibilityRequestRepositoryMock;
 
     @Autowired
     private EntityManager em;
@@ -217,6 +228,24 @@ class CoverageEligibilityRequestResourceIT {
             .andExpect(jsonPath("$.[*].servicedDateEnd").value(hasItem(DEFAULT_SERVICED_DATE_END.toString())));
     }
 
+    @SuppressWarnings({ "unchecked" })
+    void getAllCoverageEligibilityRequestsWithEagerRelationshipsIsEnabled() throws Exception {
+        when(coverageEligibilityRequestRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restCoverageEligibilityRequestMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(coverageEligibilityRequestRepositoryMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllCoverageEligibilityRequestsWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(coverageEligibilityRequestRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restCoverageEligibilityRequestMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(coverageEligibilityRequestRepositoryMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
     @Test
     @Transactional
     void getCoverageEligibilityRequest() throws Exception {
@@ -360,7 +389,7 @@ class CoverageEligibilityRequestResourceIT {
         CoverageEligibilityRequest partialUpdatedCoverageEligibilityRequest = new CoverageEligibilityRequest();
         partialUpdatedCoverageEligibilityRequest.setId(coverageEligibilityRequest.getId());
 
-        partialUpdatedCoverageEligibilityRequest.priority(UPDATED_PRIORITY).identifier(UPDATED_IDENTIFIER);
+        partialUpdatedCoverageEligibilityRequest.guid(UPDATED_GUID).parsed(UPDATED_PARSED).servicedDateEnd(UPDATED_SERVICED_DATE_END);
 
         restCoverageEligibilityRequestMockMvc
             .perform(
@@ -376,12 +405,12 @@ class CoverageEligibilityRequestResourceIT {
         CoverageEligibilityRequest testCoverageEligibilityRequest = coverageEligibilityRequestList.get(
             coverageEligibilityRequestList.size() - 1
         );
-        assertThat(testCoverageEligibilityRequest.getGuid()).isEqualTo(DEFAULT_GUID);
-        assertThat(testCoverageEligibilityRequest.getParsed()).isEqualTo(DEFAULT_PARSED);
-        assertThat(testCoverageEligibilityRequest.getPriority()).isEqualTo(UPDATED_PRIORITY);
-        assertThat(testCoverageEligibilityRequest.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
+        assertThat(testCoverageEligibilityRequest.getGuid()).isEqualTo(UPDATED_GUID);
+        assertThat(testCoverageEligibilityRequest.getParsed()).isEqualTo(UPDATED_PARSED);
+        assertThat(testCoverageEligibilityRequest.getPriority()).isEqualTo(DEFAULT_PRIORITY);
+        assertThat(testCoverageEligibilityRequest.getIdentifier()).isEqualTo(DEFAULT_IDENTIFIER);
         assertThat(testCoverageEligibilityRequest.getServicedDate()).isEqualTo(DEFAULT_SERVICED_DATE);
-        assertThat(testCoverageEligibilityRequest.getServicedDateEnd()).isEqualTo(DEFAULT_SERVICED_DATE_END);
+        assertThat(testCoverageEligibilityRequest.getServicedDateEnd()).isEqualTo(UPDATED_SERVICED_DATE_END);
     }
 
     @Test

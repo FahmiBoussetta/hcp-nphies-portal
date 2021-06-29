@@ -161,12 +161,15 @@ public class CoverageEligibilityRequestResource {
     /**
      * {@code GET  /coverage-eligibility-requests} : get all the coverageEligibilityRequests.
      *
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of coverageEligibilityRequests in body.
      */
     @GetMapping("/coverage-eligibility-requests")
-    public List<CoverageEligibilityRequest> getAllCoverageEligibilityRequests() {
+    public List<CoverageEligibilityRequest> getAllCoverageEligibilityRequests(
+        @RequestParam(required = false, defaultValue = "false") boolean eagerload
+    ) {
         log.debug("REST request to get all CoverageEligibilityRequests");
-        return coverageEligibilityRequestRepository.findAll();
+        return coverageEligibilityRequestRepository.findAllWithEagerRelationships();
     }
 
     /**
@@ -178,7 +181,9 @@ public class CoverageEligibilityRequestResource {
     @GetMapping("/coverage-eligibility-requests/{id}")
     public ResponseEntity<CoverageEligibilityRequest> getCoverageEligibilityRequest(@PathVariable Long id) {
         log.debug("REST request to get CoverageEligibilityRequest : {}", id);
-        Optional<CoverageEligibilityRequest> coverageEligibilityRequest = coverageEligibilityRequestRepository.findById(id);
+        Optional<CoverageEligibilityRequest> coverageEligibilityRequest = coverageEligibilityRequestRepository.findOneWithEagerRelationships(
+            id
+        );
         return ResponseUtil.wrapOrNotFound(coverageEligibilityRequest);
     }
 

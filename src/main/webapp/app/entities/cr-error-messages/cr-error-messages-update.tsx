@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IClaimResponse } from 'app/shared/model/claim-response.model';
 import { getEntities as getClaimResponses } from 'app/entities/claim-response/claim-response.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './cr-error-message
 import { ICRErrorMessages } from 'app/shared/model/cr-error-messages.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICRErrorMessagesUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CRErrorMessagesUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CRErrorMessagesUpdate = (props: ICRErrorMessagesUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { cRErrorMessagesEntity, claimResponses, loading, updating } = props;
+  const claimResponses = useAppSelector(state => state.claimResponse.entities);
+  const cRErrorMessagesEntity = useAppSelector(state => state.cRErrorMessages.entity);
+  const loading = useAppSelector(state => state.cRErrorMessages.loading);
+  const updating = useAppSelector(state => state.cRErrorMessages.updating);
+  const updateSuccess = useAppSelector(state => state.cRErrorMessages.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/cr-error-messages');
@@ -27,35 +29,41 @@ export const CRErrorMessagesUpdate = (props: ICRErrorMessagesUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getClaimResponses();
+    dispatch(getClaimResponses({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...cRErrorMessagesEntity,
-        ...values,
-        claimResponse: claimResponses.find(it => it.id.toString() === values.claimResponseId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...cRErrorMessagesEntity,
+      ...values,
+      claimResponse: claimResponses.find(it => it.id.toString() === values.claimResponseId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...cRErrorMessagesEntity,
+          claimResponseId: cRErrorMessagesEntity?.claimResponse?.id,
+        };
 
   return (
     <div>
@@ -71,43 +79,41 @@ export const CRErrorMessagesUpdate = (props: ICRErrorMessagesUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : cRErrorMessagesEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="cr-error-messages-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="cr-error-messages-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="cr-error-messages-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="messageLabel" for="cr-error-messages-message">
-                  <Translate contentKey="hcpNphiesPortalApp.cRErrorMessages.message">Message</Translate>
-                </Label>
-                <AvField id="cr-error-messages-message" data-cy="message" type="text" name="message" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="cr-error-messages-claimResponse">
-                  <Translate contentKey="hcpNphiesPortalApp.cRErrorMessages.claimResponse">Claim Response</Translate>
-                </Label>
-                <AvInput
-                  id="cr-error-messages-claimResponse"
-                  data-cy="claimResponse"
-                  type="select"
-                  className="form-control"
-                  name="claimResponseId"
-                >
-                  <option value="" key="0" />
-                  {claimResponses
-                    ? claimResponses.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/cr-error-messages" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.cRErrorMessages.message')}
+                id="cr-error-messages-message"
+                name="message"
+                data-cy="message"
+                type="text"
+              />
+              <ValidatedField
+                id="cr-error-messages-claimResponse"
+                name="claimResponseId"
+                data-cy="claimResponse"
+                label={translate('hcpNphiesPortalApp.cRErrorMessages.claimResponse')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {claimResponses
+                  ? claimResponses.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/cr-error-messages" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -120,7 +126,7 @@ export const CRErrorMessagesUpdate = (props: ICRErrorMessagesUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -128,23 +134,4 @@ export const CRErrorMessagesUpdate = (props: ICRErrorMessagesUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  claimResponses: storeState.claimResponse.entities,
-  cRErrorMessagesEntity: storeState.cRErrorMessages.entity,
-  loading: storeState.cRErrorMessages.loading,
-  updating: storeState.cRErrorMessages.updating,
-  updateSuccess: storeState.cRErrorMessages.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getClaimResponses,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CRErrorMessagesUpdate);
+export default CRErrorMessagesUpdate;

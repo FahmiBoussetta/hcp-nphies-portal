@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { openFile, byteSize, Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './attachment.reducer';
 import { IAttachment } from 'app/shared/model/attachment.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAttachmentProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Attachment = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Attachment = (props: IAttachmentProps) => {
+  const attachmentList = useAppSelector(state => state.attachment.entities);
+  const loading = useAppSelector(state => state.attachment.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { attachmentList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="attachment-heading" data-cy="AttachmentHeading">
@@ -157,16 +160,4 @@ export const Attachment = (props: IAttachmentProps) => {
   );
 };
 
-const mapStateToProps = ({ attachment }: IRootState) => ({
-  attachmentList: attachment.entities,
-  loading: attachment.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Attachment);
+export default Attachment;

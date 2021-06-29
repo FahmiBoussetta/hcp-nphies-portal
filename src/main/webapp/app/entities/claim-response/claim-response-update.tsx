@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { getEntity, updateEntity, createEntity, reset } from './claim-response.reducer';
 import { IClaimResponse } from 'app/shared/model/claim-response.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IClaimResponseUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ClaimResponseUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ClaimResponseUpdate = (props: IClaimResponseUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { claimResponseEntity, loading, updating } = props;
+  const claimResponseEntity = useAppSelector(state => state.claimResponse.entity);
+  const loading = useAppSelector(state => state.claimResponse.loading);
+  const updating = useAppSelector(state => state.claimResponse.updating);
+  const updateSuccess = useAppSelector(state => state.claimResponse.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/claim-response');
@@ -25,32 +26,37 @@ export const ClaimResponseUpdate = (props: IClaimResponseUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...claimResponseEntity,
-        ...values,
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...claimResponseEntity,
+      ...values,
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...claimResponseEntity,
+        };
 
   return (
     <div>
@@ -66,40 +72,46 @@ export const ClaimResponseUpdate = (props: IClaimResponseUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : claimResponseEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="claim-response-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="claim-response-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="claim-response-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="valueLabel" for="claim-response-value">
-                  <Translate contentKey="hcpNphiesPortalApp.claimResponse.value">Value</Translate>
-                </Label>
-                <AvField id="claim-response-value" data-cy="value" type="text" name="value" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="systemLabel" for="claim-response-system">
-                  <Translate contentKey="hcpNphiesPortalApp.claimResponse.system">System</Translate>
-                </Label>
-                <AvField id="claim-response-system" data-cy="system" type="text" name="system" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="parsedLabel" for="claim-response-parsed">
-                  <Translate contentKey="hcpNphiesPortalApp.claimResponse.parsed">Parsed</Translate>
-                </Label>
-                <AvField id="claim-response-parsed" data-cy="parsed" type="text" name="parsed" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="outcomeLabel" for="claim-response-outcome">
-                  <Translate contentKey="hcpNphiesPortalApp.claimResponse.outcome">Outcome</Translate>
-                </Label>
-                <AvField id="claim-response-outcome" data-cy="outcome" type="text" name="outcome" />
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/claim-response" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.claimResponse.value')}
+                id="claim-response-value"
+                name="value"
+                data-cy="value"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.claimResponse.system')}
+                id="claim-response-system"
+                name="system"
+                data-cy="system"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.claimResponse.parsed')}
+                id="claim-response-parsed"
+                name="parsed"
+                data-cy="parsed"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.claimResponse.outcome')}
+                id="claim-response-outcome"
+                name="outcome"
+                data-cy="outcome"
+                type="text"
+              />
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/claim-response" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -112,7 +124,7 @@ export const ClaimResponseUpdate = (props: IClaimResponseUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -120,21 +132,4 @@ export const ClaimResponseUpdate = (props: IClaimResponseUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  claimResponseEntity: storeState.claimResponse.entity,
-  loading: storeState.claimResponse.loading,
-  updating: storeState.claimResponse.updating,
-  updateSuccess: storeState.claimResponse.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ClaimResponseUpdate);
+export default ClaimResponseUpdate;

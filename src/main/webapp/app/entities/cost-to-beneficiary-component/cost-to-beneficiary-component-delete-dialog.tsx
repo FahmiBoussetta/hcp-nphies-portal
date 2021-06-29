@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './cost-to-beneficiary-component.reducer';
 
-export interface ICostToBeneficiaryComponentDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CostToBeneficiaryComponentDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CostToBeneficiaryComponentDeleteDialog = (props: ICostToBeneficiaryComponentDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const costToBeneficiaryComponentEntity = useAppSelector(state => state.costToBeneficiaryComponent.entity);
+  const updateSuccess = useAppSelector(state => state.costToBeneficiaryComponent.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/cost-to-beneficiary-component');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.costToBeneficiaryComponentEntity.id);
+    dispatch(deleteEntity(costToBeneficiaryComponentEntity.id));
   };
 
-  const { costToBeneficiaryComponentEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="costToBeneficiaryComponentDeleteDialogHeading">
@@ -64,14 +65,4 @@ export const CostToBeneficiaryComponentDeleteDialog = (props: ICostToBeneficiary
   );
 };
 
-const mapStateToProps = ({ costToBeneficiaryComponent }: IRootState) => ({
-  costToBeneficiaryComponentEntity: costToBeneficiaryComponent.entity,
-  updateSuccess: costToBeneficiaryComponent.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CostToBeneficiaryComponentDeleteDialog);
+export default CostToBeneficiaryComponentDeleteDialog;

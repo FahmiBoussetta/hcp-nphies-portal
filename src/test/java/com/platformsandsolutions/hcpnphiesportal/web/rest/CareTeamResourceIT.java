@@ -286,7 +286,7 @@ class CareTeamResourceIT {
         CareTeam partialUpdatedCareTeam = new CareTeam();
         partialUpdatedCareTeam.setId(careTeam.getId());
 
-        partialUpdatedCareTeam.role(UPDATED_ROLE);
+        partialUpdatedCareTeam.sequence(UPDATED_SEQUENCE);
 
         restCareTeamMockMvc
             .perform(
@@ -300,8 +300,8 @@ class CareTeamResourceIT {
         List<CareTeam> careTeamList = careTeamRepository.findAll();
         assertThat(careTeamList).hasSize(databaseSizeBeforeUpdate);
         CareTeam testCareTeam = careTeamList.get(careTeamList.size() - 1);
-        assertThat(testCareTeam.getSequence()).isEqualTo(DEFAULT_SEQUENCE);
-        assertThat(testCareTeam.getRole()).isEqualTo(UPDATED_ROLE);
+        assertThat(testCareTeam.getSequence()).isEqualTo(UPDATED_SEQUENCE);
+        assertThat(testCareTeam.getRole()).isEqualTo(DEFAULT_ROLE);
     }
 
     @Test

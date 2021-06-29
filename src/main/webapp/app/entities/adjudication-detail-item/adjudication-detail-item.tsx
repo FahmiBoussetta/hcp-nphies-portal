@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './adjudication-detail-item.reducer';
 import { IAdjudicationDetailItem } from 'app/shared/model/adjudication-detail-item.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAdjudicationDetailItemProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const AdjudicationDetailItem = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AdjudicationDetailItem = (props: IAdjudicationDetailItemProps) => {
+  const adjudicationDetailItemList = useAppSelector(state => state.adjudicationDetailItem.entities);
+  const loading = useAppSelector(state => state.adjudicationDetailItem.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { adjudicationDetailItemList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="adjudication-detail-item-heading" data-cy="AdjudicationDetailItemHeading">
@@ -131,16 +134,4 @@ export const AdjudicationDetailItem = (props: IAdjudicationDetailItemProps) => {
   );
 };
 
-const mapStateToProps = ({ adjudicationDetailItem }: IRootState) => ({
-  adjudicationDetailItemList: adjudicationDetailItem.entities,
-  loading: adjudicationDetailItem.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdjudicationDetailItem);
+export default AdjudicationDetailItem;

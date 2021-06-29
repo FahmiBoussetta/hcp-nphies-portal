@@ -281,7 +281,7 @@ class PractitionerRoleResourceIT {
         PractitionerRole partialUpdatedPractitionerRole = new PractitionerRole();
         partialUpdatedPractitionerRole.setId(practitionerRole.getId());
 
-        partialUpdatedPractitionerRole.guid(UPDATED_GUID).start(UPDATED_START);
+        partialUpdatedPractitionerRole.forceId(UPDATED_FORCE_ID);
 
         restPractitionerRoleMockMvc
             .perform(
@@ -295,9 +295,9 @@ class PractitionerRoleResourceIT {
         List<PractitionerRole> practitionerRoleList = practitionerRoleRepository.findAll();
         assertThat(practitionerRoleList).hasSize(databaseSizeBeforeUpdate);
         PractitionerRole testPractitionerRole = practitionerRoleList.get(practitionerRoleList.size() - 1);
-        assertThat(testPractitionerRole.getGuid()).isEqualTo(UPDATED_GUID);
-        assertThat(testPractitionerRole.getForceId()).isEqualTo(DEFAULT_FORCE_ID);
-        assertThat(testPractitionerRole.getStart()).isEqualTo(UPDATED_START);
+        assertThat(testPractitionerRole.getGuid()).isEqualTo(DEFAULT_GUID);
+        assertThat(testPractitionerRole.getForceId()).isEqualTo(UPDATED_FORCE_ID);
+        assertThat(testPractitionerRole.getStart()).isEqualTo(DEFAULT_START);
         assertThat(testPractitionerRole.getEnd()).isEqualTo(DEFAULT_END);
     }
 

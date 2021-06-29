@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './reference-identifier.reducer';
 import { IReferenceIdentifier } from 'app/shared/model/reference-identifier.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IReferenceIdentifierProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const ReferenceIdentifier = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ReferenceIdentifier = (props: IReferenceIdentifierProps) => {
+  const referenceIdentifierList = useAppSelector(state => state.referenceIdentifier.entities);
+  const loading = useAppSelector(state => state.referenceIdentifier.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { referenceIdentifierList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="reference-identifier-heading" data-cy="ReferenceIdentifierHeading">
@@ -149,16 +152,4 @@ export const ReferenceIdentifier = (props: IReferenceIdentifierProps) => {
   );
 };
 
-const mapStateToProps = ({ referenceIdentifier }: IRootState) => ({
-  referenceIdentifierList: referenceIdentifier.entities,
-  loading: referenceIdentifier.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ReferenceIdentifier);
+export default ReferenceIdentifier;

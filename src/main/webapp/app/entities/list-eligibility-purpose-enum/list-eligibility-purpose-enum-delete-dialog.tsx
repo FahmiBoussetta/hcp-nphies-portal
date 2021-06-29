@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './list-eligibility-purpose-enum.reducer';
 
-export interface IListEligibilityPurposeEnumDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ListEligibilityPurposeEnumDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ListEligibilityPurposeEnumDeleteDialog = (props: IListEligibilityPurposeEnumDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const listEligibilityPurposeEnumEntity = useAppSelector(state => state.listEligibilityPurposeEnum.entity);
+  const updateSuccess = useAppSelector(state => state.listEligibilityPurposeEnum.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/list-eligibility-purpose-enum');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.listEligibilityPurposeEnumEntity.id);
+    dispatch(deleteEntity(listEligibilityPurposeEnumEntity.id));
   };
 
-  const { listEligibilityPurposeEnumEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="listEligibilityPurposeEnumDeleteDialogHeading">
@@ -64,14 +65,4 @@ export const ListEligibilityPurposeEnumDeleteDialog = (props: IListEligibilityPu
   );
 };
 
-const mapStateToProps = ({ listEligibilityPurposeEnum }: IRootState) => ({
-  listEligibilityPurposeEnumEntity: listEligibilityPurposeEnum.entity,
-  updateSuccess: listEligibilityPurposeEnum.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListEligibilityPurposeEnumDeleteDialog);
+export default ListEligibilityPurposeEnumDeleteDialog;

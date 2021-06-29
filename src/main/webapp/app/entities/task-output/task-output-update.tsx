@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IReferenceIdentifier } from 'app/shared/model/reference-identifier.model';
 import { getEntities as getReferenceIdentifiers } from 'app/entities/reference-identifier/reference-identifier.reducer';
@@ -15,13 +12,19 @@ import { getEntity, updateEntity, createEntity, reset } from './task-output.redu
 import { ITaskOutput } from 'app/shared/model/task-output.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ITaskOutputUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const TaskOutputUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const TaskOutputUpdate = (props: ITaskOutputUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { taskOutputEntity, referenceIdentifiers, taskResponses, loading, updating } = props;
+  const referenceIdentifiers = useAppSelector(state => state.referenceIdentifier.entities);
+  const taskResponses = useAppSelector(state => state.taskResponse.entities);
+  const taskOutputEntity = useAppSelector(state => state.taskOutput.entity);
+  const loading = useAppSelector(state => state.taskOutput.loading);
+  const updating = useAppSelector(state => state.taskOutput.updating);
+  const updateSuccess = useAppSelector(state => state.taskOutput.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/task-output');
@@ -29,37 +32,44 @@ export const TaskOutputUpdate = (props: ITaskOutputUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getReferenceIdentifiers();
-    props.getTaskResponses();
+    dispatch(getReferenceIdentifiers({}));
+    dispatch(getTaskResponses({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...taskOutputEntity,
-        ...values,
-        response: referenceIdentifiers.find(it => it.id.toString() === values.responseId.toString()),
-        taskResponse: taskResponses.find(it => it.id.toString() === values.taskResponseId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...taskOutputEntity,
+      ...values,
+      response: referenceIdentifiers.find(it => it.id.toString() === values.responseId.toString()),
+      taskResponse: taskResponses.find(it => it.id.toString() === values.taskResponseId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...taskOutputEntity,
+          responseId: taskOutputEntity?.response?.id,
+          taskResponseId: taskOutputEntity?.taskResponse?.id,
+        };
 
   return (
     <div>
@@ -75,58 +85,64 @@ export const TaskOutputUpdate = (props: ITaskOutputUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : taskOutputEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="task-output-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="task-output-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="task-output-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="statusLabel" for="task-output-status">
-                  <Translate contentKey="hcpNphiesPortalApp.taskOutput.status">Status</Translate>
-                </Label>
-                <AvField id="task-output-status" data-cy="status" type="text" name="status" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="errorOutputLabel" for="task-output-errorOutput">
-                  <Translate contentKey="hcpNphiesPortalApp.taskOutput.errorOutput">Error Output</Translate>
-                </Label>
-                <AvField id="task-output-errorOutput" data-cy="errorOutput" type="text" name="errorOutput" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="task-output-response">
-                  <Translate contentKey="hcpNphiesPortalApp.taskOutput.response">Response</Translate>
-                </Label>
-                <AvInput id="task-output-response" data-cy="response" type="select" className="form-control" name="responseId">
-                  <option value="" key="0" />
-                  {referenceIdentifiers
-                    ? referenceIdentifiers.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="task-output-taskResponse">
-                  <Translate contentKey="hcpNphiesPortalApp.taskOutput.taskResponse">Task Response</Translate>
-                </Label>
-                <AvInput id="task-output-taskResponse" data-cy="taskResponse" type="select" className="form-control" name="taskResponseId">
-                  <option value="" key="0" />
-                  {taskResponses
-                    ? taskResponses.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/task-output" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.taskOutput.status')}
+                id="task-output-status"
+                name="status"
+                data-cy="status"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.taskOutput.errorOutput')}
+                id="task-output-errorOutput"
+                name="errorOutput"
+                data-cy="errorOutput"
+                type="text"
+              />
+              <ValidatedField
+                id="task-output-response"
+                name="responseId"
+                data-cy="response"
+                label={translate('hcpNphiesPortalApp.taskOutput.response')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {referenceIdentifiers
+                  ? referenceIdentifiers.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="task-output-taskResponse"
+                name="taskResponseId"
+                data-cy="taskResponse"
+                label={translate('hcpNphiesPortalApp.taskOutput.taskResponse')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {taskResponses
+                  ? taskResponses.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/task-output" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -139,7 +155,7 @@ export const TaskOutputUpdate = (props: ITaskOutputUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -147,25 +163,4 @@ export const TaskOutputUpdate = (props: ITaskOutputUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  referenceIdentifiers: storeState.referenceIdentifier.entities,
-  taskResponses: storeState.taskResponse.entities,
-  taskOutputEntity: storeState.taskOutput.entity,
-  loading: storeState.taskOutput.loading,
-  updating: storeState.taskOutput.updating,
-  updateSuccess: storeState.taskOutput.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getReferenceIdentifiers,
-  getTaskResponses,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(TaskOutputUpdate);
+export default TaskOutputUpdate;

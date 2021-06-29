@@ -37,7 +37,7 @@ public class ResponseInsurance implements Serializable {
 
     @JsonIgnoreProperties(
         value = {
-            "subscriberPatient", "beneficiary", "payor", "classComponents", "costToBeneficiaryComponents", "coverageEligibilityRequest",
+            "subscriberPatient", "beneficiary", "payor", "classComponents", "costToBeneficiaryComponents", "coverageEligibilityRequests",
         },
         allowSetters = true
     )

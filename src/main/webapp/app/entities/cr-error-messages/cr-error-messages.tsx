@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './cr-error-messages.reducer';
 import { ICRErrorMessages } from 'app/shared/model/cr-error-messages.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICRErrorMessagesProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const CRErrorMessages = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CRErrorMessages = (props: ICRErrorMessagesProps) => {
+  const cRErrorMessagesList = useAppSelector(state => state.cRErrorMessages.entities);
+  const loading = useAppSelector(state => state.cRErrorMessages.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { cRErrorMessagesList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="cr-error-messages-heading" data-cy="CRErrorMessagesHeading">
@@ -121,16 +124,4 @@ export const CRErrorMessages = (props: ICRErrorMessagesProps) => {
   );
 };
 
-const mapStateToProps = ({ cRErrorMessages }: IRootState) => ({
-  cRErrorMessagesList: cRErrorMessages.entities,
-  loading: cRErrorMessages.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CRErrorMessages);
+export default CRErrorMessages;

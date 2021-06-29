@@ -264,7 +264,7 @@ class AcknowledgementResourceIT {
         Acknowledgement partialUpdatedAcknowledgement = new Acknowledgement();
         partialUpdatedAcknowledgement.setId(acknowledgement.getId());
 
-        partialUpdatedAcknowledgement.system(UPDATED_SYSTEM);
+        partialUpdatedAcknowledgement.value(UPDATED_VALUE).parsed(UPDATED_PARSED);
 
         restAcknowledgementMockMvc
             .perform(
@@ -278,9 +278,9 @@ class AcknowledgementResourceIT {
         List<Acknowledgement> acknowledgementList = acknowledgementRepository.findAll();
         assertThat(acknowledgementList).hasSize(databaseSizeBeforeUpdate);
         Acknowledgement testAcknowledgement = acknowledgementList.get(acknowledgementList.size() - 1);
-        assertThat(testAcknowledgement.getValue()).isEqualTo(DEFAULT_VALUE);
-        assertThat(testAcknowledgement.getSystem()).isEqualTo(UPDATED_SYSTEM);
-        assertThat(testAcknowledgement.getParsed()).isEqualTo(DEFAULT_PARSED);
+        assertThat(testAcknowledgement.getValue()).isEqualTo(UPDATED_VALUE);
+        assertThat(testAcknowledgement.getSystem()).isEqualTo(DEFAULT_SYSTEM);
+        assertThat(testAcknowledgement.getParsed()).isEqualTo(UPDATED_PARSED);
     }
 
     @Test

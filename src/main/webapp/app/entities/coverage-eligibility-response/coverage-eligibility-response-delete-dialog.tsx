@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './coverage-eligibility-response.reducer';
 
-export interface ICoverageEligibilityResponseDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CoverageEligibilityResponseDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CoverageEligibilityResponseDeleteDialog = (props: ICoverageEligibilityResponseDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const coverageEligibilityResponseEntity = useAppSelector(state => state.coverageEligibilityResponse.entity);
+  const updateSuccess = useAppSelector(state => state.coverageEligibilityResponse.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/coverage-eligibility-response');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.coverageEligibilityResponseEntity.id);
+    dispatch(deleteEntity(coverageEligibilityResponseEntity.id));
   };
 
-  const { coverageEligibilityResponseEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="coverageEligibilityResponseDeleteDialogHeading">
@@ -64,14 +65,4 @@ export const CoverageEligibilityResponseDeleteDialog = (props: ICoverageEligibil
   );
 };
 
-const mapStateToProps = ({ coverageEligibilityResponse }: IRootState) => ({
-  coverageEligibilityResponseEntity: coverageEligibilityResponse.entity,
-  updateSuccess: coverageEligibilityResponse.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CoverageEligibilityResponseDeleteDialog);
+export default CoverageEligibilityResponseDeleteDialog;

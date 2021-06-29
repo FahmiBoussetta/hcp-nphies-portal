@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './exemption-component.reducer';
 
-export interface IExemptionComponentDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ExemptionComponentDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ExemptionComponentDeleteDialog = (props: IExemptionComponentDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const exemptionComponentEntity = useAppSelector(state => state.exemptionComponent.entity);
+  const updateSuccess = useAppSelector(state => state.exemptionComponent.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/exemption-component');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.exemptionComponentEntity.id);
+    dispatch(deleteEntity(exemptionComponentEntity.id));
   };
 
-  const { exemptionComponentEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="exemptionComponentDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const ExemptionComponentDeleteDialog = (props: IExemptionComponentDeleteD
   );
 };
 
-const mapStateToProps = ({ exemptionComponent }: IRootState) => ({
-  exemptionComponentEntity: exemptionComponent.entity,
-  updateSuccess: exemptionComponent.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ExemptionComponentDeleteDialog);
+export default ExemptionComponentDeleteDialog;

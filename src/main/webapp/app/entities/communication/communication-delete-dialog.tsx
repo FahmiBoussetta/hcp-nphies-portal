@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './communication.reducer';
 
-export interface ICommunicationDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CommunicationDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CommunicationDeleteDialog = (props: ICommunicationDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const communicationEntity = useAppSelector(state => state.communication.entity);
+  const updateSuccess = useAppSelector(state => state.communication.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/communication');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.communicationEntity.id);
+    dispatch(deleteEntity(communicationEntity.id));
   };
 
-  const { communicationEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="communicationDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const CommunicationDeleteDialog = (props: ICommunicationDeleteDialogProps
   );
 };
 
-const mapStateToProps = ({ communication }: IRootState) => ({
-  communicationEntity: communication.entity,
-  updateSuccess: communication.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CommunicationDeleteDialog);
+export default CommunicationDeleteDialog;

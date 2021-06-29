@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './sub-detail-item.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ISubDetailItemDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const SubDetailItemDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const SubDetailItemDetail = (props: ISubDetailItemDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { subDetailItemEntity } = props;
+  const subDetailItemEntity = useAppSelector(state => state.subDetailItem.entity);
   return (
     <Row>
       <Col md="8">
@@ -131,13 +130,4 @@ export const SubDetailItemDetail = (props: ISubDetailItemDetailProps) => {
   );
 };
 
-const mapStateToProps = ({ subDetailItem }: IRootState) => ({
-  subDetailItemEntity: subDetailItem.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(SubDetailItemDetail);
+export default SubDetailItemDetail;

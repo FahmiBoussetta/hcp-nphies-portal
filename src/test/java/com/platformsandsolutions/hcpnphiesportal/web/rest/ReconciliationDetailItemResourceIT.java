@@ -305,7 +305,7 @@ class ReconciliationDetailItemResourceIT {
         ReconciliationDetailItem partialUpdatedReconciliationDetailItem = new ReconciliationDetailItem();
         partialUpdatedReconciliationDetailItem.setId(reconciliationDetailItem.getId());
 
-        partialUpdatedReconciliationDetailItem.predecessor(UPDATED_PREDECESSOR).type(UPDATED_TYPE).date(UPDATED_DATE);
+        partialUpdatedReconciliationDetailItem.predecessor(UPDATED_PREDECESSOR);
 
         restReconciliationDetailItemMockMvc
             .perform(
@@ -321,8 +321,8 @@ class ReconciliationDetailItemResourceIT {
         ReconciliationDetailItem testReconciliationDetailItem = reconciliationDetailItemList.get(reconciliationDetailItemList.size() - 1);
         assertThat(testReconciliationDetailItem.getIdentifier()).isEqualTo(DEFAULT_IDENTIFIER);
         assertThat(testReconciliationDetailItem.getPredecessor()).isEqualTo(UPDATED_PREDECESSOR);
-        assertThat(testReconciliationDetailItem.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testReconciliationDetailItem.getDate()).isEqualTo(UPDATED_DATE);
+        assertThat(testReconciliationDetailItem.getType()).isEqualTo(DEFAULT_TYPE);
+        assertThat(testReconciliationDetailItem.getDate()).isEqualTo(DEFAULT_DATE);
         assertThat(testReconciliationDetailItem.getAmount()).isEqualByComparingTo(DEFAULT_AMOUNT);
     }
 

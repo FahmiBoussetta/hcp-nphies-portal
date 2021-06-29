@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './attachment.reducer';
 
-export interface IAttachmentDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const AttachmentDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AttachmentDeleteDialog = (props: IAttachmentDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const attachmentEntity = useAppSelector(state => state.attachment.entity);
+  const updateSuccess = useAppSelector(state => state.attachment.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/attachment');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.attachmentEntity.id);
+    dispatch(deleteEntity(attachmentEntity.id));
   };
 
-  const { attachmentEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="attachmentDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const AttachmentDeleteDialog = (props: IAttachmentDeleteDialogProps) => {
   );
 };
 
-const mapStateToProps = ({ attachment }: IRootState) => ({
-  attachmentEntity: attachment.entity,
-  updateSuccess: attachment.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AttachmentDeleteDialog);
+export default AttachmentDeleteDialog;

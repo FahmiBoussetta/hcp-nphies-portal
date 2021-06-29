@@ -337,7 +337,12 @@ class AttachmentResourceIT {
         Attachment partialUpdatedAttachment = new Attachment();
         partialUpdatedAttachment.setId(attachment.getId());
 
-        partialUpdatedAttachment.title(UPDATED_TITLE).url(UPDATED_URL).attachmentSize(UPDATED_ATTACHMENT_SIZE);
+        partialUpdatedAttachment
+            .title(UPDATED_TITLE)
+            .isData(UPDATED_IS_DATA)
+            .attachmentSize(UPDATED_ATTACHMENT_SIZE)
+            .hash(UPDATED_HASH)
+            .hashContentType(UPDATED_HASH_CONTENT_TYPE);
 
         restAttachmentMockMvc
             .perform(
@@ -354,13 +359,13 @@ class AttachmentResourceIT {
         assertThat(testAttachment.getContentType()).isEqualTo(DEFAULT_CONTENT_TYPE);
         assertThat(testAttachment.getTitle()).isEqualTo(UPDATED_TITLE);
         assertThat(testAttachment.getLanguage()).isEqualTo(DEFAULT_LANGUAGE);
-        assertThat(testAttachment.getIsData()).isEqualTo(DEFAULT_IS_DATA);
+        assertThat(testAttachment.getIsData()).isEqualTo(UPDATED_IS_DATA);
         assertThat(testAttachment.getDataFile()).isEqualTo(DEFAULT_DATA_FILE);
         assertThat(testAttachment.getDataFileContentType()).isEqualTo(DEFAULT_DATA_FILE_CONTENT_TYPE);
-        assertThat(testAttachment.getUrl()).isEqualTo(UPDATED_URL);
+        assertThat(testAttachment.getUrl()).isEqualTo(DEFAULT_URL);
         assertThat(testAttachment.getAttachmentSize()).isEqualTo(UPDATED_ATTACHMENT_SIZE);
-        assertThat(testAttachment.getHash()).isEqualTo(DEFAULT_HASH);
-        assertThat(testAttachment.getHashContentType()).isEqualTo(DEFAULT_HASH_CONTENT_TYPE);
+        assertThat(testAttachment.getHash()).isEqualTo(UPDATED_HASH);
+        assertThat(testAttachment.getHashContentType()).isEqualTo(UPDATED_HASH_CONTENT_TYPE);
     }
 
     @Test

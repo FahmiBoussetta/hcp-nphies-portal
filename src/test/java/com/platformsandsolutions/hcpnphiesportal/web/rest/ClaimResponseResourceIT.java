@@ -273,7 +273,7 @@ class ClaimResponseResourceIT {
         ClaimResponse partialUpdatedClaimResponse = new ClaimResponse();
         partialUpdatedClaimResponse.setId(claimResponse.getId());
 
-        partialUpdatedClaimResponse.parsed(UPDATED_PARSED);
+        partialUpdatedClaimResponse.value(UPDATED_VALUE).parsed(UPDATED_PARSED).outcome(UPDATED_OUTCOME);
 
         restClaimResponseMockMvc
             .perform(
@@ -287,10 +287,10 @@ class ClaimResponseResourceIT {
         List<ClaimResponse> claimResponseList = claimResponseRepository.findAll();
         assertThat(claimResponseList).hasSize(databaseSizeBeforeUpdate);
         ClaimResponse testClaimResponse = claimResponseList.get(claimResponseList.size() - 1);
-        assertThat(testClaimResponse.getValue()).isEqualTo(DEFAULT_VALUE);
+        assertThat(testClaimResponse.getValue()).isEqualTo(UPDATED_VALUE);
         assertThat(testClaimResponse.getSystem()).isEqualTo(DEFAULT_SYSTEM);
         assertThat(testClaimResponse.getParsed()).isEqualTo(UPDATED_PARSED);
-        assertThat(testClaimResponse.getOutcome()).isEqualTo(DEFAULT_OUTCOME);
+        assertThat(testClaimResponse.getOutcome()).isEqualTo(UPDATED_OUTCOME);
     }
 
     @Test

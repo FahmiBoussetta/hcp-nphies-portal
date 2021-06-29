@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntity } from './list-role-code-enum.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IListRoleCodeEnumDetailProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const ListRoleCodeEnumDetail = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const ListRoleCodeEnumDetail = (props: IListRoleCodeEnumDetailProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
 
-  const { listRoleCodeEnumEntity } = props;
+  const listRoleCodeEnumEntity = useAppSelector(state => state.listRoleCodeEnum.entity);
   return (
     <Row>
       <Col md="8">
@@ -59,13 +58,4 @@ export const ListRoleCodeEnumDetail = (props: IListRoleCodeEnumDetailProps) => {
   );
 };
 
-const mapStateToProps = ({ listRoleCodeEnum }: IRootState) => ({
-  listRoleCodeEnumEntity: listRoleCodeEnum.entity,
-});
-
-const mapDispatchToProps = { getEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListRoleCodeEnumDetail);
+export default ListRoleCodeEnumDetail;

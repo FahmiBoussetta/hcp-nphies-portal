@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { ICommunication } from 'app/shared/model/communication.model';
 import { getEntities as getCommunications } from 'app/entities/communication/communication.reducer';
@@ -15,13 +12,19 @@ import { getEntity, updateEntity, createEntity, reset } from './note.reducer';
 import { INote } from 'app/shared/model/note.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface INoteUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const NoteUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const NoteUpdate = (props: INoteUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { noteEntity, communications, communicationRequests, loading, updating } = props;
+  const communications = useAppSelector(state => state.communication.entities);
+  const communicationRequests = useAppSelector(state => state.communicationRequest.entities);
+  const noteEntity = useAppSelector(state => state.note.entity);
+  const loading = useAppSelector(state => state.note.loading);
+  const updating = useAppSelector(state => state.note.updating);
+  const updateSuccess = useAppSelector(state => state.note.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/note');
@@ -29,39 +32,49 @@ export const NoteUpdate = (props: INoteUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getCommunications();
-    props.getCommunicationRequests();
+    dispatch(getCommunications({}));
+    dispatch(getCommunicationRequests({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
+  const saveEntity = values => {
     values.time = convertDateTimeToServer(values.time);
 
-    if (errors.length === 0) {
-      const entity = {
-        ...noteEntity,
-        ...values,
-        communication: communications.find(it => it.id.toString() === values.communicationId.toString()),
-        communicationRequest: communicationRequests.find(it => it.id.toString() === values.communicationRequestId.toString()),
-      };
+    const entity = {
+      ...noteEntity,
+      ...values,
+      communication: communications.find(it => it.id.toString() === values.communicationId.toString()),
+      communicationRequest: communicationRequests.find(it => it.id.toString() === values.communicationRequestId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {
+          time: displayDefaultDateTime(),
+        }
+      : {
+          ...noteEntity,
+          time: convertDateTimeFromServer(noteEntity.time),
+          communicationId: noteEntity?.communication?.id,
+          communicationRequestId: noteEntity?.communicationRequest?.id,
+        };
 
   return (
     <div>
@@ -77,78 +90,66 @@ export const NoteUpdate = (props: INoteUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : noteEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="note-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="note-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
-              ) : null}
-              <AvGroup>
-                <Label id="textLabel" for="note-text">
-                  <Translate contentKey="hcpNphiesPortalApp.note.text">Text</Translate>
-                </Label>
-                <AvField id="note-text" data-cy="text" type="text" name="text" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="authorLabel" for="note-author">
-                  <Translate contentKey="hcpNphiesPortalApp.note.author">Author</Translate>
-                </Label>
-                <AvField id="note-author" data-cy="author" type="text" name="author" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="timeLabel" for="note-time">
-                  <Translate contentKey="hcpNphiesPortalApp.note.time">Time</Translate>
-                </Label>
-                <AvInput
-                  id="note-time"
-                  data-cy="time"
-                  type="datetime-local"
-                  className="form-control"
-                  name="time"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.noteEntity.time)}
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="note-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
                 />
-              </AvGroup>
-              <AvGroup>
-                <Label for="note-communication">
-                  <Translate contentKey="hcpNphiesPortalApp.note.communication">Communication</Translate>
-                </Label>
-                <AvInput id="note-communication" data-cy="communication" type="select" className="form-control" name="communicationId">
-                  <option value="" key="0" />
-                  {communications
-                    ? communications.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="note-communicationRequest">
-                  <Translate contentKey="hcpNphiesPortalApp.note.communicationRequest">Communication Request</Translate>
-                </Label>
-                <AvInput
-                  id="note-communicationRequest"
-                  data-cy="communicationRequest"
-                  type="select"
-                  className="form-control"
-                  name="communicationRequestId"
-                >
-                  <option value="" key="0" />
-                  {communicationRequests
-                    ? communicationRequests.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/note" replace color="info">
+              ) : null}
+              <ValidatedField label={translate('hcpNphiesPortalApp.note.text')} id="note-text" name="text" data-cy="text" type="text" />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.note.author')}
+                id="note-author"
+                name="author"
+                data-cy="author"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.note.time')}
+                id="note-time"
+                name="time"
+                data-cy="time"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                id="note-communication"
+                name="communicationId"
+                data-cy="communication"
+                label={translate('hcpNphiesPortalApp.note.communication')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {communications
+                  ? communications.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="note-communicationRequest"
+                name="communicationRequestId"
+                data-cy="communicationRequest"
+                label={translate('hcpNphiesPortalApp.note.communicationRequest')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {communicationRequests
+                  ? communicationRequests.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/note" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -161,7 +162,7 @@ export const NoteUpdate = (props: INoteUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -169,25 +170,4 @@ export const NoteUpdate = (props: INoteUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  communications: storeState.communication.entities,
-  communicationRequests: storeState.communicationRequest.entities,
-  noteEntity: storeState.note.entity,
-  loading: storeState.note.loading,
-  updating: storeState.note.updating,
-  updateSuccess: storeState.note.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getCommunications,
-  getCommunicationRequests,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(NoteUpdate);
+export default NoteUpdate;

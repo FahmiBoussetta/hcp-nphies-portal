@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './cov-eli-error-messages.reducer';
 
-export interface ICovEliErrorMessagesDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CovEliErrorMessagesDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CovEliErrorMessagesDeleteDialog = (props: ICovEliErrorMessagesDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const covEliErrorMessagesEntity = useAppSelector(state => state.covEliErrorMessages.entity);
+  const updateSuccess = useAppSelector(state => state.covEliErrorMessages.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/cov-eli-error-messages');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.covEliErrorMessagesEntity.id);
+    dispatch(deleteEntity(covEliErrorMessagesEntity.id));
   };
 
-  const { covEliErrorMessagesEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="covEliErrorMessagesDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const CovEliErrorMessagesDeleteDialog = (props: ICovEliErrorMessagesDelet
   );
 };
 
-const mapStateToProps = ({ covEliErrorMessages }: IRootState) => ({
-  covEliErrorMessagesEntity: covEliErrorMessages.entity,
-  updateSuccess: covEliErrorMessages.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CovEliErrorMessagesDeleteDialog);
+export default CovEliErrorMessagesDeleteDialog;

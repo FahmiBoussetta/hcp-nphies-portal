@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './payment-reconciliation.reducer';
 import { IPaymentReconciliation } from 'app/shared/model/payment-reconciliation.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPaymentReconciliationProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const PaymentReconciliation = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PaymentReconciliation = (props: IPaymentReconciliationProps) => {
+  const paymentReconciliationList = useAppSelector(state => state.paymentReconciliation.entities);
+  const loading = useAppSelector(state => state.paymentReconciliation.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { paymentReconciliationList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="payment-reconciliation-heading" data-cy="PaymentReconciliationHeading">
@@ -167,16 +170,4 @@ export const PaymentReconciliation = (props: IPaymentReconciliationProps) => {
   );
 };
 
-const mapStateToProps = ({ paymentReconciliation }: IRootState) => ({
-  paymentReconciliationList: paymentReconciliation.entities,
-  loading: paymentReconciliation.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PaymentReconciliation);
+export default PaymentReconciliation;

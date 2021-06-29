@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './adjudication-notes.reducer';
 import { IAdjudicationNotes } from 'app/shared/model/adjudication-notes.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IAdjudicationNotesProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const AdjudicationNotes = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const AdjudicationNotes = (props: IAdjudicationNotesProps) => {
+  const adjudicationNotesList = useAppSelector(state => state.adjudicationNotes.entities);
+  const loading = useAppSelector(state => state.adjudicationNotes.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { adjudicationNotesList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="adjudication-notes-heading" data-cy="AdjudicationNotesHeading">
@@ -121,16 +124,4 @@ export const AdjudicationNotes = (props: IAdjudicationNotesProps) => {
   );
 };
 
-const mapStateToProps = ({ adjudicationNotes }: IRootState) => ({
-  adjudicationNotesList: adjudicationNotes.entities,
-  loading: adjudicationNotes.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdjudicationNotes);
+export default AdjudicationNotes;

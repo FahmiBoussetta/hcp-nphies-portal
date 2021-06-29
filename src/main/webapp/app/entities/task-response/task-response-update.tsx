@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { getEntity, updateEntity, createEntity, reset } from './task-response.reducer';
 import { ITaskResponse } from 'app/shared/model/task-response.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ITaskResponseUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const TaskResponseUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const TaskResponseUpdate = (props: ITaskResponseUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { taskResponseEntity, loading, updating } = props;
+  const taskResponseEntity = useAppSelector(state => state.taskResponse.entity);
+  const loading = useAppSelector(state => state.taskResponse.loading);
+  const updating = useAppSelector(state => state.taskResponse.updating);
+  const updateSuccess = useAppSelector(state => state.taskResponse.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/task-response');
@@ -25,32 +26,37 @@ export const TaskResponseUpdate = (props: ITaskResponseUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...taskResponseEntity,
-        ...values,
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...taskResponseEntity,
+      ...values,
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...taskResponseEntity,
+        };
 
   return (
     <div>
@@ -66,40 +72,46 @@ export const TaskResponseUpdate = (props: ITaskResponseUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : taskResponseEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="task-response-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="task-response-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="task-response-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="valueLabel" for="task-response-value">
-                  <Translate contentKey="hcpNphiesPortalApp.taskResponse.value">Value</Translate>
-                </Label>
-                <AvField id="task-response-value" data-cy="value" type="text" name="value" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="systemLabel" for="task-response-system">
-                  <Translate contentKey="hcpNphiesPortalApp.taskResponse.system">System</Translate>
-                </Label>
-                <AvField id="task-response-system" data-cy="system" type="text" name="system" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="parsedLabel" for="task-response-parsed">
-                  <Translate contentKey="hcpNphiesPortalApp.taskResponse.parsed">Parsed</Translate>
-                </Label>
-                <AvField id="task-response-parsed" data-cy="parsed" type="text" name="parsed" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="statusLabel" for="task-response-status">
-                  <Translate contentKey="hcpNphiesPortalApp.taskResponse.status">Status</Translate>
-                </Label>
-                <AvField id="task-response-status" data-cy="status" type="text" name="status" />
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/task-response" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.taskResponse.value')}
+                id="task-response-value"
+                name="value"
+                data-cy="value"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.taskResponse.system')}
+                id="task-response-system"
+                name="system"
+                data-cy="system"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.taskResponse.parsed')}
+                id="task-response-parsed"
+                name="parsed"
+                data-cy="parsed"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.taskResponse.status')}
+                id="task-response-status"
+                name="status"
+                data-cy="status"
+                type="text"
+              />
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/task-response" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -112,7 +124,7 @@ export const TaskResponseUpdate = (props: ITaskResponseUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -120,21 +132,4 @@ export const TaskResponseUpdate = (props: ITaskResponseUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  taskResponseEntity: storeState.taskResponse.entity,
-  loading: storeState.taskResponse.loading,
-  updating: storeState.taskResponse.updating,
-  updateSuccess: storeState.taskResponse.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(TaskResponseUpdate);
+export default TaskResponseUpdate;

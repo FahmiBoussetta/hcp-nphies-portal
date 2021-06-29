@@ -1,156 +1,121 @@
 import axios from 'axios';
-import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
-
+import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { ICostToBeneficiaryComponent, defaultValue } from 'app/shared/model/cost-to-beneficiary-component.model';
 
-export const ACTION_TYPES = {
-  FETCH_COSTTOBENEFICIARYCOMPONENT_LIST: 'costToBeneficiaryComponent/FETCH_COSTTOBENEFICIARYCOMPONENT_LIST',
-  FETCH_COSTTOBENEFICIARYCOMPONENT: 'costToBeneficiaryComponent/FETCH_COSTTOBENEFICIARYCOMPONENT',
-  CREATE_COSTTOBENEFICIARYCOMPONENT: 'costToBeneficiaryComponent/CREATE_COSTTOBENEFICIARYCOMPONENT',
-  UPDATE_COSTTOBENEFICIARYCOMPONENT: 'costToBeneficiaryComponent/UPDATE_COSTTOBENEFICIARYCOMPONENT',
-  PARTIAL_UPDATE_COSTTOBENEFICIARYCOMPONENT: 'costToBeneficiaryComponent/PARTIAL_UPDATE_COSTTOBENEFICIARYCOMPONENT',
-  DELETE_COSTTOBENEFICIARYCOMPONENT: 'costToBeneficiaryComponent/DELETE_COSTTOBENEFICIARYCOMPONENT',
-  RESET: 'costToBeneficiaryComponent/RESET',
-};
-
-const initialState = {
+const initialState: EntityState<ICostToBeneficiaryComponent> = {
   loading: false,
   errorMessage: null,
-  entities: [] as ReadonlyArray<ICostToBeneficiaryComponent>,
+  entities: [],
   entity: defaultValue,
   updating: false,
   updateSuccess: false,
-};
-
-export type CostToBeneficiaryComponentState = Readonly<typeof initialState>;
-
-// Reducer
-
-export default (state: CostToBeneficiaryComponentState = initialState, action): CostToBeneficiaryComponentState => {
-  switch (action.type) {
-    case REQUEST(ACTION_TYPES.FETCH_COSTTOBENEFICIARYCOMPONENT_LIST):
-    case REQUEST(ACTION_TYPES.FETCH_COSTTOBENEFICIARYCOMPONENT):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        loading: true,
-      };
-    case REQUEST(ACTION_TYPES.CREATE_COSTTOBENEFICIARYCOMPONENT):
-    case REQUEST(ACTION_TYPES.UPDATE_COSTTOBENEFICIARYCOMPONENT):
-    case REQUEST(ACTION_TYPES.DELETE_COSTTOBENEFICIARYCOMPONENT):
-    case REQUEST(ACTION_TYPES.PARTIAL_UPDATE_COSTTOBENEFICIARYCOMPONENT):
-      return {
-        ...state,
-        errorMessage: null,
-        updateSuccess: false,
-        updating: true,
-      };
-    case FAILURE(ACTION_TYPES.FETCH_COSTTOBENEFICIARYCOMPONENT_LIST):
-    case FAILURE(ACTION_TYPES.FETCH_COSTTOBENEFICIARYCOMPONENT):
-    case FAILURE(ACTION_TYPES.CREATE_COSTTOBENEFICIARYCOMPONENT):
-    case FAILURE(ACTION_TYPES.UPDATE_COSTTOBENEFICIARYCOMPONENT):
-    case FAILURE(ACTION_TYPES.PARTIAL_UPDATE_COSTTOBENEFICIARYCOMPONENT):
-    case FAILURE(ACTION_TYPES.DELETE_COSTTOBENEFICIARYCOMPONENT):
-      return {
-        ...state,
-        loading: false,
-        updating: false,
-        updateSuccess: false,
-        errorMessage: action.payload,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_COSTTOBENEFICIARYCOMPONENT_LIST):
-      return {
-        ...state,
-        loading: false,
-        entities: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.FETCH_COSTTOBENEFICIARYCOMPONENT):
-      return {
-        ...state,
-        loading: false,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.CREATE_COSTTOBENEFICIARYCOMPONENT):
-    case SUCCESS(ACTION_TYPES.UPDATE_COSTTOBENEFICIARYCOMPONENT):
-    case SUCCESS(ACTION_TYPES.PARTIAL_UPDATE_COSTTOBENEFICIARYCOMPONENT):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: action.payload.data,
-      };
-    case SUCCESS(ACTION_TYPES.DELETE_COSTTOBENEFICIARYCOMPONENT):
-      return {
-        ...state,
-        updating: false,
-        updateSuccess: true,
-        entity: {},
-      };
-    case ACTION_TYPES.RESET:
-      return {
-        ...initialState,
-      };
-    default:
-      return state;
-  }
 };
 
 const apiUrl = 'api/cost-to-beneficiary-components';
 
 // Actions
 
-export const getEntities: ICrudGetAllAction<ICostToBeneficiaryComponent> = (page, size, sort) => ({
-  type: ACTION_TYPES.FETCH_COSTTOBENEFICIARYCOMPONENT_LIST,
-  payload: axios.get<ICostToBeneficiaryComponent>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+export const getEntities = createAsyncThunk('costToBeneficiaryComponent/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+  const requestUrl = `${apiUrl}?cacheBuster=${new Date().getTime()}`;
+  return axios.get<ICostToBeneficiaryComponent[]>(requestUrl);
 });
 
-export const getEntity: ICrudGetAction<ICostToBeneficiaryComponent> = id => {
-  const requestUrl = `${apiUrl}/${id}`;
-  return {
-    type: ACTION_TYPES.FETCH_COSTTOBENEFICIARYCOMPONENT,
-    payload: axios.get<ICostToBeneficiaryComponent>(requestUrl),
-  };
-};
+export const getEntity = createAsyncThunk(
+  'costToBeneficiaryComponent/fetch_entity',
+  async (id: string | number) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    return axios.get<ICostToBeneficiaryComponent>(requestUrl);
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const createEntity: ICrudPutAction<ICostToBeneficiaryComponent> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.CREATE_COSTTOBENEFICIARYCOMPONENT,
-    payload: axios.post(apiUrl, cleanEntity(entity)),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const createEntity = createAsyncThunk(
+  'costToBeneficiaryComponent/create_entity',
+  async (entity: ICostToBeneficiaryComponent, thunkAPI) => {
+    const result = await axios.post<ICostToBeneficiaryComponent>(apiUrl, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const updateEntity: ICrudPutAction<ICostToBeneficiaryComponent> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.UPDATE_COSTTOBENEFICIARYCOMPONENT,
-    payload: axios.put(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const updateEntity = createAsyncThunk(
+  'costToBeneficiaryComponent/update_entity',
+  async (entity: ICostToBeneficiaryComponent, thunkAPI) => {
+    const result = await axios.put<ICostToBeneficiaryComponent>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const partialUpdate: ICrudPutAction<ICostToBeneficiaryComponent> = entity => async dispatch => {
-  const result = await dispatch({
-    type: ACTION_TYPES.PARTIAL_UPDATE_COSTTOBENEFICIARYCOMPONENT,
-    payload: axios.patch(`${apiUrl}/${entity.id}`, cleanEntity(entity)),
-  });
-  return result;
-};
+export const partialUpdateEntity = createAsyncThunk(
+  'costToBeneficiaryComponent/partial_update_entity',
+  async (entity: ICostToBeneficiaryComponent, thunkAPI) => {
+    const result = await axios.patch<ICostToBeneficiaryComponent>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const deleteEntity: ICrudDeleteAction<ICostToBeneficiaryComponent> = id => async dispatch => {
-  const requestUrl = `${apiUrl}/${id}`;
-  const result = await dispatch({
-    type: ACTION_TYPES.DELETE_COSTTOBENEFICIARYCOMPONENT,
-    payload: axios.delete(requestUrl),
-  });
-  dispatch(getEntities());
-  return result;
-};
+export const deleteEntity = createAsyncThunk(
+  'costToBeneficiaryComponent/delete_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/${id}`;
+    const result = await axios.delete<ICostToBeneficiaryComponent>(requestUrl);
+    thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
 
-export const reset = () => ({
-  type: ACTION_TYPES.RESET,
+// slice
+
+export const CostToBeneficiaryComponentSlice = createEntitySlice({
+  name: 'costToBeneficiaryComponent',
+  initialState,
+  extraReducers(builder) {
+    builder
+      .addCase(getEntity.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entity = action.payload.data;
+      })
+      .addCase(deleteEntity.fulfilled, state => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = {};
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          entities: action.payload.data,
+        };
+      })
+      .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
+        state.updating = false;
+        state.loading = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isPending(getEntities, getEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.loading = true;
+      })
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+        state.errorMessage = null;
+        state.updateSuccess = false;
+        state.updating = true;
+      });
+  },
 });
+
+export const { reset } = CostToBeneficiaryComponentSlice.actions;
+
+// Reducer
+export default CostToBeneficiaryComponentSlice.reducer;

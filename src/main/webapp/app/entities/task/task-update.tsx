@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IOrganization } from 'app/shared/model/organization.model';
 import { getEntities as getOrganizations } from 'app/entities/organization/organization.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './task.reducer';
 import { ITask } from 'app/shared/model/task.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ITaskUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const TaskUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const TaskUpdate = (props: ITaskUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { taskEntity, organizations, loading, updating } = props;
+  const organizations = useAppSelector(state => state.organization.entities);
+  const taskEntity = useAppSelector(state => state.task.entity);
+  const loading = useAppSelector(state => state.task.loading);
+  const updating = useAppSelector(state => state.task.updating);
+  const updateSuccess = useAppSelector(state => state.task.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/task');
@@ -27,36 +29,45 @@ export const TaskUpdate = (props: ITaskUpdateProps) => {
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getOrganizations();
+    dispatch(getOrganizations({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...taskEntity,
-        ...values,
-        requester: organizations.find(it => it.id.toString() === values.requesterId.toString()),
-        owner: organizations.find(it => it.id.toString() === values.ownerId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...taskEntity,
+      ...values,
+      requester: organizations.find(it => it.id.toString() === values.requesterId.toString()),
+      owner: organizations.find(it => it.id.toString() === values.ownerId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...taskEntity,
+          code: 'Cancel',
+          reasonCode: 'WI',
+          requesterId: taskEntity?.requester?.id,
+          ownerId: taskEntity?.owner?.id,
+        };
 
   return (
     <div>
@@ -72,119 +83,100 @@ export const TaskUpdate = (props: ITaskUpdateProps) => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : taskEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="task-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="task-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="task-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="guidLabel" for="task-guid">
-                  <Translate contentKey="hcpNphiesPortalApp.task.guid">Guid</Translate>
-                </Label>
-                <AvField id="task-guid" data-cy="guid" type="text" name="guid" />
-              </AvGroup>
-              <AvGroup check>
-                <Label id="isQueuedLabel">
-                  <AvInput id="task-isQueued" data-cy="isQueued" type="checkbox" className="form-check-input" name="isQueued" />
-                  <Translate contentKey="hcpNphiesPortalApp.task.isQueued">Is Queued</Translate>
-                </Label>
-              </AvGroup>
-              <AvGroup>
-                <Label id="parsedLabel" for="task-parsed">
-                  <Translate contentKey="hcpNphiesPortalApp.task.parsed">Parsed</Translate>
-                </Label>
-                <AvField id="task-parsed" data-cy="parsed" type="text" name="parsed" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="identifierLabel" for="task-identifier">
-                  <Translate contentKey="hcpNphiesPortalApp.task.identifier">Identifier</Translate>
-                </Label>
-                <AvField id="task-identifier" data-cy="identifier" type="text" name="identifier" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="codeLabel" for="task-code">
-                  <Translate contentKey="hcpNphiesPortalApp.task.code">Code</Translate>
-                </Label>
-                <AvInput
-                  id="task-code"
-                  data-cy="code"
-                  type="select"
-                  className="form-control"
-                  name="code"
-                  value={(!isNew && taskEntity.code) || 'Cancel'}
-                >
-                  <option value="Cancel">{translate('hcpNphiesPortalApp.TaskCodeEnum.Cancel')}</option>
-                  <option value="Nullify">{translate('hcpNphiesPortalApp.TaskCodeEnum.Nullify')}</option>
-                  <option value="Poll">{translate('hcpNphiesPortalApp.TaskCodeEnum.Poll')}</option>
-                  <option value="Release">{translate('hcpNphiesPortalApp.TaskCodeEnum.Release')}</option>
-                  <option value="Reprocess">{translate('hcpNphiesPortalApp.TaskCodeEnum.Reprocess')}</option>
-                  <option value="Status">{translate('hcpNphiesPortalApp.TaskCodeEnum.Status')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label id="descriptionLabel" for="task-description">
-                  <Translate contentKey="hcpNphiesPortalApp.task.description">Description</Translate>
-                </Label>
-                <AvField id="task-description" data-cy="description" type="text" name="description" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="focusLabel" for="task-focus">
-                  <Translate contentKey="hcpNphiesPortalApp.task.focus">Focus</Translate>
-                </Label>
-                <AvField id="task-focus" data-cy="focus" type="text" name="focus" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="reasonCodeLabel" for="task-reasonCode">
-                  <Translate contentKey="hcpNphiesPortalApp.task.reasonCode">Reason Code</Translate>
-                </Label>
-                <AvInput
-                  id="task-reasonCode"
-                  data-cy="reasonCode"
-                  type="select"
-                  className="form-control"
-                  name="reasonCode"
-                  value={(!isNew && taskEntity.reasonCode) || 'WI'}
-                >
-                  <option value="WI">{translate('hcpNphiesPortalApp.TaskReasonCodeEnum.WI')}</option>
-                  <option value="NP">{translate('hcpNphiesPortalApp.TaskReasonCodeEnum.NP')}</option>
-                  <option value="TAS">{translate('hcpNphiesPortalApp.TaskReasonCodeEnum.TAS')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="task-requester">
-                  <Translate contentKey="hcpNphiesPortalApp.task.requester">Requester</Translate>
-                </Label>
-                <AvInput id="task-requester" data-cy="requester" type="select" className="form-control" name="requesterId">
-                  <option value="" key="0" />
-                  {organizations
-                    ? organizations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="task-owner">
-                  <Translate contentKey="hcpNphiesPortalApp.task.owner">Owner</Translate>
-                </Label>
-                <AvInput id="task-owner" data-cy="owner" type="select" className="form-control" name="ownerId">
-                  <option value="" key="0" />
-                  {organizations
-                    ? organizations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/task" replace color="info">
+              <ValidatedField label={translate('hcpNphiesPortalApp.task.guid')} id="task-guid" name="guid" data-cy="guid" type="text" />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.task.isQueued')}
+                id="task-isQueued"
+                name="isQueued"
+                data-cy="isQueued"
+                check
+                type="checkbox"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.task.parsed')}
+                id="task-parsed"
+                name="parsed"
+                data-cy="parsed"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.task.identifier')}
+                id="task-identifier"
+                name="identifier"
+                data-cy="identifier"
+                type="text"
+              />
+              <ValidatedField label={translate('hcpNphiesPortalApp.task.code')} id="task-code" name="code" data-cy="code" type="select">
+                <option value="Cancel">{translate('hcpNphiesPortalApp.TaskCodeEnum.Cancel')}</option>
+                <option value="Nullify">{translate('hcpNphiesPortalApp.TaskCodeEnum.Nullify')}</option>
+                <option value="Poll">{translate('hcpNphiesPortalApp.TaskCodeEnum.Poll')}</option>
+                <option value="Release">{translate('hcpNphiesPortalApp.TaskCodeEnum.Release')}</option>
+                <option value="Reprocess">{translate('hcpNphiesPortalApp.TaskCodeEnum.Reprocess')}</option>
+                <option value="Status">{translate('hcpNphiesPortalApp.TaskCodeEnum.Status')}</option>
+              </ValidatedField>
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.task.description')}
+                id="task-description"
+                name="description"
+                data-cy="description"
+                type="text"
+              />
+              <ValidatedField label={translate('hcpNphiesPortalApp.task.focus')} id="task-focus" name="focus" data-cy="focus" type="text" />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.task.reasonCode')}
+                id="task-reasonCode"
+                name="reasonCode"
+                data-cy="reasonCode"
+                type="select"
+              >
+                <option value="WI">{translate('hcpNphiesPortalApp.TaskReasonCodeEnum.WI')}</option>
+                <option value="NP">{translate('hcpNphiesPortalApp.TaskReasonCodeEnum.NP')}</option>
+                <option value="TAS">{translate('hcpNphiesPortalApp.TaskReasonCodeEnum.TAS')}</option>
+              </ValidatedField>
+              <ValidatedField
+                id="task-requester"
+                name="requesterId"
+                data-cy="requester"
+                label={translate('hcpNphiesPortalApp.task.requester')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {organizations
+                  ? organizations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="task-owner"
+                name="ownerId"
+                data-cy="owner"
+                label={translate('hcpNphiesPortalApp.task.owner')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {organizations
+                  ? organizations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/task" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -197,7 +189,7 @@ export const TaskUpdate = (props: ITaskUpdateProps) => {
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -205,23 +197,4 @@ export const TaskUpdate = (props: ITaskUpdateProps) => {
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  organizations: storeState.organization.entities,
-  taskEntity: storeState.task.entity,
-  loading: storeState.task.loading,
-  updating: storeState.task.updating,
-  updateSuccess: storeState.task.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getOrganizations,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(TaskUpdate);
+export default TaskUpdate;

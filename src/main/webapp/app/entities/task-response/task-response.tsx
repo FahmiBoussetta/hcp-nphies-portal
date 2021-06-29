@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './task-response.reducer';
 import { ITaskResponse } from 'app/shared/model/task-response.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ITaskResponseProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const TaskResponse = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const TaskResponse = (props: ITaskResponseProps) => {
+  const taskResponseList = useAppSelector(state => state.taskResponse.entities);
+  const loading = useAppSelector(state => state.taskResponse.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { taskResponseList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="task-response-heading" data-cy="TaskResponseHeading">
@@ -117,16 +120,4 @@ export const TaskResponse = (props: ITaskResponseProps) => {
   );
 };
 
-const mapStateToProps = ({ taskResponse }: IRootState) => ({
-  taskResponseList: taskResponse.entities,
-  loading: taskResponse.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(TaskResponse);
+export default TaskResponse;

@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IPatient } from 'app/shared/model/patient.model';
 import { getEntities as getPatients } from 'app/entities/patient/patient.reducer';
@@ -13,17 +10,27 @@ import { IOrganization } from 'app/shared/model/organization.model';
 import { getEntities as getOrganizations } from 'app/entities/organization/organization.reducer';
 import { ILocation } from 'app/shared/model/location.model';
 import { getEntities as getLocations } from 'app/entities/location/location.reducer';
+import { ICoverage } from 'app/shared/model/coverage.model';
+import { getEntities as getCoverages } from 'app/entities/coverage/coverage.reducer';
 import { getEntity, updateEntity, createEntity, reset } from './coverage-eligibility-request.reducer';
 import { ICoverageEligibilityRequest } from 'app/shared/model/coverage-eligibility-request.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface ICoverageEligibilityRequestUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const CoverageEligibilityRequestUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const CoverageEligibilityRequestUpdate = (props: ICoverageEligibilityRequestUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { coverageEligibilityRequestEntity, patients, organizations, locations, loading, updating } = props;
+  const patients = useAppSelector(state => state.patient.entities);
+  const organizations = useAppSelector(state => state.organization.entities);
+  const locations = useAppSelector(state => state.location.entities);
+  const coverages = useAppSelector(state => state.coverage.entities);
+  const coverageEligibilityRequestEntity = useAppSelector(state => state.coverageEligibilityRequest.entity);
+  const loading = useAppSelector(state => state.coverageEligibilityRequest.loading);
+  const updating = useAppSelector(state => state.coverageEligibilityRequest.updating);
+  const updateSuccess = useAppSelector(state => state.coverageEligibilityRequest.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/coverage-eligibility-request');
@@ -31,43 +38,61 @@ export const CoverageEligibilityRequestUpdate = (props: ICoverageEligibilityRequ
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getPatients();
-    props.getOrganizations();
-    props.getLocations();
+    dispatch(getPatients({}));
+    dispatch(getOrganizations({}));
+    dispatch(getLocations({}));
+    dispatch(getCoverages({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
+  const saveEntity = values => {
     values.servicedDate = convertDateTimeToServer(values.servicedDate);
     values.servicedDateEnd = convertDateTimeToServer(values.servicedDateEnd);
 
-    if (errors.length === 0) {
-      const entity = {
-        ...coverageEligibilityRequestEntity,
-        ...values,
-        patient: patients.find(it => it.id.toString() === values.patientId.toString()),
-        provider: organizations.find(it => it.id.toString() === values.providerId.toString()),
-        insurer: organizations.find(it => it.id.toString() === values.insurerId.toString()),
-        facility: locations.find(it => it.id.toString() === values.facilityId.toString()),
-      };
+    const entity = {
+      ...coverageEligibilityRequestEntity,
+      ...values,
+      coverages: mapIdList(values.coverages),
+      patient: patients.find(it => it.id.toString() === values.patientId.toString()),
+      provider: organizations.find(it => it.id.toString() === values.providerId.toString()),
+      insurer: organizations.find(it => it.id.toString() === values.insurerId.toString()),
+      facility: locations.find(it => it.id.toString() === values.facilityId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {
+          servicedDate: displayDefaultDateTime(),
+          servicedDateEnd: displayDefaultDateTime(),
+        }
+      : {
+          ...coverageEligibilityRequestEntity,
+          priority: 'Stat',
+          servicedDate: convertDateTimeFromServer(coverageEligibilityRequestEntity.servicedDate),
+          servicedDateEnd: convertDateTimeFromServer(coverageEligibilityRequestEntity.servicedDateEnd),
+          patientId: coverageEligibilityRequestEntity?.patient?.id,
+          providerId: coverageEligibilityRequestEntity?.provider?.id,
+          insurerId: coverageEligibilityRequestEntity?.insurer?.id,
+          facilityId: coverageEligibilityRequestEntity?.facility?.id,
+          coverages: coverageEligibilityRequestEntity?.coverages?.map(e => e.id.toString()),
+        };
 
   return (
     <div>
@@ -88,168 +113,157 @@ export const CoverageEligibilityRequestUpdate = (props: ICoverageEligibilityRequ
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : coverageEligibilityRequestEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="coverage-eligibility-request-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="coverage-eligibility-request-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="coverage-eligibility-request-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="guidLabel" for="coverage-eligibility-request-guid">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.guid">Guid</Translate>
-                </Label>
-                <AvField id="coverage-eligibility-request-guid" data-cy="guid" type="text" name="guid" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="parsedLabel" for="coverage-eligibility-request-parsed">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.parsed">Parsed</Translate>
-                </Label>
-                <AvField id="coverage-eligibility-request-parsed" data-cy="parsed" type="text" name="parsed" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="priorityLabel" for="coverage-eligibility-request-priority">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.priority">Priority</Translate>
-                </Label>
-                <AvInput
-                  id="coverage-eligibility-request-priority"
-                  data-cy="priority"
-                  type="select"
-                  className="form-control"
-                  name="priority"
-                  value={(!isNew && coverageEligibilityRequestEntity.priority) || 'Stat'}
-                >
-                  <option value="Stat">{translate('hcpNphiesPortalApp.PriorityEnum.Stat')}</option>
-                  <option value="Normal">{translate('hcpNphiesPortalApp.PriorityEnum.Normal')}</option>
-                  <option value="Deferred">{translate('hcpNphiesPortalApp.PriorityEnum.Deferred')}</option>
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label id="identifierLabel" for="coverage-eligibility-request-identifier">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.identifier">Identifier</Translate>
-                </Label>
-                <AvField id="coverage-eligibility-request-identifier" data-cy="identifier" type="text" name="identifier" />
-              </AvGroup>
-              <AvGroup>
-                <Label id="servicedDateLabel" for="coverage-eligibility-request-servicedDate">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.servicedDate">Serviced Date</Translate>
-                </Label>
-                <AvInput
-                  id="coverage-eligibility-request-servicedDate"
-                  data-cy="servicedDate"
-                  type="datetime-local"
-                  className="form-control"
-                  name="servicedDate"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.coverageEligibilityRequestEntity.servicedDate)}
-                  validate={{
-                    required: { value: true, errorMessage: translate('entity.validation.required') },
-                  }}
-                />
-              </AvGroup>
-              <AvGroup>
-                <Label id="servicedDateEndLabel" for="coverage-eligibility-request-servicedDateEnd">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.servicedDateEnd">Serviced Date End</Translate>
-                </Label>
-                <AvInput
-                  id="coverage-eligibility-request-servicedDateEnd"
-                  data-cy="servicedDateEnd"
-                  type="datetime-local"
-                  className="form-control"
-                  name="servicedDateEnd"
-                  placeholder={'YYYY-MM-DD HH:mm'}
-                  value={
-                    isNew ? displayDefaultDateTime() : convertDateTimeFromServer(props.coverageEligibilityRequestEntity.servicedDateEnd)
-                  }
-                />
-              </AvGroup>
-              <AvGroup>
-                <Label for="coverage-eligibility-request-patient">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.patient">Patient</Translate>
-                </Label>
-                <AvInput
-                  id="coverage-eligibility-request-patient"
-                  data-cy="patient"
-                  type="select"
-                  className="form-control"
-                  name="patientId"
-                >
-                  <option value="" key="0" />
-                  {patients
-                    ? patients.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="coverage-eligibility-request-provider">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.provider">Provider</Translate>
-                </Label>
-                <AvInput
-                  id="coverage-eligibility-request-provider"
-                  data-cy="provider"
-                  type="select"
-                  className="form-control"
-                  name="providerId"
-                >
-                  <option value="" key="0" />
-                  {organizations
-                    ? organizations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="coverage-eligibility-request-insurer">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.insurer">Insurer</Translate>
-                </Label>
-                <AvInput
-                  id="coverage-eligibility-request-insurer"
-                  data-cy="insurer"
-                  type="select"
-                  className="form-control"
-                  name="insurerId"
-                >
-                  <option value="" key="0" />
-                  {organizations
-                    ? organizations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <AvGroup>
-                <Label for="coverage-eligibility-request-facility">
-                  <Translate contentKey="hcpNphiesPortalApp.coverageEligibilityRequest.facility">Facility</Translate>
-                </Label>
-                <AvInput
-                  id="coverage-eligibility-request-facility"
-                  data-cy="facility"
-                  type="select"
-                  className="form-control"
-                  name="facilityId"
-                >
-                  <option value="" key="0" />
-                  {locations
-                    ? locations.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/coverage-eligibility-request" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.guid')}
+                id="coverage-eligibility-request-guid"
+                name="guid"
+                data-cy="guid"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.parsed')}
+                id="coverage-eligibility-request-parsed"
+                name="parsed"
+                data-cy="parsed"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.priority')}
+                id="coverage-eligibility-request-priority"
+                name="priority"
+                data-cy="priority"
+                type="select"
+              >
+                <option value="Stat">{translate('hcpNphiesPortalApp.PriorityEnum.Stat')}</option>
+                <option value="Normal">{translate('hcpNphiesPortalApp.PriorityEnum.Normal')}</option>
+                <option value="Deferred">{translate('hcpNphiesPortalApp.PriorityEnum.Deferred')}</option>
+              </ValidatedField>
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.identifier')}
+                id="coverage-eligibility-request-identifier"
+                name="identifier"
+                data-cy="identifier"
+                type="text"
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.servicedDate')}
+                id="coverage-eligibility-request-servicedDate"
+                name="servicedDate"
+                data-cy="servicedDate"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+                validate={{
+                  required: { value: true, message: translate('entity.validation.required') },
+                }}
+              />
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.servicedDateEnd')}
+                id="coverage-eligibility-request-servicedDateEnd"
+                name="servicedDateEnd"
+                data-cy="servicedDateEnd"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+              />
+              <ValidatedField
+                id="coverage-eligibility-request-patient"
+                name="patientId"
+                data-cy="patient"
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.patient')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {patients
+                  ? patients.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="coverage-eligibility-request-provider"
+                name="providerId"
+                data-cy="provider"
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.provider')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {organizations
+                  ? organizations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="coverage-eligibility-request-insurer"
+                name="insurerId"
+                data-cy="insurer"
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.insurer')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {organizations
+                  ? organizations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                id="coverage-eligibility-request-facility"
+                name="facilityId"
+                data-cy="facility"
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.facility')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {locations
+                  ? locations.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.coverageEligibilityRequest.coverages')}
+                id="coverage-eligibility-request-coverages"
+                data-cy="coverages"
+                type="select"
+                multiple
+                name="coverages"
+              >
+                <option value="" key="0" />
+                {coverages
+                  ? coverages.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button
+                tag={Link}
+                id="cancel-save"
+                data-cy="entityCreateCancelButton"
+                to="/coverage-eligibility-request"
+                replace
+                color="info"
+              >
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -262,7 +276,7 @@ export const CoverageEligibilityRequestUpdate = (props: ICoverageEligibilityRequ
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -270,27 +284,4 @@ export const CoverageEligibilityRequestUpdate = (props: ICoverageEligibilityRequ
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  patients: storeState.patient.entities,
-  organizations: storeState.organization.entities,
-  locations: storeState.location.entities,
-  coverageEligibilityRequestEntity: storeState.coverageEligibilityRequest.entity,
-  loading: storeState.coverageEligibilityRequest.loading,
-  updating: storeState.coverageEligibilityRequest.updating,
-  updateSuccess: storeState.coverageEligibilityRequest.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getPatients,
-  getOrganizations,
-  getLocations,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(CoverageEligibilityRequestUpdate);
+export default CoverageEligibilityRequestUpdate;

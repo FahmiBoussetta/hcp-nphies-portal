@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './insurance-benefit.reducer';
 import { IInsuranceBenefit } from 'app/shared/model/insurance-benefit.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IInsuranceBenefitProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const InsuranceBenefit = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const InsuranceBenefit = (props: IInsuranceBenefitProps) => {
+  const insuranceBenefitList = useAppSelector(state => state.insuranceBenefit.entities);
+  const loading = useAppSelector(state => state.insuranceBenefit.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { insuranceBenefitList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="insurance-benefit-heading" data-cy="InsuranceBenefitHeading">
@@ -127,16 +130,4 @@ export const InsuranceBenefit = (props: IInsuranceBenefitProps) => {
   );
 };
 
-const mapStateToProps = ({ insuranceBenefit }: IRootState) => ({
-  insuranceBenefitList: insuranceBenefit.entities,
-  loading: insuranceBenefit.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(InsuranceBenefit);
+export default InsuranceBenefit;

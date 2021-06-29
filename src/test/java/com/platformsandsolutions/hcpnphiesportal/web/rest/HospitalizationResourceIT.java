@@ -276,7 +276,10 @@ class HospitalizationResourceIT {
         Hospitalization partialUpdatedHospitalization = new Hospitalization();
         partialUpdatedHospitalization.setId(hospitalization.getId());
 
-        partialUpdatedHospitalization.admitSource(UPDATED_ADMIT_SOURCE).reAdmission(UPDATED_RE_ADMISSION);
+        partialUpdatedHospitalization
+            .admitSource(UPDATED_ADMIT_SOURCE)
+            .reAdmission(UPDATED_RE_ADMISSION)
+            .dischargeDisposition(UPDATED_DISCHARGE_DISPOSITION);
 
         restHospitalizationMockMvc
             .perform(
@@ -292,7 +295,7 @@ class HospitalizationResourceIT {
         Hospitalization testHospitalization = hospitalizationList.get(hospitalizationList.size() - 1);
         assertThat(testHospitalization.getAdmitSource()).isEqualTo(UPDATED_ADMIT_SOURCE);
         assertThat(testHospitalization.getReAdmission()).isEqualTo(UPDATED_RE_ADMISSION);
-        assertThat(testHospitalization.getDischargeDisposition()).isEqualTo(DEFAULT_DISCHARGE_DISPOSITION);
+        assertThat(testHospitalization.getDischargeDisposition()).isEqualTo(UPDATED_DISCHARGE_DISPOSITION);
     }
 
     @Test

@@ -285,7 +285,7 @@ class ResponseInsuranceResourceIT {
         ResponseInsurance partialUpdatedResponseInsurance = new ResponseInsurance();
         partialUpdatedResponseInsurance.setId(responseInsurance.getId());
 
-        partialUpdatedResponseInsurance.notInforceReason(UPDATED_NOT_INFORCE_REASON).benefitEnd(UPDATED_BENEFIT_END);
+        partialUpdatedResponseInsurance.benefitStart(UPDATED_BENEFIT_START);
 
         restResponseInsuranceMockMvc
             .perform(
@@ -299,10 +299,10 @@ class ResponseInsuranceResourceIT {
         List<ResponseInsurance> responseInsuranceList = responseInsuranceRepository.findAll();
         assertThat(responseInsuranceList).hasSize(databaseSizeBeforeUpdate);
         ResponseInsurance testResponseInsurance = responseInsuranceList.get(responseInsuranceList.size() - 1);
-        assertThat(testResponseInsurance.getNotInforceReason()).isEqualTo(UPDATED_NOT_INFORCE_REASON);
+        assertThat(testResponseInsurance.getNotInforceReason()).isEqualTo(DEFAULT_NOT_INFORCE_REASON);
         assertThat(testResponseInsurance.getInforce()).isEqualTo(DEFAULT_INFORCE);
-        assertThat(testResponseInsurance.getBenefitStart()).isEqualTo(DEFAULT_BENEFIT_START);
-        assertThat(testResponseInsurance.getBenefitEnd()).isEqualTo(UPDATED_BENEFIT_END);
+        assertThat(testResponseInsurance.getBenefitStart()).isEqualTo(UPDATED_BENEFIT_START);
+        assertThat(testResponseInsurance.getBenefitEnd()).isEqualTo(DEFAULT_BENEFIT_END);
     }
 
     @Test

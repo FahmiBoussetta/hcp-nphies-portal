@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './givens.reducer';
 
-export interface IGivensDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const GivensDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const GivensDeleteDialog = (props: IGivensDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const givensEntity = useAppSelector(state => state.givens.entity);
+  const updateSuccess = useAppSelector(state => state.givens.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/givens');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.givensEntity.id);
+    dispatch(deleteEntity(givensEntity.id));
   };
 
-  const { givensEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="givensDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const GivensDeleteDialog = (props: IGivensDeleteDialogProps) => {
   );
 };
 
-const mapStateToProps = ({ givens }: IRootState) => ({
-  givensEntity: givens.entity,
-  updateSuccess: givens.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(GivensDeleteDialog);
+export default GivensDeleteDialog;

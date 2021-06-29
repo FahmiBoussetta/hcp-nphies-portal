@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, Col, Row, Table } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
 import { getEntities } from './diagnosis.reducer';
 import { IDiagnosis } from 'app/shared/model/diagnosis.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IDiagnosisProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
+export const Diagnosis = (props: RouteComponentProps<{ url: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const Diagnosis = (props: IDiagnosisProps) => {
+  const diagnosisList = useAppSelector(state => state.diagnosis.entities);
+  const loading = useAppSelector(state => state.diagnosis.loading);
+
   useEffect(() => {
-    props.getEntities();
+    dispatch(getEntities({}));
   }, []);
 
   const handleSyncList = () => {
-    props.getEntities();
+    dispatch(getEntities({}));
   };
 
-  const { diagnosisList, match, loading } = props;
+  const { match } = props;
+
   return (
     <div>
       <h2 id="diagnosis-heading" data-cy="DiagnosisHeading">
@@ -119,16 +122,4 @@ export const Diagnosis = (props: IDiagnosisProps) => {
   );
 };
 
-const mapStateToProps = ({ diagnosis }: IRootState) => ({
-  diagnosisList: diagnosis.entities,
-  loading: diagnosis.loading,
-});
-
-const mapDispatchToProps = {
-  getEntities,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(Diagnosis);
+export default Diagnosis;

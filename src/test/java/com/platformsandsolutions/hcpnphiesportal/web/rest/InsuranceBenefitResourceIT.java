@@ -257,6 +257,8 @@ class InsuranceBenefitResourceIT {
         InsuranceBenefit partialUpdatedInsuranceBenefit = new InsuranceBenefit();
         partialUpdatedInsuranceBenefit.setId(insuranceBenefit.getId());
 
+        partialUpdatedInsuranceBenefit.allowed(UPDATED_ALLOWED);
+
         restInsuranceBenefitMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedInsuranceBenefit.getId())
@@ -269,7 +271,7 @@ class InsuranceBenefitResourceIT {
         List<InsuranceBenefit> insuranceBenefitList = insuranceBenefitRepository.findAll();
         assertThat(insuranceBenefitList).hasSize(databaseSizeBeforeUpdate);
         InsuranceBenefit testInsuranceBenefit = insuranceBenefitList.get(insuranceBenefitList.size() - 1);
-        assertThat(testInsuranceBenefit.getAllowed()).isEqualTo(DEFAULT_ALLOWED);
+        assertThat(testInsuranceBenefit.getAllowed()).isEqualTo(UPDATED_ALLOWED);
         assertThat(testInsuranceBenefit.getUsed()).isEqualTo(DEFAULT_USED);
     }
 

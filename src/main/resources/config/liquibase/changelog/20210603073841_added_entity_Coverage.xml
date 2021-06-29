@@ -47,9 +47,6 @@
             <column name="payor_id" type="bigint">
                 <constraints nullable="true" unique="true" uniqueConstraintName="ux_coverage__payor_id" />
             </column>
-            <column name="coverage_eligibility_request_id" type="bigint">
-                <constraints nullable="true" />
-            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>

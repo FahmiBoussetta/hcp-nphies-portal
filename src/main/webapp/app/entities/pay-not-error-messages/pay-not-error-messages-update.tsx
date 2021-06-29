@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
-import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
-import { Translate, translate } from 'react-jhipster';
+import { Button, Row, Col, FormText } from 'reactstrap';
+import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IRootState } from 'app/shared/reducers';
 
 import { IPaymentNotice } from 'app/shared/model/payment-notice.model';
 import { getEntities as getPaymentNotices } from 'app/entities/payment-notice/payment-notice.reducer';
@@ -13,13 +10,18 @@ import { getEntity, updateEntity, createEntity, reset } from './pay-not-error-me
 import { IPayNotErrorMessages } from 'app/shared/model/pay-not-error-messages.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export interface IPayNotErrorMessagesUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const PayNotErrorMessagesUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const PayNotErrorMessagesUpdate = (props: IPayNotErrorMessagesUpdateProps) => {
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
-  const { payNotErrorMessagesEntity, paymentNotices, loading, updating } = props;
+  const paymentNotices = useAppSelector(state => state.paymentNotice.entities);
+  const payNotErrorMessagesEntity = useAppSelector(state => state.payNotErrorMessages.entity);
+  const loading = useAppSelector(state => state.payNotErrorMessages.loading);
+  const updating = useAppSelector(state => state.payNotErrorMessages.updating);
+  const updateSuccess = useAppSelector(state => state.payNotErrorMessages.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/pay-not-error-messages');
@@ -27,35 +29,41 @@ export const PayNotErrorMessagesUpdate = (props: IPayNotErrorMessagesUpdateProps
 
   useEffect(() => {
     if (isNew) {
-      props.reset();
+      dispatch(reset());
     } else {
-      props.getEntity(props.match.params.id);
+      dispatch(getEntity(props.match.params.id));
     }
 
-    props.getPaymentNotices();
+    dispatch(getPaymentNotices({}));
   }, []);
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
-  const saveEntity = (event, errors, values) => {
-    if (errors.length === 0) {
-      const entity = {
-        ...payNotErrorMessagesEntity,
-        ...values,
-        paymentNotice: paymentNotices.find(it => it.id.toString() === values.paymentNoticeId.toString()),
-      };
+  const saveEntity = values => {
+    const entity = {
+      ...payNotErrorMessagesEntity,
+      ...values,
+      paymentNotice: paymentNotices.find(it => it.id.toString() === values.paymentNoticeId.toString()),
+    };
 
-      if (isNew) {
-        props.createEntity(entity);
-      } else {
-        props.updateEntity(entity);
-      }
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
     }
   };
+
+  const defaultValues = () =>
+    isNew
+      ? {}
+      : {
+          ...payNotErrorMessagesEntity,
+          paymentNoticeId: payNotErrorMessagesEntity?.paymentNotice?.id,
+        };
 
   return (
     <div>
@@ -73,43 +81,41 @@ export const PayNotErrorMessagesUpdate = (props: IPayNotErrorMessagesUpdateProps
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <AvForm model={isNew ? {} : payNotErrorMessagesEntity} onSubmit={saveEntity}>
+            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <AvGroup>
-                  <Label for="pay-not-error-messages-id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvInput id="pay-not-error-messages-id" type="text" className="form-control" name="id" required readOnly />
-                </AvGroup>
+                <ValidatedField
+                  name="id"
+                  required
+                  readOnly
+                  id="pay-not-error-messages-id"
+                  label={translate('global.field.id')}
+                  validate={{ required: true }}
+                />
               ) : null}
-              <AvGroup>
-                <Label id="messageLabel" for="pay-not-error-messages-message">
-                  <Translate contentKey="hcpNphiesPortalApp.payNotErrorMessages.message">Message</Translate>
-                </Label>
-                <AvField id="pay-not-error-messages-message" data-cy="message" type="text" name="message" />
-              </AvGroup>
-              <AvGroup>
-                <Label for="pay-not-error-messages-paymentNotice">
-                  <Translate contentKey="hcpNphiesPortalApp.payNotErrorMessages.paymentNotice">Payment Notice</Translate>
-                </Label>
-                <AvInput
-                  id="pay-not-error-messages-paymentNotice"
-                  data-cy="paymentNotice"
-                  type="select"
-                  className="form-control"
-                  name="paymentNoticeId"
-                >
-                  <option value="" key="0" />
-                  {paymentNotices
-                    ? paymentNotices.map(otherEntity => (
-                        <option value={otherEntity.id} key={otherEntity.id}>
-                          {otherEntity.id}
-                        </option>
-                      ))
-                    : null}
-                </AvInput>
-              </AvGroup>
-              <Button tag={Link} id="cancel-save" to="/pay-not-error-messages" replace color="info">
+              <ValidatedField
+                label={translate('hcpNphiesPortalApp.payNotErrorMessages.message')}
+                id="pay-not-error-messages-message"
+                name="message"
+                data-cy="message"
+                type="text"
+              />
+              <ValidatedField
+                id="pay-not-error-messages-paymentNotice"
+                name="paymentNoticeId"
+                data-cy="paymentNotice"
+                label={translate('hcpNphiesPortalApp.payNotErrorMessages.paymentNotice')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {paymentNotices
+                  ? paymentNotices.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/pay-not-error-messages" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -122,7 +128,7 @@ export const PayNotErrorMessagesUpdate = (props: IPayNotErrorMessagesUpdateProps
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </AvForm>
+            </ValidatedForm>
           )}
         </Col>
       </Row>
@@ -130,23 +136,4 @@ export const PayNotErrorMessagesUpdate = (props: IPayNotErrorMessagesUpdateProps
   );
 };
 
-const mapStateToProps = (storeState: IRootState) => ({
-  paymentNotices: storeState.paymentNotice.entities,
-  payNotErrorMessagesEntity: storeState.payNotErrorMessages.entity,
-  loading: storeState.payNotErrorMessages.loading,
-  updating: storeState.payNotErrorMessages.updating,
-  updateSuccess: storeState.payNotErrorMessages.updateSuccess,
-});
-
-const mapDispatchToProps = {
-  getPaymentNotices,
-  getEntity,
-  updateEntity,
-  createEntity,
-  reset,
-};
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(PayNotErrorMessagesUpdate);
+export default PayNotErrorMessagesUpdate;

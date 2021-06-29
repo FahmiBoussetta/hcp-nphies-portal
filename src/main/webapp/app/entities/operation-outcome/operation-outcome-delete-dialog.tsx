@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IRootState } from 'app/shared/reducers';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntity, deleteEntity } from './operation-outcome.reducer';
 
-export interface IOperationOutcomeDeleteDialogProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
+export const OperationOutcomeDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
+  const dispatch = useAppDispatch();
 
-export const OperationOutcomeDeleteDialog = (props: IOperationOutcomeDeleteDialogProps) => {
   useEffect(() => {
-    props.getEntity(props.match.params.id);
+    dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const operationOutcomeEntity = useAppSelector(state => state.operationOutcome.entity);
+  const updateSuccess = useAppSelector(state => state.operationOutcome.updateSuccess);
 
   const handleClose = () => {
     props.history.push('/operation-outcome');
   };
 
   useEffect(() => {
-    if (props.updateSuccess) {
+    if (updateSuccess) {
       handleClose();
     }
-  }, [props.updateSuccess]);
+  }, [updateSuccess]);
 
   const confirmDelete = () => {
-    props.deleteEntity(props.operationOutcomeEntity.id);
+    dispatch(deleteEntity(operationOutcomeEntity.id));
   };
 
-  const { operationOutcomeEntity } = props;
   return (
     <Modal isOpen toggle={handleClose}>
       <ModalHeader toggle={handleClose} data-cy="operationOutcomeDeleteDialogHeading">
@@ -56,14 +57,4 @@ export const OperationOutcomeDeleteDialog = (props: IOperationOutcomeDeleteDialo
   );
 };
 
-const mapStateToProps = ({ operationOutcome }: IRootState) => ({
-  operationOutcomeEntity: operationOutcome.entity,
-  updateSuccess: operationOutcome.updateSuccess,
-});
-
-const mapDispatchToProps = { getEntity, deleteEntity };
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-type DispatchProps = typeof mapDispatchToProps;
-
-export default connect(mapStateToProps, mapDispatchToProps)(OperationOutcomeDeleteDialog);
+export default OperationOutcomeDeleteDialog;
